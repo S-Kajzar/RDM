@@ -1,0 +1,13 @@
+{
+  "name": "rdm-exercices-interactifs",
+  "private": true,
+  "description": "Exercice interactif autonome : traction, compression et cisaillement",
+  "scripts": {
+    "images": "bash outils/preparer-images.sh",
+    "generer": "python3 src/generer.py",
+    "test": "node --test tests/*.test.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.56.1"
+  }
+}

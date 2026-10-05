@@ -1,0 +1,1740 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- ===================================================================
+     GABARIT — exercice interactif autonome (aucune dépendance externe).
+     À FAIRE pour un nouveau sujet :
+       1. remplacer les textes entre crochets et le contenu de démonstration ;
+       2. intégrer les images (documents, figures, fonds de DR) en data URI ;
+       3. décrire chaque question dans __QCFG__ et chaque tracé dans __SKCFG__ ;
+       4. décrire les parties et leurs durées dans __PARTS__ (la durée fixe
+          la pondération) ;
+       5. ajouter une entrée DECOR et DR_NAMES par fond de tracé.
+     NE PAS MODIFIER : le bloc <style>, le moteur Grading et le moteur
+     applicatif — ils portent la charte graphique et toute la mécanique
+     (modes, chronomètre, notation pondérée, impression, tracés).
+     =================================================================== -->
+<title>[Titre de l'exercice] — exercice interactif</title>
+<meta name="description" content="[Notions travaillées dans l'exercice.]">
+<style>:root{
+  --beton:#E3E5E0; --papier:#FFFFFF; --encre:#1C2530; --encre-2:#46525C;
+  --trait:#A5ADAA; --trait-fin:#D3D8D5;
+  --jaune:#F2B705; --jaune-pale:#FFF3C4;
+  --bleu:#1F5FA8; --bleu-pale:#E6EEF8;
+  --vert:#1B7A43; --vert-pale:#E2F1E7; --rouge:#B42318; --rouge-pale:#FBE6E4;
+  --orange:#B26A00; --orange-pale:#FCEFD8;
+  --f-titre:"Bahnschrift","DIN Alternate","DIN Condensed","Roboto Condensed","Arial Narrow",sans-serif;
+  --f-texte:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --rail:58px; --panel:min(900px, 47vw); --banner:58px;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:16px; scroll-padding-bottom:calc(var(--banner) + 16px)}
+body{margin:0; background:var(--beton); color:var(--encre); font:16px/1.55 var(--f-texte);
+  font-variant-numeric:tabular-nums; padding-bottom:calc(var(--banner) + 40px)}
+img{max-width:100%; height:auto}
+sub,sup{line-height:0}
+button,input{font:inherit; color:inherit}
+:focus-visible{outline:3px solid var(--bleu); outline-offset:2px}
+.small{font-size:.9rem; color:var(--encre-2)}
+.print-only{display:none}
+
+/* ---------- mise en page ---------- */
+.page{max-width:900px; margin:0 auto; padding:28px 22px 0; transition:margin .25s ease}
+body.panel-open .page{margin-right:calc(var(--panel) + var(--rail) + 24px); margin-left:24px}
+@media (max-width:1180px){ body.panel-open .page{margin:0 auto} }
+
+/* ---------- cartouche ---------- */
+.cartouche{background:var(--papier); border:2px solid var(--encre); display:grid;
+  grid-template-columns:1fr; margin-bottom:26px}
+.cartouche>div{border-right:1px solid var(--encre); border-bottom:1px solid var(--encre); padding:8px 12px}
+.cartouche>div:nth-child(3n){border-right:0}
+.cartouche .k{display:block; font:600 .72rem/1.2 var(--f-titre); letter-spacing:.02em; color:var(--encre-2)}
+.cartouche .v{font:600 1rem/1.3 var(--f-titre)}
+.cartouche .title{grid-column:1/-1; border-right:0; padding:18px 16px 16px}
+.cartouche h1{margin-top:0}
+.cartouche h1{font:700 clamp(1.6rem,3.6vw,2.35rem)/1.08 var(--f-titre); margin:2px 0 6px; letter-spacing:-.01em}
+.cartouche .title p{margin:0; color:var(--encre-2)}
+.cartouche .nom{grid-column:1/-1; border-bottom:0; display:flex; gap:10px; align-items:center}
+.cartouche .nom label{font:600 .9rem var(--f-titre)}
+.cartouche .nom input{flex:1; border:0; border-bottom:1px dashed var(--trait); padding:4px 2px; background:transparent}
+
+
+.consignes{background:var(--papier); border-left:6px solid var(--jaune); padding:12px 16px; margin:0 0 30px}
+.consignes p{margin:.2rem 0}
+
+/* ---------- parties ---------- */
+.part{background:var(--papier); margin:0 0 34px; padding:0 0 22px; border:1px solid var(--trait-fin)}
+.part-head{display:grid; grid-template-columns:64px 1fr; border-bottom:2px solid var(--encre)}
+.part-num{background:var(--encre); color:var(--jaune); font:700 2.3rem/1 var(--f-titre);
+  display:flex; align-items:center; justify-content:center}
+.part-head h2{font:700 1.45rem/1.15 var(--f-titre); margin:0; padding:12px 16px 2px}
+.part-head .duree{padding:0 16px 10px; font-size:.9rem; color:var(--encre-2)}
+.part-body{padding:4px 22px 0}
+.part-body>p,.part-body>ul{max-width:72ch}
+h4.sub{font:700 1.1rem var(--f-titre); margin:26px 0 6px; padding-top:10px; border-top:1px dashed var(--trait)}
+
+/* barre de question (reprend l'en-tête du questionnaire) */
+.qbar{display:grid; grid-template-columns:auto 1fr auto; align-items:stretch; margin:30px 0 10px;
+  border:1.5px solid var(--encre); font:500 .95rem/1.2 var(--f-titre)}
+.qbar>*{padding:7px 10px; display:flex; align-items:center; gap:6px; flex-wrap:wrap}
+.qbar .qb-num{background:var(--jaune); font-weight:700; font-size:1.1rem; border-right:1.5px solid var(--encre); min-width:64px; justify-content:center}
+.qbar .qb-ans{border-left:1.5px solid var(--encre)}
+.qbar .qb-title{grid-column:1/-1; border-top:1px solid var(--encre); font-weight:700; font-style:italic}
+@media (max-width:640px){ .qbar{grid-template-columns:auto 1fr} .qbar .qb-ans{grid-column:1/-1; border-left:0; border-top:1px solid var(--encre)} }
+.doc-chip{border:1.5px solid var(--encre); background:var(--papier); padding:2px 8px; font:700 .88rem var(--f-titre);
+  cursor:pointer; border-radius:2px}
+.doc-chip:hover{background:var(--jaune-pale)}
+.doc-chip[aria-pressed="true"]{background:var(--jaune)}
+
+/* données */
+.data{border:1px solid var(--encre); padding:8px 14px; margin:12px 0; max-width:72ch; background:#FBFBF9}
+.data p{margin:.25rem 0}
+.data .data-title{font:700 .95rem var(--f-titre); text-decoration:underline; text-underline-offset:3px}
+.data ul{margin:.2rem 0; padding-left:1.1rem}
+.data ul.cols{columns:2; column-gap:28px}
+@media (max-width:560px){ .data ul.cols{columns:1} }
+
+figure{margin:14px 0}
+.fig img,.fig svg{display:block; width:100%; height:auto; border:1px solid var(--trait-fin); background:#fff}
+figcaption{font-size:.85rem; color:var(--encre-2); margin-top:4px}
+.fig1 .lead line{stroke:#6B7580; stroke-width:1}
+.fig1 .lab text{font:600 15px var(--f-titre); fill:var(--encre)}
+.fig1 .dir{stroke:var(--encre); stroke-width:3; fill:none}
+.fig1 .dirhead{fill:var(--encre)}
+.split{display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap}
+.small-fig{width:220px; margin:0}
+
+.chain{display:flex; align-items:center; flex-wrap:wrap; gap:0; margin:18px 0 8px}
+.chain-box{border:2px solid var(--encre); padding:8px 10px; min-width:130px; text-align:center; background:#fff}
+.chain-box span{display:block; font-size:.9rem}
+.chain-box b{font:700 .95rem var(--f-titre)}
+.chain-arrow{width:34px; height:2px; background:var(--encre); position:relative; margin:0 2px}
+.chain-arrow::after{content:""; position:absolute; right:-1px; top:-5px; border:6px solid transparent; border-left:9px solid var(--encre); border-right:0}
+.chain figcaption{flex-basis:100%}
+
+table.t{border-collapse:collapse; margin:10px 0; font-size:.93rem; width:100%}
+table.t th,table.t td{border:1px solid var(--trait); padding:4px 8px; text-align:left; vertical-align:top}
+table.t th{background:#EEF0EC; font:600 .88rem var(--f-titre)}
+table.nomencl{width:auto; min-width:210px}
+table.nomencl td:first-child{font-weight:700; text-align:center}
+
+.vec{position:relative; display:inline-block; font-style:italic}
+.vec::before{content:""; position:absolute; left:0; right:-1px; top:-.12em; height:1.2px; background:currentColor}
+.vec::after{content:""; position:absolute; right:-3px; top:-.32em; border:.2em solid transparent; border-left:.36em solid currentColor; border-right:0}
+
+/* ---------- questions ---------- */
+.q{margin:14px 0 6px; padding:10px 0 12px 14px; border-left:3px solid var(--trait-fin)}
+.q.is-ok{border-left-color:var(--vert)} .q.is-ko{border-left-color:var(--rouge)} .q.is-half{border-left-color:var(--orange)}
+.q-stem{margin:0 0 3px; max-width:74ch}
+.q-num{display:inline-block; font:700 .92rem var(--f-titre); background:var(--encre); color:#fff; padding:1px 7px; margin-right:6px; border-radius:2px}
+.q-hint{margin:0 0 8px; font-size:.88rem; color:var(--encre-2); max-width:74ch}
+.q-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+.q-input{flex:1 1 240px; max-width:420px; border:1.5px solid var(--encre-2); background:#fff; padding:7px 10px; border-radius:2px}
+.q-input:disabled{background:#F2F3F1; color:var(--encre); -webkit-text-fill-color:var(--encre)}
+.is-ok .q-input{border-color:var(--vert); background:var(--vert-pale)}
+.is-half .q-input{border-color:var(--orange); background:var(--orange-pale)}
+.is-ko .q-input{border-color:var(--rouge); background:var(--rouge-pale)}
+.btn{border:1.5px solid var(--encre); background:var(--encre); color:#fff; padding:7px 14px; border-radius:2px; cursor:pointer; font-weight:600}
+.btn:hover{background:#2E3B47}
+.btn:disabled{background:#9AA2A8; border-color:#9AA2A8; cursor:not-allowed}
+.btn.ghost{background:#fff; color:var(--encre)}
+.btn.ghost:hover{background:var(--jaune-pale)}
+.q-status{font-weight:700; font-size:.95rem}
+.is-ok .q-status{color:var(--vert)} .is-ko .q-status{color:var(--rouge)} .is-half .q-status{color:var(--orange)}
+.q-msg{margin:4px 0 0; font-size:.88rem; color:var(--rouge); min-height:0}
+.q-msg:empty{display:none}
+.q-expl{margin-top:10px; background:#F6F7F4; border:1px solid var(--trait-fin); padding:8px 14px; max-width:78ch}
+.is-ok .q-expl{border-top:3px solid var(--vert)} .is-ko .q-expl{border-top:3px solid var(--rouge)} .is-half .q-expl{border-top:3px solid var(--orange)}
+.q-unit-msg{margin:.1rem 0 .4rem; font-weight:600; color:var(--orange)}
+.q-unit-msg[hidden]{display:none}
+.q-expl p{margin:.35rem 0}
+.q-expected span,.q-yours span.lab{font:700 .9rem var(--f-titre)}
+.q-expl ul,.q-expl ol{padding-left:1.2rem; margin:.3rem 0}
+.q-expl li{margin:.2rem 0}
+.cor-imgs{display:flex; gap:14px; flex-wrap:wrap; margin-top:8px}
+.cor-imgs figure{margin:0; flex:1 1 260px}
+.cor-imgs img{border:1px solid var(--trait-fin); background:#fff; display:block}
+.reveal{animation:reveal .35s ease-out}
+@keyframes reveal{from{opacity:0; transform:translateY(-4px)}to{opacity:1; transform:none}}
+
+/* ---------- FAST ---------- */
+.fast-wrap{overflow-x:auto; padding:6px 0 4px}
+.fast{display:grid; min-width:720px; grid-template-columns:138px 24px 112px 24px minmax(180px,1fr) 18px 178px; grid-auto-rows:minmax(64px,auto);
+  font-size:.84rem; line-height:1.25}
+.fast .box{border:1.5px solid var(--encre); background:#fff; padding:6px 8px; align-self:center}
+.fast .fp{grid-column:1; grid-row:1/9; font-weight:700}
+.fast .ft{grid-column:3}
+.fast .ft2{grid-column:5}
+.fast .sol{grid-column:7; align-self:center}
+.fast .sol input{width:100%; border:1.5px dashed var(--encre-2); padding:9px 8px; background:#fff; border-radius:0; font-size:.9rem}
+.fast .sol.is-ok input{border:2px solid var(--vert); background:var(--vert-pale)}
+.fast .sol.is-ko input{border:2px solid var(--rouge); background:var(--rouge-pale)}
+.fast .sol .mark{display:block; font-size:.78rem; font-weight:700; margin-top:2px; min-height:1em}
+.fast .sol.is-ok .mark{color:var(--vert)} .fast .sol.is-ko .mark{color:var(--rouge)}
+.fast .cn{position:relative}
+.fast .cn::before{content:""; position:absolute; left:0; right:0; top:50%; border-top:1.5px solid var(--encre)}
+.fast .bus{position:relative}
+.fast .bus::before{content:""; position:absolute; left:0; right:0; top:50%; border-top:1.5px solid var(--encre)}
+.fast .bus::after{content:""; position:absolute; left:0; top:0; bottom:0; border-left:1.5px solid var(--encre)}
+.fast .bus.first::after{top:50%} .fast .bus.last::after{bottom:50%}
+.fast .bus.mid::before{display:none}
+.fast .ft.grp{position:relative}
+.fast .ft.grp::before{content:""; position:absolute; right:100%; width:24px; top:50%; border-top:1.5px solid var(--encre)}
+.fast .dash::before{border-top-style:dashed}
+.fast .note{grid-column:5/8; align-self:center; color:var(--encre-2); font-style:italic; padding-left:8px}
+.fast-foot{display:flex; gap:10px; align-items:center; margin-top:10px; flex-wrap:wrap}
+
+/* ---------- tracés ---------- */
+.sketch{margin:14px 0 6px; padding:10px 0 12px 14px; border-left:3px dashed var(--bleu)}
+.sk-layout{display:flex; flex-direction:column-reverse; gap:8px}
+.sk-main{min-width:0}
+.sk-side{max-width:78ch}
+.sk-side p,.sk-side ul{margin:.2rem 0}
+.nomencl-grid{display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); border:1px solid var(--trait); font-size:.85rem; margin:2px 0 4px}
+.nomencl-grid span{padding:3px 8px; border-right:1px solid var(--trait-fin); border-bottom:1px solid var(--trait-fin)}
+.nomencl-grid b{font-family:var(--f-titre); margin-right:6px}
+@media (max-width:640px){ .nomencl-grid{grid-template-columns:repeat(2, minmax(0,1fr))} }
+.sk-toolbar{display:flex; flex-wrap:wrap; gap:4px; align-items:center; background:#EEF1F4; border:1px solid var(--trait); border-bottom:0; padding:5px}
+.sk-toolbar button{border:1px solid var(--trait); background:#fff; padding:4px 9px; font-size:.86rem; cursor:pointer; border-radius:2px; line-height:1.2}
+.sk-toolbar button[aria-pressed="true"]{background:var(--bleu); color:#fff; border-color:var(--bleu)}
+.sk-toolbar button:disabled{opacity:.45; cursor:not-allowed}
+.sk-toolbar .sep{width:1px; align-self:stretch; background:var(--trait); margin:0 4px}
+.sk-toolbar .tb-group{display:inline-flex; align-items:center; gap:4px; white-space:nowrap}
+.sk-toolbar .tb-lab{font:600 .78rem var(--f-titre); color:var(--encre-2); padding:0 2px}
+.sk-toolbar .zoom-val{font:600 .82rem var(--f-titre); min-width:3.6em; text-align:center}
+.sk-toolbar .btn-drprint{font-weight:600; border-color:var(--encre)}
+.sk-toolbar .btn-drprint:hover{background:var(--jaune-pale)}
+.sk-toolbar .sw{width:24px; height:24px; padding:0; border-radius:50%; border:2px solid #fff; outline:1px solid var(--trait)}
+.sk-toolbar .sw[aria-pressed="true"]{outline:2px solid var(--encre)}
+.sk-toolbar .spacer{flex:1}
+.sk-stage{position:relative; border:1px solid var(--trait); background:#fff; line-height:0; overflow:hidden}
+.sk-stage.zoomed{overflow:auto; max-height:min(72vh,640px)}
+/* au zoom, seule la largeur pilote la taille : la hauteur suit, sinon l'image est écrasée */
+.sk-stage.zoomed canvas{max-width:none!important; max-height:none!important; height:auto!important}
+.sk-stage canvas{display:block; width:100%; height:auto; touch-action:none; cursor:crosshair}
+.sketch.locked .sk-stage canvas{cursor:default; touch-action:auto}
+.sketch.tool-erase .sk-stage canvas{cursor:cell}
+.sk-toolbar button[data-tool="erase"][aria-pressed="true"]{background:var(--rouge); border-color:var(--rouge)}
+.sk-text{position:absolute; line-height:1.2; font:600 15px var(--f-texte); border:1.5px solid var(--bleu); padding:1px 4px; min-width:90px; background:#fff; z-index:2}
+.sk-foot{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:8px}
+.sk-meas{font-size:.85rem; color:var(--bleu); font-weight:600}
+.sk-corr-toggle{display:none; align-items:center; gap:6px; font-size:.92rem; cursor:pointer}
+.sketch.revealed .sk-corr-toggle{display:inline-flex}
+.sk-note{font-size:.86rem; color:var(--encre-2)}
+.sketch.is-full{position:fixed; inset:0; z-index:60; background:var(--beton); margin:0; padding:10px; border:0; overflow:auto; display:flex; flex-direction:column}
+.sketch.is-full .sk-side,.sketch.is-full .q-stem,.sketch.is-full .q-expl,.sketch.is-full .sk-note-wrap{display:none}
+.sketch.is-full .sk-layout{flex:1; min-height:0}
+.sketch.is-full .sk-main{display:flex; flex-direction:column; align-items:center; height:100%}
+.sketch.is-full .sk-toolbar{width:100%}
+.sketch.is-full .sk-stage{max-width:100%}
+.sketch.is-full .sk-stage.zoomed{max-height:calc(100vh - 150px); width:100%; align-self:stretch}
+.sketch.is-full .sk-stage canvas{width:auto; max-width:100%; max-height:calc(100vh - 120px)}
+body.sk-full-open{overflow:hidden}
+body.sk-full-open .banner,body.sk-full-open .rail{display:none}
+
+/* ---------- rail d'onglets ---------- */
+.rail{position:fixed; right:0; top:0; bottom:var(--banner); width:var(--rail); z-index:40; display:flex; flex-direction:column;
+  justify-content:center; gap:3px; padding:8px 0}
+.rail .grp{height:14px}
+.tab{display:block; width:100%; border:1.5px solid var(--encre); border-right:0; background:var(--papier); color:var(--encre);
+  font:700 .9rem/1 var(--f-titre); padding:10px 0 10px 4px; cursor:pointer; border-radius:4px 0 0 4px; text-align:center;
+  transform:translateX(6px); transition:transform .15s ease, background .15s}
+.tab.dt{background:var(--jaune)}
+.tab:hover{transform:translateX(0)}
+.tab[aria-selected="true"]{transform:translateX(0); background:var(--encre); color:var(--jaune)}
+@media (max-width:760px){ .rail{display:none} }
+
+/* ---------- panneau documents ---------- */
+#docpanel{position:fixed; top:0; bottom:var(--banner); right:var(--rail); width:var(--panel); z-index:45; background:var(--papier);
+  border-left:2px solid var(--encre); box-shadow:-10px 0 28px rgba(28,37,48,.18); display:flex; flex-direction:column;
+  transform:translateX(calc(100% + var(--rail) + 20px)); transition:transform .25s ease; visibility:hidden}
+body.panel-open #docpanel{transform:none; visibility:visible}
+@media (max-width:1180px){ :root{--panel:min(720px, calc(100vw - var(--rail) - 40px))} }
+@media (max-width:760px){ #docpanel{right:0; width:100vw} }
+.dp-head{display:flex; align-items:center; gap:8px; padding:8px 10px; border-bottom:1.5px solid var(--encre); background:#F4F5F2; flex-wrap:wrap}
+.dp-head h3{margin:0; font:700 1.05rem/1.2 var(--f-titre); flex:1; min-width:180px}
+.dp-head h3 small{display:block; font:500 .78rem var(--f-titre); color:var(--encre-2)}
+.dp-head button{border:1px solid var(--trait); background:#fff; padding:4px 9px; cursor:pointer; border-radius:2px}
+.dp-tabs{display:flex; gap:3px; padding:6px 10px; border-bottom:1px solid var(--trait-fin); overflow-x:auto}
+.dp-tabs button{border:1px solid var(--trait); background:#fff; font:700 .82rem var(--f-titre); padding:3px 8px; cursor:pointer; white-space:nowrap; border-radius:2px}
+.dp-tabs button[aria-selected="true"]{background:var(--encre); color:var(--jaune); border-color:var(--encre)}
+.dp-body{flex:1; overflow:auto; padding:12px; --z:1; background:#E9EBE7}
+.doc{display:none}
+.doc.active{display:block}
+.doc .doc-img{display:block; width:calc(var(--z) * 100%); max-width:none; background:#fff; border:1px solid var(--trait-fin); margin:0 auto 8px}
+.doc .doc-text{background:#fff; padding:6px 16px; width:calc(var(--z) * 100%); margin:0 auto 8px; font-size:calc(var(--z) * .95rem)}
+.doc .doc-text h3{font:700 1.1rem var(--f-titre)}
+.doc .doc-cap{width:calc(var(--z) * 100%); margin:-2px auto 10px; font-size:.85rem; color:var(--encre-2); background:#fff; padding:4px 10px}
+dl.steps dt{font:700 .98rem var(--f-titre); margin-top:10px}
+dl.steps dd{margin:2px 0 0 0}
+
+/* ---------- bandeau de note ---------- */
+.banner{position:fixed; left:0; right:0; bottom:0; height:var(--banner); z-index:50; background:var(--encre); color:#fff;
+  display:flex; align-items:center; gap:18px; padding:0 calc(var(--rail) + 14px) 0 18px; border-top:3px solid var(--jaune)}
+.banner .score{font:700 1.7rem/1 var(--f-titre); color:var(--jaune); min-width:5.5ch; white-space:nowrap}
+.banner .score small{font-size:.95rem; color:#fff}
+.banner .lab{font:600 .8rem/1.15 var(--f-titre); color:#C9D1D8}
+.banner .count{font-size:.9rem; color:#E7EBEE}
+.banner .spacer{flex:1}
+.banner .btn-docs{display:none; background:var(--jaune); color:var(--encre); border:0; padding:8px 12px; font:700 .9rem var(--f-titre); border-radius:2px; cursor:pointer}
+@media (max-width:760px){ .banner{padding:0 12px; gap:10px} .banner .btn-docs{display:block} .banner .count{font-size:.78rem} }
+
+/* ---------- auto-évaluation des tracés ---------- */
+.selfeval{margin:12px 0 4px; border:1.5px solid var(--bleu); background:var(--bleu-pale); padding:10px 14px; max-width:78ch}
+.selfeval[hidden]{display:none}
+.se-title{margin:0 0 2px; font:700 1rem var(--f-titre)}
+.se-lead{margin:0 0 8px; font-size:.9rem; color:var(--encre-2)}
+.se-item{display:flex; gap:8px; align-items:flex-start; padding:4px 0; border-top:1px solid rgba(31,95,168,.18); cursor:pointer; font-size:.94rem}
+.se-item input{margin-top:.25rem; width:17px; height:17px; flex:0 0 auto; accent-color:var(--bleu)}
+.se-item input:disabled{cursor:default}
+.se-foot{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:10px}
+.se-score{font-weight:700; color:var(--bleu)}
+.sketch.is-ok{border-left-color:var(--vert)} .sketch.is-half{border-left-color:var(--orange)} .sketch.is-ko{border-left-color:var(--rouge)}
+
+/* ---------- récapitulatif ---------- */
+.recap{background:var(--papier); border:2px solid var(--encre); margin:0 0 36px; padding:0 0 18px}
+.recap-head{border-bottom:2px solid var(--encre); padding:14px 20px 12px; background:#F4F5F2}
+.recap-head h2{margin:0 0 4px; font:700 1.5rem var(--f-titre)}
+.recap-head p{margin:0; max-width:74ch}
+.recap-wrap{overflow-x:auto; padding:14px 20px 0}
+.recap-table{min-width:620px}
+.recap-table th[scope="row"]{font-weight:600; text-align:left}
+.recap-table td,.recap-table th{vertical-align:middle}
+.recap-table .rc-note{font:700 1.05rem var(--f-titre); text-align:right; white-space:nowrap}
+.recap-table thead th{white-space:nowrap}
+.recap-table td:nth-child(2),.recap-table td:nth-child(3),.recap-table td:nth-child(6){white-space:nowrap}
+.recap-table th[scope="row"]{width:38%}
+.recap-table tfoot th{background:var(--encre); color:#fff; font:700 1.1rem var(--f-titre); border-color:var(--encre)}
+.recap-table tfoot th.final-note{color:var(--jaune); text-align:right; white-space:nowrap}
+.recap .final-detail{padding:8px 20px 0; margin:0; max-width:80ch}
+.recap-foot{display:flex; gap:12px; align-items:center; flex-wrap:wrap; padding:14px 20px 0}
+.recap-foot .btn{padding:10px 18px; font-size:1.02rem}
+
+@media (prefers-reduced-motion:reduce){ *{transition:none!important; animation:none!important} }
+
+/* ---------- impression ---------- */
+@media print{
+  @page{size:A4; margin:12mm}
+  :root{--banner:0px}
+  body{background:#fff; padding:0; font-size:10.5pt}
+  .rail,#docpanel,.banner,.btn,.sk-toolbar,.sk-stage,.sk-foot,.fast-foot button,.se-foot,.no-print,.q-msg,.sk-corr-toggle{display:none!important}
+  .print-only{display:block!important}
+  span.print-only{display:inline!important}
+  .page{max-width:none; margin:0!important; padding:0}
+  .part{border:0; margin:0 0 8mm; break-before:auto}
+  .part-head{break-after:avoid}
+  .qbar{break-after:avoid}
+  .q{break-inside:avoid}
+  .q-row .q-status{display:none!important}
+  .q-expl,.q-expl[hidden],.sketch .q-expl[hidden]{display:block!important; background:#fff}
+  .q-unit-msg[hidden]{display:none!important}
+  .q-input{border:1px solid #555!important}
+  .fast-wrap{overflow:visible}
+  .fast{min-width:0; grid-template-columns:120px 16px 100px 16px 1fr 12px 160px; font-size:8pt}
+  .sk-print{display:block!important; width:auto; max-width:100%; max-height:115mm; border:1px solid #999; margin:2px 0 6px; break-inside:avoid}
+  .sk-print:not([src]),.sk-print[src=""]{display:none!important}
+  .sk-print-wrap{display:grid!important; grid-template-columns:1fr; gap:4px}
+  .sk-print-wrap p{margin:2px 0; font:600 9pt var(--f-titre); break-after:avoid}
+  .cor-imgs img{max-height:120mm; width:auto}
+  .print-summary{border:2px solid #000; padding:6px 10px; margin:0 0 6mm}
+  .print-summary strong{font-size:14pt}
+  .selfeval{background:#fff!important; border:1px solid #666; break-inside:avoid}
+  .se-lead{display:none}
+  .recap{break-before:page; border:1.5px solid #000}
+  .recap-head{background:#fff}
+  .recap-wrap{overflow:visible; padding:8px 10px 0}
+  .recap-table{min-width:0; font-size:9.5pt}
+  .recap-table tfoot th{background:#000!important; color:#fff!important; -webkit-print-color-adjust:exact; print-color-adjust:exact}
+  .recap-foot{display:none}
+  a{color:inherit}
+}
+
+
+/* ==================== PAGE D'ACCUEIL ==================== */
+body.no-mode .page,body.no-mode .rail,body.no-mode .banner,body.no-mode #docpanel{display:none!important}
+body.no-mode{padding-bottom:0}
+body:not(.no-mode) #home{display:none}
+#home{min-height:100vh; padding:32px 20px 48px}
+.home-inner{max-width:1040px; margin:0 auto}
+.home-head{background:var(--papier); border:2px solid var(--encre); border-left:10px solid var(--jaune); padding:20px 24px}
+#home h1{margin:0 0 8px; font:700 clamp(1.7rem,4vw,2.6rem)/1.06 var(--f-titre); letter-spacing:-.01em}
+.home-sub{margin:0; max-width:78ch; color:var(--encre-2)}
+.home-hero{margin:18px 0 0; background:var(--papier); border:1px solid var(--trait); padding:10px}
+.home-hero img{display:block; width:100%; height:auto}
+.home-hero figcaption{margin-top:6px; padding:0 4px}
+.home-facts{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:14px 0 26px}
+.home-facts div{background:var(--encre); color:#fff; padding:10px 14px}
+.home-facts b{display:block; font:700 1.25rem var(--f-titre); color:var(--jaune)}
+.home-facts span{font-size:.85rem; color:#D7DDE2}
+@media (max-width:820px){ .home-facts{grid-template-columns:repeat(2,1fr)} }
+.home-choose{font:700 1.4rem var(--f-titre); margin:0 0 12px}
+.modes{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+@media (max-width:820px){ .modes{grid-template-columns:1fr} }
+.mode-card{background:var(--papier); border:2px solid var(--encre); padding:18px 20px 20px; display:flex; flex-direction:column}
+.mode-card.exam{border-color:var(--bleu)}
+.mc-head{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:2px}
+.mc-tag{font:700 .74rem var(--f-titre); background:var(--jaune); padding:2px 8px; letter-spacing:.04em}
+.mode-card.exam .mc-tag{background:var(--bleu); color:#fff}
+.mode-card h3{margin:0; font:700 1.35rem var(--f-titre)}
+.mc-lead{margin:2px 0 8px; font-weight:600; color:var(--encre-2)}
+.mode-card ul{margin:0 0 16px; padding-left:1.1rem}
+.mode-card li{margin:.3rem 0}
+.mode-card .btn{margin-top:auto; align-self:flex-start; padding:11px 18px; font-size:1.02rem}
+.mode-card.exam .btn{background:var(--bleu); border-color:var(--bleu)}
+.mode-card.exam .btn:hover{background:#17508F}
+.home-note{margin:18px 0 0}
+
+/* ==================== MODES ==================== */
+body:not(.mode-training) .only-training,body:not(.mode-exam) .only-exam{display:none}
+.print-nograde{display:none}
+.mode-exam .btn-validate,.mode-exam .btn-fast,.mode-exam .btn-sketch,
+.mode-exam:not(.graded) .exam-only-hide{display:none!important}
+.mode-exam:not(.graded) .score-block,.mode-training .exam-block,.mode-exam.graded .exam-block{display:none}
+.mode-exam:not(.graded) #recap-graded,.mode-exam:not(.graded) #recap-foot,
+.mode-exam.graded #exam-submit-wrap,.mode-training #exam-submit-wrap{display:none}
+.banner .exam-state{font:700 1.05rem var(--f-titre); color:var(--jaune)}
+#exam-submit-wrap{padding:16px 20px 4px}
+.es-lead{margin:0 0 10px; max-width:74ch}
+.btn-exam{background:var(--bleu); border-color:var(--bleu); padding:12px 20px; font-size:1.05rem}
+.btn-exam:hover{background:#17508F}
+.es-warn{margin:8px 0 0; color:var(--rouge); font-weight:600}
+.es-warn:empty{display:none}
+
+/* ==================== CHRONOMÈTRE ==================== */
+.timer-block{padding-left:4px}
+.banner .timer{font:700 1.3rem/1 var(--f-titre); color:#fff; font-variant-numeric:tabular-nums}
+.banner .timer.over{color:var(--jaune)}
+@media (max-width:760px){ .banner .count{display:none} }
+
+@media print{
+  #home{display:none!important}
+  body:not(.corrections-open) .print-note-line{display:none!important}
+  body:not(.corrections-open) .print-nograde{display:block!important; font-weight:600}
+  .banner{display:none!important}
+  body:not(.corrections-open) .q-expl,body:not(.corrections-open) .selfeval,
+  body:not(.corrections-open) .sk-print-corr{display:none!important}
+  body:not(.corrections-open) #recap-graded{display:none!important}
+  #exam-submit-wrap{display:none!important}
+}
+
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+</head>
+<body class="no-mode">
+
+<!-- RAIL DES DOCUMENTS : un bouton par document, .dt pour le dossier technique -->
+<nav class="rail" aria-label="Dossiers de présentation et dossier technique">
+  <button type="button" class="tab" data-doc="DP1" aria-selected="false" title="Présentation">DP1</button>
+  <div class="grp" aria-hidden="true"></div>
+  <button type="button" class="tab dt" data-doc="DT1" aria-selected="false" title="Document technique">DT1</button>
+</nav>
+
+<aside id="docpanel" aria-label="Documents du sujet" aria-hidden="true">
+  <div class="dp-head">
+    <h3 id="dp-title">Documents</h3>
+    <button type="button" id="dp-out" aria-label="Réduire">−</button><span id="dp-zoom" class="small">100 %</span>
+    <button type="button" id="dp-in" aria-label="Agrandir">+</button>
+    <button type="button" id="dp-fit">Ajuster</button>
+    <button type="button" id="dp-close">Fermer</button>
+  </div>
+  <div class="dp-tabs" role="tablist" aria-label="Choisir un document">
+    <button type="button" data-doc="DP1" aria-selected="false">DP1</button>
+    <button type="button" data-doc="DT1" aria-selected="false">DT1</button>
+  </div>
+  <div class="dp-body">
+    <section class="doc" id="doc-DP1" data-title="DP1 : [intitulé]" data-kind="Dossier présentation">
+      <div class="doc-text"><h3>[Titre]</h3><p>[Texte du dossier de présentation.]</p></div>
+    </section>
+    <section class="doc" id="doc-DT1" data-title="DT1 : [intitulé]" data-kind="Dossier technique">
+      <img class="doc-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5MDAiIGhlaWdodD0iNTYwIj48cmVjdCB3aWR0aD0iOTAwIiBoZWlnaHQ9IjU2MCIgZmlsbD0iI2ZmZiIvPjxnIHN0cm9rZT0iI0QzRDhENSIgc3Ryb2tlLXdpZHRoPSIxIj48bGluZSB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iNTYwIi8+PGxpbmUgeDE9IjQwIiB5MT0iMCIgeDI9IjQwIiB5Mj0iNTYwIi8+PGxpbmUgeDE9IjgwIiB5MT0iMCIgeDI9IjgwIiB5Mj0iNTYwIi8+PGxpbmUgeDE9IjEyMCIgeTE9IjAiIHgyPSIxMjAiIHkyPSI1NjAiLz48bGluZSB4MT0iMTYwIiB5MT0iMCIgeDI9IjE2MCIgeTI9IjU2MCIvPjxsaW5lIHgxPSIyMDAiIHkxPSIwIiB4Mj0iMjAwIiB5Mj0iNTYwIi8+PGxpbmUgeDE9IjI0MCIgeTE9IjAiIHgyPSIyNDAiIHkyPSI1NjAiLz48bGluZSB4MT0iMjgwIiB5MT0iMCIgeDI9IjI4MCIgeTI9IjU2MCIvPjxsaW5lIHgxPSIzMjAiIHkxPSIwIiB4Mj0iMzIwIiB5Mj0iNTYwIi8+PGxpbmUgeDE9IjM2MCIgeTE9IjAiIHgyPSIzNjAiIHkyPSI1NjAiLz48bGluZSB4MT0iNDAwIiB5MT0iMCIgeDI9IjQwMCIgeTI9IjU2MCIvPjxsaW5lIHgxPSI0NDAiIHkxPSIwIiB4Mj0iNDQwIiB5Mj0iNTYwIi8+PGxpbmUgeDE9IjQ4MCIgeTE9IjAiIHgyPSI0ODAiIHkyPSI1NjAiLz48bGluZSB4MT0iNTIwIiB5MT0iMCIgeDI9IjUyMCIgeTI9IjU2MCIvPjxsaW5lIHgxPSI1NjAiIHkxPSIwIiB4Mj0iNTYwIiB5Mj0iNTYwIi8+PGxpbmUgeDE9IjYwMCIgeTE9IjAiIHgyPSI2MDAiIHkyPSI1NjAiLz48bGluZSB4MT0iNjQwIiB5MT0iMCIgeDI9IjY0MCIgeTI9IjU2MCIvPjxsaW5lIHgxPSI2ODAiIHkxPSIwIiB4Mj0iNjgwIiB5Mj0iNTYwIi8+PGxpbmUgeDE9IjcyMCIgeTE9IjAiIHgyPSI3MjAiIHkyPSI1NjAiLz48bGluZSB4MT0iNzYwIiB5MT0iMCIgeDI9Ijc2MCIgeTI9IjU2MCIvPjxsaW5lIHgxPSI4MDAiIHkxPSIwIiB4Mj0iODAwIiB5Mj0iNTYwIi8+PGxpbmUgeDE9Ijg0MCIgeTE9IjAiIHgyPSI4NDAiIHkyPSI1NjAiLz48bGluZSB4MT0iODgwIiB5MT0iMCIgeDI9Ijg4MCIgeTI9IjU2MCIvPjxsaW5lIHgxPSIwIiB5MT0iMCIgeDI9IjkwMCIgeTI9IjAiLz48bGluZSB4MT0iMCIgeTE9IjQwIiB4Mj0iOTAwIiB5Mj0iNDAiLz48bGluZSB4MT0iMCIgeTE9IjgwIiB4Mj0iOTAwIiB5Mj0iODAiLz48bGluZSB4MT0iMCIgeTE9IjEyMCIgeDI9IjkwMCIgeTI9IjEyMCIvPjxsaW5lIHgxPSIwIiB5MT0iMTYwIiB4Mj0iOTAwIiB5Mj0iMTYwIi8+PGxpbmUgeDE9IjAiIHkxPSIyMDAiIHgyPSI5MDAiIHkyPSIyMDAiLz48bGluZSB4MT0iMCIgeTE9IjI0MCIgeDI9IjkwMCIgeTI9IjI0MCIvPjxsaW5lIHgxPSIwIiB5MT0iMjgwIiB4Mj0iOTAwIiB5Mj0iMjgwIi8+PGxpbmUgeDE9IjAiIHkxPSIzMjAiIHgyPSI5MDAiIHkyPSIzMjAiLz48bGluZSB4MT0iMCIgeTE9IjM2MCIgeDI9IjkwMCIgeTI9IjM2MCIvPjxsaW5lIHgxPSIwIiB5MT0iNDAwIiB4Mj0iOTAwIiB5Mj0iNDAwIi8+PGxpbmUgeDE9IjAiIHkxPSI0NDAiIHgyPSI5MDAiIHkyPSI0NDAiLz48bGluZSB4MT0iMCIgeTE9IjQ4MCIgeDI9IjkwMCIgeTI9IjQ4MCIvPjxsaW5lIHgxPSIwIiB5MT0iNTIwIiB4Mj0iOTAwIiB5Mj0iNTIwIi8+PGxpbmUgeDE9IjAiIHkxPSI1NjAiIHgyPSI5MDAiIHkyPSI1NjAiLz48L2c+PHJlY3QgeD0iLjUiIHk9Ii41IiB3aWR0aD0iODk5IiBoZWlnaHQ9IjU1OSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjQTVBREFBIi8+PHRleHQgeD0iNDUwIiB5PSIzMDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjI2IiBmaWxsPSIjQTVBREFBIj5Gb25kIGR1IGRvY3VtZW50IHLDqXBvbnNlIChpbWFnZSBkdSBEUik8L3RleHQ+PC9zdmc+" alt="[Description du document technique]" width="900" height="560">
+    </section>
+  </div>
+</aside>
+
+<!-- PAGE D'ACCUEIL : aucune mention du diplôme, de la session ni de l'épreuve -->
+<section id="home" aria-labelledby="home-title">
+  <div class="home-inner">
+    <header class="home-head">
+      <h1 id="home-title">[Titre de l'exercice]</h1>
+      <p class="home-sub">[Une ou deux phrases de présentation du système étudié, puis le volume de travail.]</p>
+    </header>
+    <figure class="home-hero">
+      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5MDAiIGhlaWdodD0iNTYwIj48cmVjdCB3aWR0aD0iOTAwIiBoZWlnaHQ9IjU2MCIgZmlsbD0iI2ZmZiIvPjxnIHN0cm9rZT0iI0QzRDhENSIgc3Ryb2tlLXdpZHRoPSIxIj48bGluZSB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iNTYwIi8+PGxpbmUgeDE9IjQwIiB5MT0iMCIgeDI9IjQwIiB5Mj0iNTYwIi8+PGxpbmUgeDE9IjgwIiB5MT0iMCIgeDI9IjgwIiB5Mj0iNTYwIi8+PGxpbmUgeDE9IjEyMCIgeTE9IjAiIHgyPSIxMjAiIHkyPSI1NjAiLz48bGluZSB4MT0iMTYwIiB5MT0iMCIgeDI9IjE2MCIgeTI9IjU2MCIvPjxsaW5lIHgxPSIyMDAiIHkxPSIwIiB4Mj0iMjAwIiB5Mj0iNTYwIi8+PGxpbmUgeDE9IjI0MCIgeTE9IjAiIHgyPSIyNDAiIHkyPSI1NjAiLz48bGluZSB4MT0iMjgwIiB5MT0iMCIgeDI9IjI4MCIgeTI9IjU2MCIvPjxsaW5lIHgxPSIzMjAiIHkxPSIwIiB4Mj0iMzIwIiB5Mj0iNTYwIi8+PGxpbmUgeDE9IjM2MCIgeTE9IjAiIHgyPSIzNjAiIHkyPSI1NjAiLz48bGluZSB4MT0iNDAwIiB5MT0iMCIgeDI9IjQwMCIgeTI9IjU2MCIvPjxsaW5lIHgxPSI0NDAiIHkxPSIwIiB4Mj0iNDQwIiB5Mj0iNTYwIi8+PGxpbmUgeDE9IjQ4MCIgeTE9IjAiIHgyPSI0ODAiIHkyPSI1NjAiLz48bGluZSB4MT0iNTIwIiB5MT0iMCIgeDI9IjUyMCIgeTI9IjU2MCIvPjxsaW5lIHgxPSI1NjAiIHkxPSIwIiB4Mj0iNTYwIiB5Mj0iNTYwIi8+PGxpbmUgeDE9IjYwMCIgeTE9IjAiIHgyPSI2MDAiIHkyPSI1NjAiLz48bGluZSB4MT0iNjQwIiB5MT0iMCIgeDI9IjY0MCIgeTI9IjU2MCIvPjxsaW5lIHgxPSI2ODAiIHkxPSIwIiB4Mj0iNjgwIiB5Mj0iNTYwIi8+PGxpbmUgeDE9IjcyMCIgeTE9IjAiIHgyPSI3MjAiIHkyPSI1NjAiLz48bGluZSB4MT0iNzYwIiB5MT0iMCIgeDI9Ijc2MCIgeTI9IjU2MCIvPjxsaW5lIHgxPSI4MDAiIHkxPSIwIiB4Mj0iODAwIiB5Mj0iNTYwIi8+PGxpbmUgeDE9Ijg0MCIgeTE9IjAiIHgyPSI4NDAiIHkyPSI1NjAiLz48bGluZSB4MT0iODgwIiB5MT0iMCIgeDI9Ijg4MCIgeTI9IjU2MCIvPjxsaW5lIHgxPSIwIiB5MT0iMCIgeDI9IjkwMCIgeTI9IjAiLz48bGluZSB4MT0iMCIgeTE9IjQwIiB4Mj0iOTAwIiB5Mj0iNDAiLz48bGluZSB4MT0iMCIgeTE9IjgwIiB4Mj0iOTAwIiB5Mj0iODAiLz48bGluZSB4MT0iMCIgeTE9IjEyMCIgeDI9IjkwMCIgeTI9IjEyMCIvPjxsaW5lIHgxPSIwIiB5MT0iMTYwIiB4Mj0iOTAwIiB5Mj0iMTYwIi8+PGxpbmUgeDE9IjAiIHkxPSIyMDAiIHgyPSI5MDAiIHkyPSIyMDAiLz48bGluZSB4MT0iMCIgeTE9IjI0MCIgeDI9IjkwMCIgeTI9IjI0MCIvPjxsaW5lIHgxPSIwIiB5MT0iMjgwIiB4Mj0iOTAwIiB5Mj0iMjgwIi8+PGxpbmUgeDE9IjAiIHkxPSIzMjAiIHgyPSI5MDAiIHkyPSIzMjAiLz48bGluZSB4MT0iMCIgeTE9IjM2MCIgeDI9IjkwMCIgeTI9IjM2MCIvPjxsaW5lIHgxPSIwIiB5MT0iNDAwIiB4Mj0iOTAwIiB5Mj0iNDAwIi8+PGxpbmUgeDE9IjAiIHkxPSI0NDAiIHgyPSI5MDAiIHkyPSI0NDAiLz48bGluZSB4MT0iMCIgeTE9IjQ4MCIgeDI9IjkwMCIgeTI9IjQ4MCIvPjxsaW5lIHgxPSIwIiB5MT0iNTIwIiB4Mj0iOTAwIiB5Mj0iNTIwIi8+PGxpbmUgeDE9IjAiIHkxPSI1NjAiIHgyPSI5MDAiIHkyPSI1NjAiLz48L2c+PHJlY3QgeD0iLjUiIHk9Ii41IiB3aWR0aD0iODk5IiBoZWlnaHQ9IjU1OSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjQTVBREFBIi8+PHRleHQgeD0iNDUwIiB5PSIzMDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjI2IiBmaWxsPSIjQTVBREFBIj5Gb25kIGR1IGRvY3VtZW50IHLDqXBvbnNlIChpbWFnZSBkdSBEUik8L3RleHQ+PC9zdmc+" alt="[Description de l'illustration du système]" width="900" height="560">
+      <figcaption>[Légende de l'illustration.]</figcaption>
+    </figure>
+    <div class="home-facts">
+      <div><b>2 parties</b><span>[nature du parcours]</span></div>
+      <div><b>1 h 00</b><span>durée conseillée, qui fixe la pondération</span></div>
+      <div><b>2 documents</b><span>DP1 et DT1 consultables</span></div>
+      <div><b>1 tracé</b><span>sur document réponse, auto-évalué</span></div>
+    </div>
+    <h2 class="home-choose">Choisis ton mode de travail</h2>
+    <div class="modes">
+      <article class="mode-card">
+        <div class="mc-head"><span class="mc-tag">Mode 1</span><h3>Mode entraînement</h3></div>
+        <p class="mc-lead">Pour apprendre en avançant, question par question.</p>
+        <ul><li>Chaque question se valide isolément ; la démarche corrigée s'affiche aussitôt.</li>
+          <li>La note pondérée s'actualise en continu dans le bandeau.</li>
+          <li>Les documents et le chronomètre restent disponibles, sans contrainte de temps.</li></ul>
+        <button type="button" class="btn btn-mode" data-mode="training">Commencer l'entraînement</button>
+      </article>
+      <article class="mode-card exam">
+        <div class="mc-head"><span class="mc-tag">Mode 2</span><h3>Mode examen</h3></div>
+        <p class="mc-lead">Pour se placer dans les conditions de l'épreuve.</p>
+        <ul><li>Aucune correction et aucune note pendant la composition ; les réponses restent modifiables.</li>
+          <li>Le chronomètre tourne, à comparer à la durée conseillée.</li>
+          <li>En fin de sujet, le bouton « J'ai fini, je fais corriger ma copie » dévoile d'un coup les corrections, les notes par partie et la note globale.</li></ul>
+        <button type="button" class="btn btn-mode" data-mode="exam">Composer en mode examen</button>
+      </article>
+    </div>
+    <p class="home-note small">Le mode se choisit une seule fois : pour en changer, recharge la page. Rien n'est enregistré sur l'ordinateur.</p>
+  </div>
+</section>
+
+<main class="page">
+  <section class="print-only print-summary">
+    <p>Élève : <span class="print-nom"></span> | Copie imprimée le <span class="print-date"></span></p>
+    <p>Mode : <span class="print-mode"></span> | Temps de rédaction : <strong class="print-time"></strong> (durée conseillée : [1 h 00])</p>
+    <p class="print-note-line">Note finale pondérée : <strong class="final-note"></strong></p>
+    <p class="print-nograde">Copie non corrigée : les corrections et la note n'apparaissent qu'après la remise de la copie en mode examen.</p>
+  </section>
+
+  <header class="cartouche">
+    <div class="title">
+      <h1>[Titre de l'exercice]</h1>
+      <p>[n] questions notées (unités comprises) et [n] tracés auto-évalués, répartis en [n] parties pondérées par leur durée.</p></div>
+    <div class="nom"><label for="nom-eleve">Nom et prénom</label><input id="nom-eleve" type="text" autocomplete="name"></div>
+  </header>
+
+  <div class="consignes">
+    <p class="only-training"><strong>Mode entraînement.</strong> Réponds dans chaque champ puis clique sur « Valider » : une réponse validée est définitive et sa correction s'affiche aussitôt.</p>
+    <p class="only-exam"><strong>Mode examen.</strong> Compose tout le sujet sans correction ni note : tes réponses restent modifiables jusqu'au bout. Le bouton « J'ai fini, je fais corriger ma copie », en fin de sujet, dévoile d'un coup les corrections, les notes par partie et la note globale.</p>
+    <p><strong>Les unités sont notées.</strong> Pour toute question numérique, la valeur vaut la moitié des points et l'unité l'autre moitié : une valeur juste écrite sans unité, ou avec une unité fausse, ne rapporte qu'un demi-point.</p>
+    <p>Les dossiers de présentation (DP) et technique (DT) s'ouvrent avec les onglets sur le bord droit, ou avec les boutons des en-têtes de question.</p>
+    <p><strong>Les tracés comptent aussi.</strong> Quand la correction du tracé s'affiche, tu t'attribues toi-même les points à l'aide d'une grille de critères.</p>
+    <p><strong>Barème pondéré par la durée conseillée</strong> : chaque partie est notée sur 20, puis pèse au prorata de son temps. Le récapitulatif de fin de sujet donne le détail partie par partie.</p>
+  </div>
+
+  <!-- PARTIE : dupliquer ; le numéro doit correspondre à "part" dans __QCFG__/__SKCFG__ -->
+  <section class="part" id="partie-1" aria-labelledby="t-partie-1">
+    <header class="part-head"><div class="part-num" aria-hidden="true">1</div>
+      <div><h2 id="t-partie-1"><span class="sr-only">Partie 1 : </span>Titre de la première partie</h2>
+        <div class="duree">Durée conseillée : 20 min · Barème : 2 points, soit 33,3 % de la note</div></div></header>
+    <div class="part-body">
+      <p>[Mise en situation de la partie.]</p>
+      <div class="qbar" role="group" aria-label="Q1.1"><div class="qb-num">Q1.1</div><div class="qb-docs">Documents à consulter : <button type="button" class="doc-chip" data-doc="DT1" aria-pressed="false">DT1</button></div><div class="qb-ans">Répondre : ci-dessous</div></div>
+      <div class="data"><p class="data-title">Données</p><ul><li>[Donnée 1]</li><li>[Donnée 2]</li></ul></div>
+      
+        <!-- QUESTION : dupliquer ce bloc. id + data-q = clé dans __QCFG__ -->
+        <div class="q" id="q1_1" data-q="q1_1">
+          <p class="q-stem"><span class="q-num">Q1.1</span> <strong>Énoncé de la question numérique.</strong></p>
+          <p class="q-hint" id="h-q1_1">Arrondir au centième. Saisis la valeur <strong>avec son unité</strong> : l'unité vaut la moitié des points de la question.</p>
+          <div class="q-row">
+            <input type="text" class="q-input" id="in-q1_1" aria-label="Réponse Q1.1" aria-describedby="h-q1_1" autocomplete="off" autocapitalize="off" spellcheck="false">
+            <button type="button" class="btn btn-validate">Valider</button>
+            <span class="q-status" aria-live="polite"></span>
+            <span class="print-only pstat">Non validée : comptée fausse</span>
+          </div>
+          <p class="q-msg" role="alert"></p>
+          <div class="q-expl" hidden>
+            <p class="q-unit-msg" hidden></p>
+            <p class="q-expected"><span>Réponse attendue :</span> m = 84,80 kg</p>
+            <div class="q-why"><p>Démarche détaillée, pas seulement le résultat.</p></div>
+          </div>
+        </div>
+      
+        <!-- QUESTION : dupliquer ce bloc. id + data-q = clé dans __QCFG__ -->
+        <div class="q" id="q1_2" data-q="q1_2">
+          <p class="q-stem"><span class="q-num">Q1.2</span> <strong>Énoncé de la question à réponse rédigée courte.</strong></p>
+          <p class="q-hint" id="h-q1_2">Réponse courte en toutes lettres.</p>
+          <div class="q-row">
+            <input type="text" class="q-input" id="in-q1_2" aria-label="Réponse Q1.2" aria-describedby="h-q1_2" autocomplete="off" autocapitalize="off" spellcheck="false">
+            <button type="button" class="btn btn-validate">Valider</button>
+            <span class="q-status" aria-live="polite"></span>
+            <span class="print-only pstat">Non validée : comptée fausse</span>
+          </div>
+          <p class="q-msg" role="alert"></p>
+          <div class="q-expl" hidden>
+            <p class="q-unit-msg" hidden></p>
+            <p class="q-expected"><span>Réponse attendue :</span> Réducteur</p>
+            <div class="q-why"><p>Justification du composant attendu.</p></div>
+          </div>
+        </div>
+    </div>
+  </section>
+
+  <section class="part" id="partie-2" aria-labelledby="t-partie-2">
+    <header class="part-head"><div class="part-num" aria-hidden="true">2</div>
+      <div><h2 id="t-partie-2"><span class="sr-only">Partie 2 : </span>Titre de la seconde partie</h2>
+        <div class="duree">Durée conseillée : 40 min · Barème : 5 points, soit 66,7 % de la note</div></div></header>
+    <div class="part-body">
+      <div class="qbar" role="group" aria-label="Q2.1"><div class="qb-num">Q2.1</div><div class="qb-docs">Documents à consulter : <button type="button" class="doc-chip" data-doc="DT1" aria-pressed="false">DT1</button></div><div class="qb-ans">Répondre : ci-dessous</div></div>
+      
+        <!-- QUESTION : dupliquer ce bloc. id + data-q = clé dans __QCFG__ -->
+        <div class="q" id="q2_1" data-q="q2_1">
+          <p class="q-stem"><span class="q-num">Q2.1</span> <strong>Énoncé de la question à référence catalogue.</strong></p>
+          <p class="q-hint" id="h-q2_1">Recopie la référence du catalogue.</p>
+          <div class="q-row">
+            <input type="text" class="q-input" id="in-q2_1" aria-label="Réponse Q2.1" aria-describedby="h-q2_1" autocomplete="off" autocapitalize="off" spellcheck="false">
+            <button type="button" class="btn btn-validate">Valider</button>
+            <span class="q-status" aria-live="polite"></span>
+            <span class="print-only pstat">Non validée : comptée fausse</span>
+          </div>
+          <p class="q-msg" role="alert"></p>
+          <div class="q-expl" hidden>
+            <p class="q-unit-msg" hidden></p>
+            <p class="q-expected"><span>Réponse attendue :</span> KN 70/66/4 K (n° 117584)</p>
+            <div class="q-why"><p>Critère de choix et justification.</p></div>
+          </div>
+        </div>
+      
+        <!-- QUESTION : dupliquer ce bloc. id + data-q = clé dans __QCFG__ -->
+        <div class="q" id="q2_2" data-q="q2_2">
+          <p class="q-stem"><span class="q-num">Q2.2</span> <strong>Énoncé de la question de conclusion.</strong></p>
+          <p class="q-hint" id="h-q2_2">Commence ta réponse par « oui » ou « non ».</p>
+          <div class="q-row">
+            <input type="text" class="q-input" id="in-q2_2" aria-label="Réponse Q2.2" aria-describedby="h-q2_2" autocomplete="off" autocapitalize="off" spellcheck="false">
+            <button type="button" class="btn btn-validate">Valider</button>
+            <span class="q-status" aria-live="polite"></span>
+            <span class="print-only pstat">Non validée : comptée fausse</span>
+          </div>
+          <p class="q-msg" role="alert"></p>
+          <div class="q-expl" hidden>
+            <p class="q-unit-msg" hidden></p>
+            <p class="q-expected"><span>Réponse attendue :</span> Oui</p>
+            <div class="q-why"><p>Comparaison chiffrée qui fonde la conclusion.</p></div>
+          </div>
+        </div>
+      
+        <!-- TRACÉ : id = clé dans __SKCFG__ ; le fond est une image en data URI -->
+        <div class="sketch" data-sketch="sk_q2_3" id="sk_q2_3">
+          <p class="q-stem"><span class="q-num">Q2.3</span> <strong>Énoncé du tracé à réaliser sur le document réponse.</strong></p>
+          <div class="sk-layout">
+            <div class="sk-main">
+              <div class="sk-toolbar" role="toolbar" aria-label="Outils de tracé Q2.3">
+                <button type="button" data-tool="pen" aria-pressed="true">Crayon</button>
+                <button type="button" data-tool="line" aria-pressed="false">Ligne</button>
+                <button type="button" data-tool="arrow" aria-pressed="false">Flèche</button>
+                <button type="button" data-tool="text" aria-pressed="false">Texte</button>
+                <button type="button" data-tool="erase" aria-pressed="false">Gomme</button>
+                <span class="sep"></span>
+                <button type="button" class="sw" data-color="#1F5FA8" aria-label="Couleur bleue" aria-pressed="true" style="background:#1F5FA8"></button>
+                <button type="button" class="sw" data-color="#1B7A43" aria-label="Couleur verte" aria-pressed="false" style="background:#1B7A43"></button>
+                <button type="button" class="sw" data-color="#1C2530" aria-label="Couleur noire" aria-pressed="false" style="background:#1C2530"></button>
+                <span class="sep"></span>
+                <span class="tb-group"><span class="tb-lab">Trait</span>
+                  <button type="button" data-width="fin" aria-pressed="false">Fin</button>
+                  <button type="button" data-width="moyen" aria-pressed="true">Moyen</button>
+                  <button type="button" data-width="epais" aria-pressed="false">Épais</button></span>
+                <span class="sep"></span>
+                <span class="tb-group"><span class="tb-lab">Zoom</span>
+                  <button type="button" data-zoom="out" aria-label="Réduire le zoom">−</button>
+                  <span class="zoom-val">100 %</span>
+                  <button type="button" data-zoom="in" aria-label="Agrandir le zoom">+</button>
+                  <button type="button" data-zoom="reset">Ajuster</button></span>
+                <span class="sep"></span>
+                <button type="button" data-act="undo">Annuler</button>
+                <button type="button" data-act="clear">Tout effacer</button>
+                <span class="spacer"></span>
+                <button type="button" class="btn-drprint" data-act="drprint">Imprimer les DR</button>
+                <button type="button" data-act="full" aria-pressed="false">Plein écran</button>
+              </div>
+              <div class="sk-stage"><img class="sk-bg" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5MDAiIGhlaWdodD0iNTYwIj48cmVjdCB3aWR0aD0iOTAwIiBoZWlnaHQ9IjU2MCIgZmlsbD0iI2ZmZiIvPjxnIHN0cm9rZT0iI0QzRDhENSIgc3Ryb2tlLXdpZHRoPSIxIj48bGluZSB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iNTYwIi8+PGxpbmUgeDE9IjQwIiB5MT0iMCIgeDI9IjQwIiB5Mj0iNTYwIi8+PGxpbmUgeDE9IjgwIiB5MT0iMCIgeDI9IjgwIiB5Mj0iNTYwIi8+PGxpbmUgeDE9IjEyMCIgeTE9IjAiIHgyPSIxMjAiIHkyPSI1NjAiLz48bGluZSB4MT0iMTYwIiB5MT0iMCIgeDI9IjE2MCIgeTI9IjU2MCIvPjxsaW5lIHgxPSIyMDAiIHkxPSIwIiB4Mj0iMjAwIiB5Mj0iNTYwIi8+PGxpbmUgeDE9IjI0MCIgeTE9IjAiIHgyPSIyNDAiIHkyPSI1NjAiLz48bGluZSB4MT0iMjgwIiB5MT0iMCIgeDI9IjI4MCIgeTI9IjU2MCIvPjxsaW5lIHgxPSIzMjAiIHkxPSIwIiB4Mj0iMzIwIiB5Mj0iNTYwIi8+PGxpbmUgeDE9IjM2MCIgeTE9IjAiIHgyPSIzNjAiIHkyPSI1NjAiLz48bGluZSB4MT0iNDAwIiB5MT0iMCIgeDI9IjQwMCIgeTI9IjU2MCIvPjxsaW5lIHgxPSI0NDAiIHkxPSIwIiB4Mj0iNDQwIiB5Mj0iNTYwIi8+PGxpbmUgeDE9IjQ4MCIgeTE9IjAiIHgyPSI0ODAiIHkyPSI1NjAiLz48bGluZSB4MT0iNTIwIiB5MT0iMCIgeDI9IjUyMCIgeTI9IjU2MCIvPjxsaW5lIHgxPSI1NjAiIHkxPSIwIiB4Mj0iNTYwIiB5Mj0iNTYwIi8+PGxpbmUgeDE9IjYwMCIgeTE9IjAiIHgyPSI2MDAiIHkyPSI1NjAiLz48bGluZSB4MT0iNjQwIiB5MT0iMCIgeDI9IjY0MCIgeTI9IjU2MCIvPjxsaW5lIHgxPSI2ODAiIHkxPSIwIiB4Mj0iNjgwIiB5Mj0iNTYwIi8+PGxpbmUgeDE9IjcyMCIgeTE9IjAiIHgyPSI3MjAiIHkyPSI1NjAiLz48bGluZSB4MT0iNzYwIiB5MT0iMCIgeDI9Ijc2MCIgeTI9IjU2MCIvPjxsaW5lIHgxPSI4MDAiIHkxPSIwIiB4Mj0iODAwIiB5Mj0iNTYwIi8+PGxpbmUgeDE9Ijg0MCIgeTE9IjAiIHgyPSI4NDAiIHkyPSI1NjAiLz48bGluZSB4MT0iODgwIiB5MT0iMCIgeDI9Ijg4MCIgeTI9IjU2MCIvPjxsaW5lIHgxPSIwIiB5MT0iMCIgeDI9IjkwMCIgeTI9IjAiLz48bGluZSB4MT0iMCIgeTE9IjQwIiB4Mj0iOTAwIiB5Mj0iNDAiLz48bGluZSB4MT0iMCIgeTE9IjgwIiB4Mj0iOTAwIiB5Mj0iODAiLz48bGluZSB4MT0iMCIgeTE9IjEyMCIgeDI9IjkwMCIgeTI9IjEyMCIvPjxsaW5lIHgxPSIwIiB5MT0iMTYwIiB4Mj0iOTAwIiB5Mj0iMTYwIi8+PGxpbmUgeDE9IjAiIHkxPSIyMDAiIHgyPSI5MDAiIHkyPSIyMDAiLz48bGluZSB4MT0iMCIgeTE9IjI0MCIgeDI9IjkwMCIgeTI9IjI0MCIvPjxsaW5lIHgxPSIwIiB5MT0iMjgwIiB4Mj0iOTAwIiB5Mj0iMjgwIi8+PGxpbmUgeDE9IjAiIHkxPSIzMjAiIHgyPSI5MDAiIHkyPSIzMjAiLz48bGluZSB4MT0iMCIgeTE9IjM2MCIgeDI9IjkwMCIgeTI9IjM2MCIvPjxsaW5lIHgxPSIwIiB5MT0iNDAwIiB4Mj0iOTAwIiB5Mj0iNDAwIi8+PGxpbmUgeDE9IjAiIHkxPSI0NDAiIHgyPSI5MDAiIHkyPSI0NDAiLz48bGluZSB4MT0iMCIgeTE9IjQ4MCIgeDI9IjkwMCIgeTI9IjQ4MCIvPjxsaW5lIHgxPSIwIiB5MT0iNTIwIiB4Mj0iOTAwIiB5Mj0iNTIwIi8+PGxpbmUgeDE9IjAiIHkxPSI1NjAiIHgyPSI5MDAiIHkyPSI1NjAiLz48L2c+PHJlY3QgeD0iLjUiIHk9Ii41IiB3aWR0aD0iODk5IiBoZWlnaHQ9IjU1OSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjQTVBREFBIi8+PHRleHQgeD0iNDUwIiB5PSIzMDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjI2IiBmaWxsPSIjQTVBREFBIj5Gb25kIGR1IGRvY3VtZW50IHLDqXBvbnNlIChpbWFnZSBkdSBEUik8L3RleHQ+PC9zdmc+" width="900" height="560" alt="" hidden>
+                <canvas role="img" aria-label="Zone de tracé sur le document réponse Q2.3"></canvas></div>
+              <div class="sk-foot">
+                <button type="button" class="btn btn-sketch">Valider mon tracé</button>
+                <label class="sk-corr-toggle"><input type="checkbox"> Superposer la correction</label>
+                <span class="sk-meas" aria-live="polite"></span><span class="q-status" aria-live="polite"></span>
+              </div>
+              <div class="sk-print-wrap print-only"><p>Tracé de l'élève</p><img class="sk-print sk-print-student" alt="Tracé de l'élève">
+                <p>Correction superposée au document réponse</p><img class="sk-print sk-print-corr" alt="Correction du tracé"></div>
+              <div class="selfeval" hidden>
+                <p class="se-title">Auto-évaluation — 3 points sur les 5 de la partie 2</p>
+                <p class="se-lead">Compare ton tracé à la correction ci-dessous, puis coche uniquement ce que ton tracé comporte réellement. Sois honnête : c'est toi qui repères ce qu'il te reste à travailler.</p>
+                <label class="se-item"><input type="checkbox" data-crit="0"><span>Premier critère observable sur le tracé.</span></label><label class="se-item"><input type="checkbox" data-crit="1"><span>Deuxième critère observable sur le tracé.</span></label><label class="se-item"><input type="checkbox" data-crit="2"><span>Troisième critère observable sur le tracé.</span></label>
+                <div class="se-foot"><button type="button" class="btn btn-self">Valider mon auto-évaluation</button>
+                  <span class="se-score" aria-live="polite"></span></div>
+                <p class="print-only se-print"></p>
+              </div>
+            </div>
+            <div class="sk-side"><p class="small">Consignes ou nomenclature à afficher au-dessus de la zone de tracé.</p></div>
+          </div>
+          <p class="sk-note sk-note-wrap">La correction se superposera à ton tracé une fois la question Q2.1 validée. <span class="sk-wait" aria-live="polite"></span></p>
+          <div class="q-expl" hidden><p class="q-expected"><span>Correction du tracé</span></p>
+            <p>Démarche du tracé attendu, point par point.</p></div>
+        </div>
+    </div>
+  </section>
+
+  <section class="recap" id="recap" aria-labelledby="t-recap">
+    <header class="recap-head"><h2 id="t-recap">Récapitulatif et note finale</h2>
+      <p class="small">Les questions non validées comptent comme fausses. Chaque partie est ramenée sur 20, puis pondérée par sa durée conseillée.</p></header>
+    <div id="exam-submit-wrap">
+      <p class="es-lead">Ta copie n'est pas encore corrigée : aucune réponse n'est verrouillée, tu peux encore revenir sur les questions et les tracés.</p>
+      <button type="button" class="btn btn-exam" id="exam-submit">J'ai fini, je fais corriger ma copie</button>
+      <p class="es-warn" id="exam-warn" role="alert"></p>
+    </div>
+    <div id="recap-graded">
+      <div class="recap-wrap">
+        <table class="t recap-table">
+          <thead><tr><th>Partie</th><th>Durée</th><th>Poids</th><th>Points</th><th>Note /20</th><th>Contribution</th></tr></thead>
+          <tbody id="recap-body"></tbody>
+          <tfoot><tr><th colspan="4">Note globale pondérée</th><th class="final-note"></th><th></th></tr></tfoot>
+        </table>
+      </div>
+      <p class="final-detail small"></p>
+    </div>
+    <div class="recap-foot" id="recap-foot"><button type="button" class="btn btn-print">Imprimer ma copie</button>
+      <span class="small no-print">L'impression reprend tes réponses, les corrections, tes tracés et ce récapitulatif.</span></div>
+  </section>
+</main>
+
+<footer class="banner" aria-label="Suivi de la composition">
+  <div class="score-block"><div class="lab">Note provisoire</div><div class="score" id="score-val">–<small>/20</small></div></div>
+  <div class="exam-block"><div class="lab">Mode examen</div><div class="exam-state">Note masquée</div></div>
+  <div class="timer-block"><div class="lab">Temps</div><div class="timer" id="timer-val">0:00:00</div></div>
+  <div class="count" id="score-count" aria-live="polite"></div>
+  <div class="spacer"></div>
+  <button type="button" class="btn-docs" id="btn-docs">Documents</button>
+</footer>
+
+<!-- CONFIGURATION DU SUJET : la seule partie à réécrire pour un nouvel exercice -->
+<script>window.__PARTS__ = [{"num": "1", "title": "Titre de la première partie", "minutes": 20, "duration": "20 min", "points": 2}, {"num": "2", "title": "Titre de la seconde partie", "minutes": 40, "duration": "40 min", "points": 5}];
+window.__QCFG__ = {"q1_1": {"label": "Q1.1", "part": "1", "pts": 1, "grader": {"type": "num", "value": 84.8, "absTol": 0.05, "unit": {"label": "kg", "accept": ["kg", "kilogramme", "kilogrammes"]}}}, "q1_2": {"label": "Q1.2", "part": "1", "pts": 1, "grader": {"type": "kw", "any": [[["reducteur"]]], "forbid": ["moteur", "motoreducteur"]}}, "q2_1": {"label": "Q2.1", "part": "2", "pts": 1, "grader": {"type": "code", "contains": ["kn70664k", "117584"], "rejectRaw": ["\\\\(4k\\\\)"]}}, "q2_2": {"label": "Q2.2", "part": "2", "pts": 1, "grader": {"type": "yesno", "value": true}}};
+window.__SKCFG__ = {"sk_q2_3": {"bg": "DEMO", "deps": ["q2_1"], "label": "Q2.3", "part": "2", "pts": 3, "criteria": ["Premier critère observable sur le tracé.", "Deuxième critère observable sur le tracé.", "Troisième critère observable sur le tracé."]}};</script>
+<script>/*GRADING-START*/
+var Grading = (function () {
+  "use strict";
+
+  function stripAccents(s) {
+    return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/œ/g, "oe").replace(/Œ/g, "oe").replace(/æ/g, "ae").replace(/Æ/g, "ae");
+  }
+  function norm(s) {
+    return stripAccents(String(s == null ? "" : s).toLowerCase())
+      .replace(/[\u2019\u2018'`´]/g, " ").replace(/\s+/g, " ").trim();
+  }
+  function tokens(s) {
+    return norm(s).split(/[^a-z0-9]+/).filter(Boolean);
+  }
+  function compact(s) {
+    return norm(s).replace(/[^a-z0-9]/g, "");
+  }
+
+  // Distance de Damerau-Levenshtein (alignement optimal) : une inversion de deux lettres compte pour 1
+  function lev(a, b) {
+    if (a === b) return 0;
+    var m = a.length, n = b.length, i, j;
+    if (!m) return n;
+    if (!n) return m;
+    var d = [];
+    for (i = 0; i <= m; i++) { d[i] = [i]; }
+    for (j = 0; j <= n; j++) d[0][j] = j;
+    for (i = 1; i <= m; i++) {
+      for (j = 1; j <= n; j++) {
+        var c = a.charAt(i - 1) === b.charAt(j - 1) ? 0 : 1;
+        var v = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + c);
+        if (i > 1 && j > 1 && a.charAt(i - 1) === b.charAt(j - 2) && a.charAt(i - 2) === b.charAt(j - 1))
+          v = Math.min(v, d[i - 2][j - 2] + 1);
+        d[i][j] = v;
+      }
+    }
+    return d[m][n];
+  }
+  // Seuil adapté à la longueur du mot attendu : pas de tolérance sur les mots courts
+  function fuzzyEq(tok, word) {
+    if (tok === word) return true;
+    var L = word.length;
+    var thr = L <= 4 ? 0 : (L <= 8 ? 1 : 2);
+    if (thr === 0) return false;
+    if (Math.abs(tok.length - L) > thr) return false;
+    return lev(tok, word) <= thr;
+  }
+
+  // ---------- Nombres (locale FR) ----------
+  // Sépare la valeur numérique du reste de la saisie (qui porte l'unité)
+  function splitNum(raw) {
+    if (raw == null) return null;
+    var s = String(raw);
+    var cut = Math.max(s.lastIndexOf("="), s.lastIndexOf(":"));
+    if (cut >= 0) s = s.slice(cut + 1);
+    s = s.replace(/[\u2212\u2012\u2013\u2014\u2010\u2011]/g, "-")
+         .replace(/[\u00a0\u202f\u2009\u2007]/g, " ");
+    s = s.replace(/(\d) (?=\d{3}(?:\D|$))/g, "$1");
+    s = s.replace(/-\s+(?=\d)/g, "-");
+    s = s.replace(/,/g, ".");
+    s = s.replace(/\s*[x\u00d7*\u00b7]?\s*10\s*\^\s*\(?\s*([-+]?\d+)\s*\)?/gi, "e$1");
+    var m = s.match(/-?\d+(?:\.\d+)?(?:e[-+]?\d+)?|-?\.\d+/i);
+    if (!m) return null;
+    var txt = m[0];
+    if (/^-?e/i.test(txt)) return null;
+    var v = parseFloat(txt);
+    if (!isFinite(v)) return null;
+    return { value: v, rest: s.slice(m.index + txt.length) };
+  }
+  function parseNum(raw) {
+    var sp = splitNum(raw);
+    return sp ? sp.value : null;
+  }
+
+  // ---------- Unités ----------
+  var SUP = { "\u00b9": "1", "\u00b2": "2", "\u00b3": "3", "\u2070": "0", "\u2074": "4",
+              "\u2075": "5", "\u2076": "6", "\u2077": "7", "\u2078": "8", "\u2079": "9" };
+  function normUnit(raw) {
+    var s = stripAccents(String(raw == null ? "" : raw).toLowerCase());
+    s = s.replace(/[\u207b\u2212\u2013\u2014\u2010\u2011]/g, "-");
+    s = s.replace(/[\u00b9\u00b2\u00b3\u2070\u2074-\u2079]/g, function (c) { return SUP[c] || ""; });
+    s = s.replace(/\^/g, "");
+    s = s.replace(/[.\u00b7\u2219\u22c5*\u00d7_,;:()\[\]'"\u2019`]/g, " ");
+    s = s.replace(/\s+/g, " ").trim();
+    return s;
+  }
+  // Mots parasites fréquents autour d'une unité (« 84,8 kg au total »)
+  var UNIT_STOP = ["environ","soit","au","aux","du","de","des","la","le","les","un","une","en","par","sur","et",
+                   "total","totale","valeur","absolue","arrondi","arrondie","donc","ainsi","pres","peu","dans","cas","je","trouve"];
+  // 'ok' : unité attendue reconnue | 'missing' : aucune unité saisie | 'wrong' : autre unité
+  function unitCheck(rest, unit) {
+    var s = normUnit(rest);
+    if (!s || !/[a-z\u00b0]/.test(s)) return "missing";
+    var chunks = s.split(" ").filter(function (t) {
+      return t && UNIT_STOP.indexOf(t) < 0 && /[a-z\u00b0]/.test(t);
+    });
+    if (!chunks.length) return "missing";
+    // Une unité composée (« N.m », « m s-1 ») doit être jugée en entier, jamais sur un seul de ses morceaux
+    var forms = [chunks.join("")];
+    if (chunks.length === 1) forms.push(chunks[0]);
+    for (var i = 0; i < unit.accept.length; i++)
+      if (forms.indexOf(unit.accept[i]) >= 0) return "ok";
+    return "wrong";
+  }
+
+  function nearValue(x, g) {
+    var v = g.value;
+    if (g.abs) { x = Math.abs(x); v = Math.abs(v); }
+    var tol = Math.max(g.absTol || 0, (g.relTol || 0) * Math.abs(v));
+    return Math.abs(x - v) <= tol + 1e-12;
+  }
+  function gradeNum(ans, g) {
+    var sp = splitNum(ans);
+    if (!sp) return { ok: false, score: 0, invalid: "Aucune valeur numérique reconnue : saisis un nombre (ex. 12,5)." };
+    var cands = [g].concat(g.variants || []), best = null;
+    for (var i = 0; i < cands.length; i++) {
+      var c = cands[i];
+      if (!nearValue(sp.value, c)) continue;
+      var u = c.unit || (c === g ? g.unit : null);
+      if (!u) return { ok: true, score: 1 };
+      var r = unitCheck(sp.rest, u);
+      if (r === "ok") return { ok: true, score: 1, unit: "ok" };
+      // Une variante n'est retenue que si son unité est explicitement écrite
+      // (« 91 125 000 » sans unité ne peut pas valoir « 91,13 millions de tours »)
+      if (c.strictUnit) continue;
+      if (!best) best = { ok: true, score: 0.5, unit: r, unitLabel: u.label };
+    }
+    return best || { ok: false, score: 0 };
+  }
+
+  function tokenMatches(toks, word) {
+    for (var i = 0; i < toks.length; i++) if (fuzzyEq(toks[i], word)) return true;
+    return false;
+  }
+  function gradeKw(ans, g) {
+    var toks = tokens(ans);
+    if (!toks.length) return { ok: false, invalid: "Réponse vide." };
+    var f = g.forbid || [];
+    for (var k = 0; k < f.length; k++) if (tokenMatches(toks, f[k])) return { ok: false };
+    for (var p = 0; p < g.any.length; p++) {
+      var pattern = g.any[p], all = true;
+      for (var q = 0; q < pattern.length && all; q++) {
+        var alts = pattern[q], hit = false;
+        for (var r = 0; r < alts.length && !hit; r++) hit = tokenMatches(toks, alts[r]);
+        all = hit;
+      }
+      if (all) return { ok: true };
+    }
+    return { ok: false };
+  }
+
+  function gradeCode(ans, g) {
+    var c = compact(ans);
+    if (!c) return { ok: false, invalid: "Réponse vide." };
+    var rawNoSpace = norm(ans).replace(/\s+/g, "");
+    var rj = g.rejectRaw || [];
+    for (var i = 0; i < rj.length; i++) if (new RegExp(rj[i], "i").test(rawNoSpace)) return { ok: false };
+    var rc = g.rejectContains || [];
+    for (i = 0; i < rc.length; i++) if (c.indexOf(rc[i]) >= 0) return { ok: false };
+    var eq = g.equals || [];
+    for (i = 0; i < eq.length; i++) if (c === eq[i]) return { ok: true };
+    var ct = g.contains || [];
+    for (i = 0; i < ct.length; i++) if (c.indexOf(ct[i]) >= 0) return { ok: true };
+    return { ok: false };
+  }
+
+  function gradeIntSet(ans, g) {
+    var m = String(ans).match(/\d+/g);
+    if (!m) return { ok: false, invalid: "Aucun numéro reconnu." };
+    var set = {}, n = 0, i;
+    for (i = 0; i < m.length; i++) { if (!set[+m[i]]) { set[+m[i]] = 1; n++; } }
+    if (n !== g.value.length) return { ok: false };
+    for (i = 0; i < g.value.length; i++) if (!set[g.value[i]]) return { ok: false };
+    return { ok: true };
+  }
+
+  function yesNo(ans) {
+    var n = norm(ans).replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+    if (!n) return null;
+    var first = n.split(" ")[0];
+    if (["oui", "o", "yes", "ok", "vrai"].indexOf(first) >= 0) return true;
+    if (["non", "n", "no", "faux"].indexOf(first) >= 0) return false;
+    var neg = ["ne convient pas", "insuffisant", "pas suffisant", "sous dimensionne", "trop faible", "ne suffit pas", "incapable", "pas capable", "pas adapte", "n est pas"];
+    for (var i = 0; i < neg.length; i++) if (n.indexOf(neg[i]) >= 0) return false;
+    var pos = ["convient", "suffisant", "suffit", "bien dimensionne", "surdimensionne", "adapte", "capable", "correct"];
+    for (i = 0; i < pos.length; i++) if (n.indexOf(pos[i]) >= 0) return true;
+    return null;
+  }
+  function gradeYesNo(ans, g) {
+    var v = yesNo(ans);
+    if (v === null) return { ok: false, invalid: "Commence ta réponse par « oui » ou « non »." };
+    return { ok: v === g.value };
+  }
+
+  // ---------- Composition des vitesses (relation de Chasles) ----------
+  function termSolids(term, solids) {
+    var toks = norm(term).split(/[^a-z0-9]+/).filter(Boolean), out = [];
+    for (var i = 0; i < toks.length; i++) {
+      var t = toks[i], cands = [t];
+      if (/^v[ab]?[a-z]{2,}$/.test(t)) cands.push(t.replace(/^v[ab]?/, ""));
+      var found = null;
+      for (var key in solids) {
+        if (!Object.prototype.hasOwnProperty.call(solids, key)) continue;
+        var syn = solids[key];
+        for (var s = 0; s < syn.length && !found; s++)
+          for (var c = 0; c < cands.length && !found; c++)
+            if (fuzzyEq(cands[c], syn[s])) found = key;
+        if (found) break;
+      }
+      if (found && out[out.length - 1] !== found) out.push(found);
+    }
+    return out;
+  }
+  function gradeChasles(ans, g) {
+    var s = String(ans);
+    if (!s.trim()) return { ok: false, invalid: "Réponse vide." };
+    if (/[-\u2212]\s*v/i.test(s.replace(/\/\s*-/g, "/"))) {
+      // signe moins devant un vecteur : forme non retenue
+      return { ok: false };
+    }
+    var sides = s.split("=");
+    if (sides.length !== 2) return { ok: false, invalid: "La relation doit contenir un seul signe « = »." };
+    function parseSide(x) {
+      var terms = x.split("+"), res = [];
+      for (var i = 0; i < terms.length; i++) {
+        if (!terms[i].trim()) continue;
+        var sol = termSolids(terms[i], g.solids);
+        if (sol.length !== 2) return null;
+        res.push(sol);
+      }
+      return res;
+    }
+    var L = parseSide(sides[0]), R = parseSide(sides[1]);
+    if (!L || !R) return { ok: false };
+    if (L.length === 2 && R.length === 1) { var tmp = L; L = R; R = tmp; }
+    if (L.length !== 1 || R.length !== 2) return { ok: false };
+    var i1 = L[0][0], k1 = L[0][1];
+    if (i1 === k1) return { ok: false };
+    function same(p, a, b) { return p[0] === a && p[1] === b; }
+    var a = R[0], b = R[1];
+    var okForm =
+      (same(a, i1, a[1]) && a[1] !== i1 && a[1] !== k1 && same(b, a[1], k1)) ||
+      (same(b, i1, b[1]) && b[1] !== i1 && b[1] !== k1 && same(a, b[1], k1));
+    return { ok: !!okForm };
+  }
+
+  function grade(ans, g) {
+    if (ans == null || !String(ans).trim()) return { ok: false, score: 0, invalid: "Saisis une réponse avant de valider." };
+    var r;
+    switch (g.type) {
+      case "num": return gradeNum(ans, g);
+      case "kw": r = gradeKw(ans, g); break;
+      case "code": r = gradeCode(ans, g); break;
+      case "intset": r = gradeIntSet(ans, g); break;
+      case "yesno": r = gradeYesNo(ans, g); break;
+      case "chasles": r = gradeChasles(ans, g); break;
+      default: return { ok: false, score: 0, invalid: "Type de question inconnu." };
+    }
+    r.score = r.ok ? 1 : 0;
+    return r;
+  }
+
+  function fmt(x, d) {
+    if (d == null) d = 2;
+    return x.toLocaleString("fr-FR", { minimumFractionDigits: d, maximumFractionDigits: d });
+  }
+
+  return { norm: norm, tokens: tokens, compact: compact, lev: lev, fuzzyEq: fuzzyEq,
+           parseNum: parseNum, splitNum: splitNum, normUnit: normUnit, unitCheck: unitCheck,
+           yesNo: yesNo, termSolids: termSolids, grade: grade, fmt: fmt };
+})();
+if (typeof module !== "undefined") module.exports = Grading;
+/*GRADING-END*/
+</script>
+<script>(function () {
+  "use strict";
+  var G = Grading;
+  var QCFG = window.__QCFG__;          // { id: {label, grader, part, pts} }
+  var SKCFG = window.__SKCFG__;        // { id: {bg, deps, label, part, pts, criteria} }
+  var PARTS = window.__PARTS__;        // [ {num, title, minutes, duration, points} ]
+  var state = {};                      // id -> {validated, ok, score, value}
+  var sketches = {};
+  var dirty = false;
+  var MODE = null;                     // "training" | "exam"
+  var graded = false;                  // copie corrigée (toujours vrai en entraînement)
+  var CONSEIL_MIN = 300;
+
+  function $(s, r) { return (r || document).querySelector(s); }
+  function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+  function fr(x, d) { return G.fmt(x, d); }
+
+  // ====================== SCORE ======================
+  var gradedIds = Object.keys(QCFG);
+  var sketchIds = Object.keys(SKCFG);
+  var TOTAL_MIN = PARTS.reduce(function (s, p) { return s + p.minutes; }, 0);
+
+  function itemsOf(part) {
+    var out = [];
+    gradedIds.forEach(function (id) { if (QCFG[id].part === part) out.push({ id: id, pts: QCFG[id].pts }); });
+    sketchIds.forEach(function (id) { if (SKCFG[id].part === part) out.push({ id: id, pts: SKCFG[id].pts }); });
+    return out;
+  }
+  // Par partie : points possibles, points engagés (items validés) et points obtenus
+  function partStats() {
+    return PARTS.map(function (p) {
+      var possible = 0, answered = 0, earned = 0, done = 0, count = 0;
+      itemsOf(p.num).forEach(function (it) {
+        var s = state[it.id];
+        possible += it.pts; count++;
+        if (s && s.validated) { answered += it.pts; earned += (s.score || 0) * it.pts; done++; }
+      });
+      return { num: p.num, title: p.title, minutes: p.minutes, duration: p.duration,
+               weight: p.minutes / TOTAL_MIN, possible: possible, answered: answered,
+               earned: earned, done: done, count: count };
+    });
+  }
+  function note20(earned, base) { return base ? Math.round(earned / base * 200) / 10 : null; }
+  // Note provisoire : pondération renormalisée sur les seules parties déjà entamées
+  function weighted(stats, useAnswered) {
+    var num = 0, den = 0;
+    stats.forEach(function (s) {
+      var base = useAnswered ? s.answered : s.possible;
+      if (!base) return;
+      num += s.weight * (s.earned / base * 20);
+      den += s.weight;
+    });
+    return den ? Math.round(num / den * 10) / 10 : null;
+  }
+  function totals(stats) {
+    var t = { earned: 0, possible: 0, done: 0, count: 0, half: 0 };
+    stats.forEach(function (s) { t.earned += s.earned; t.possible += s.possible; t.done += s.done; t.count += s.count; });
+    gradedIds.forEach(function (id) { if (state[id] && state[id].validated && state[id].score === 0.5) t.half++; });
+    return t;
+  }
+
+  function renderRecap(stats, t) {
+    var body = $("#recap-body");
+    if (!body) return;
+    var rows = stats.map(function (s) {
+      var n = note20(s.earned, s.possible);
+      var contrib = s.possible ? Math.round(s.earned / s.possible * 20 * s.weight * 100) / 100 : 0;
+      return '<tr><th scope="row">Partie ' + s.num + " — " + s.title + "</th>" +
+        "<td>" + s.duration + "</td><td>" + fr(s.weight * 100, 1) + " %</td>" +
+        "<td>" + fr(s.earned, 1) + " / " + s.possible + " <span class=\"small\">(" + s.done + "/" + s.count + " validés)</span></td>" +
+        '<td class="rc-note">' + fr(n, 1) + "</td><td>" + fr(contrib, 2) + " pt</td></tr>";
+    });
+    body.innerHTML = rows.join("");
+  }
+
+  function updateScore() {
+    var stats = partStats(), t = totals(stats);
+    var prov = weighted(stats, true), fin = weighted(stats, false);
+    $("#score-val").innerHTML = (prov === null ? "–" : fr(prov, 1)) + "<small>/20</small>";
+    var parts = stats.filter(function (s) { return s.answered > 0; }).length;
+    if (MODE === "exam" && !graded) {
+      var filled = 0, tot = 0;
+      $$(".q[data-q] .q-input").forEach(function (i) { tot++; if (i.value.trim()) filled++; });
+      $$(".fast-q .sol input").forEach(function (i) { tot++; if (i.value.trim()) filled++; });
+      $("#score-count").textContent = filled + " réponse(s) renseignée(s) sur " + tot +
+        " · corrections et note dévoilées à la remise de la copie";
+      return;
+    }
+    $("#score-count").textContent = t.done + " item" + (t.done > 1 ? "s" : "") + " validé" + (t.done > 1 ? "s" : "") +
+      " sur " + t.count + " · " + fr(t.earned, 1) + " / " + fr(t.possible, 0) + " points · " +
+      (parts ? parts + " partie" + (parts > 1 ? "s" : "") + " entamée" + (parts > 1 ? "s" : "") : "aucune partie entamée") +
+      (t.half ? " · " + t.half + " demi-point(s) d'unité" : "");
+    $$(".final-note").forEach(function (el) { el.textContent = fin === null ? "0,0/20" : fr(fin, 1) + "/20"; });
+    renderRecap(stats, t);
+    $$(".final-detail").forEach(function (el) {
+      el.textContent = fr(t.earned, 1) + " point(s) sur " + t.possible + " au total, dont " + t.half +
+        " demi-point(s) perdu(s) sur les unités. " + (t.count - t.done) + " item(s) non validé(s), comptés à zéro. " +
+        "La note globale n'est pas la moyenne des points : chaque partie est ramenée sur 20 puis pondérée par sa durée conseillée.";
+    });
+  }
+
+  // ====================== QUESTIONS SIMPLES ======================
+  function setStatus(root, score) {
+    root.classList.remove("is-ok", "is-ko", "is-half");
+    root.classList.add(score === 1 ? "is-ok" : (score === 0.5 ? "is-half" : "is-ko"));
+  }
+  function statusText(r) {
+    if (r.empty) return "✗ Non répondue";
+    if (r.score === 1) return "✓ Juste";
+    if (r.score === 0.5) return r.unit === "wrong" ? "≈ Valeur juste, unité incorrecte — ½ point" : "≈ Valeur juste, unité manquante — ½ point";
+    return "✗ Faux";
+  }
+  function printStat(r) {
+    if (r.empty) return "Non répondue : comptée fausse";
+    if (r.score === 1) return "Juste";
+    if (r.score === 0.5) return r.unit === "wrong" ? "Valeur juste, unité incorrecte : ½ point" : "Valeur juste, unité manquante : ½ point";
+    return "Faux";
+  }
+  function applyResult(root, id, r) {
+    state[id] = { validated: true, ok: r.ok, score: r.score, unit: r.unit, value: $(".q-input", root).value };
+    var input = $(".q-input", root);
+    input.disabled = true;
+    input.setAttribute("aria-invalid", r.score === 1 ? "false" : "true");
+    $(".btn-validate", root).disabled = true;
+    setStatus(root, r.score);
+    $(".q-status", root).textContent = statusText(r);
+    var ps = $(".pstat", root); if (ps) ps.textContent = printStat(r);
+    var um = $(".q-unit-msg", root);
+    if (um) {
+      if (r.score === 0.5) {
+        um.textContent = (r.unit === "wrong" ? "Unité incorrecte" : "Unité manquante") +
+          " : la valeur est juste, mais l'unité attendue (" + r.unitLabel + ") vaut la moitié des points.";
+        um.hidden = false;
+      } else um.hidden = true;
+    }
+    var yours = $(".q-yours-val", root); if (yours) yours.textContent = input.value;
+    var ex = $(".q-expl", root); ex.hidden = false; ex.classList.add("reveal");
+  }
+  function validateSimple(id) {
+    var root = document.getElementById(id);
+    if (!root || MODE !== "training" || (state[id] && state[id].validated)) return;
+    var input = $(".q-input", root), msg = $(".q-msg", root);
+    var r = G.grade(input.value, QCFG[id].grader);
+    if (r.invalid) { msg.textContent = r.invalid; input.focus(); return; }
+    msg.textContent = "";
+    applyResult(root, id, r);
+    afterValidation();
+  }
+  function afterValidation() {
+    updateScore();
+    Object.keys(sketches).forEach(function (k) { sketches[k].checkReveal(); });
+  }
+
+  $$(".q[data-q]").forEach(function (root) {
+    var id = root.getAttribute("data-q");
+    state[id] = state[id] || { validated: false, ok: false, value: "" };
+    var input = $(".q-input", root);
+    $(".btn-validate", root).addEventListener("click", function () { validateSimple(id); });
+    input.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); validateSimple(id); } });
+    input.addEventListener("input", function () { dirty = true; $(".q-msg", root).textContent = ""; if (MODE === "exam") updateScore(); });
+  });
+
+  // ====================== FAST (groupe) ======================
+  $$(".fast-q").forEach(function (root) {
+    var btn = $(".btn-fast", root), msg = $(".q-msg", root);
+    var inputs = $$(".sol input", root);
+    inputs.forEach(function (inp) {
+      state[inp.getAttribute("data-q")] = { validated: false, ok: false, value: "" };
+      inp.addEventListener("input", function () { dirty = true; msg.textContent = ""; if (MODE === "exam") updateScore(); });
+      inp.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); btn.click(); } });
+    });
+    btn.addEventListener("click", function () {
+      if (MODE !== "training") return;
+      var empty = inputs.filter(function (i) { return !i.value.trim(); });
+      if (empty.length === inputs.length) { msg.textContent = "Complète au moins une case avant de valider."; inputs[0].focus(); return; }
+      if (empty.length && !btn.dataset.confirm) {
+        btn.dataset.confirm = "1";
+        btn.textContent = "Valider quand même (" + empty.length + " case" + (empty.length > 1 ? "s" : "") + " vide" + (empty.length > 1 ? "s" : "") + ")";
+        msg.textContent = "Des cases sont vides : elles seront comptées fausses et verrouillées.";
+        return;
+      }
+      msg.textContent = "";
+      gradeFast(root);
+    });
+    root.__gradeFast = function () { gradeFast(root); };
+    function gradeFast(root) {
+      var ok = 0;
+      inputs.forEach(function (inp) {
+        var id = inp.getAttribute("data-q");
+        var r = inp.value.trim() ? G.grade(inp.value, QCFG[id].grader) : { ok: false, score: 0 };
+        state[id] = { validated: true, ok: !!r.ok, score: r.ok ? 1 : 0, value: inp.value };
+        if (r.ok) ok++;
+        inp.disabled = true;
+        var cell = inp.closest(".sol");
+        setStatus(cell, r.ok ? 1 : 0);
+        $(".mark", cell).textContent = r.ok ? "✓ Juste" : "✗ Faux";
+      });
+      btn.disabled = true;
+      btn.textContent = "Diagramme validé";
+      $(".q-status", root).textContent = ok + " case" + (ok > 1 ? "s" : "") + " juste" + (ok > 1 ? "s" : "") + " sur " + inputs.length;
+      var ex = $(".q-expl", root); ex.hidden = false; ex.classList.add("reveal");
+      afterValidation();
+    }
+  });
+
+  // ====================== TRACÉS ======================
+  var COLORS = [["#1F5FA8", "Bleu"], ["#1B7A43", "Vert"], ["#1C2530", "Noir"]];
+  var CORR = "#C62828", TEAL = "#0E7C66", PURP = "#7B3FA0", ORNG = "#D35400";
+
+  function arrow(ctx, x1, y1, x2, y2, color, w, head) {
+    var dx = x2 - x1, dy = y2 - y1, L = Math.sqrt(dx * dx + dy * dy);
+    if (L < 0.5) return;
+    var h = Math.min(head || w * 4.5 + 4, L * 0.45), ux = dx / L, uy = dy / L;
+    ctx.save(); ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = w; ctx.lineCap = "round";
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2 - ux * h * 0.6, y2 - uy * h * 0.6); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - ux * h - uy * h * 0.42, y2 - uy * h + ux * h * 0.42);
+    ctx.lineTo(x2 - ux * h + uy * h * 0.42, y2 - uy * h - ux * h * 0.42);
+    ctx.closePath(); ctx.fill(); ctx.restore();
+  }
+  function line(ctx, x1, y1, x2, y2, color, w, dash) {
+    ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = w; ctx.lineCap = "round";
+    if (dash) ctx.setLineDash(dash);
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.restore();
+  }
+  function text(ctx, s, x, y, color, size, align, weight) {
+    ctx.save(); ctx.fillStyle = color; ctx.font = (weight || "600") + " " + size + "px system-ui, Segoe UI, Arial, sans-serif";
+    ctx.textAlign = align || "left"; ctx.textBaseline = "middle";
+    ctx.lineWidth = Math.max(2, size / 5); ctx.strokeStyle = "rgba(255,255,255,.9)"; ctx.strokeText(s, x, y);
+    ctx.fillText(s, x, y); ctx.restore();
+  }
+  // Libellé vectoriel : lettre surmontée d'une flèche + indice
+  function vlabel(ctx, x, y, letter, sub, color, size, align) {
+    ctx.save();
+    var f1 = "italic 700 " + size + "px system-ui, Segoe UI, Arial, sans-serif";
+    var f2 = "600 " + Math.round(size * 0.66) + "px system-ui, Segoe UI, Arial, sans-serif";
+    ctx.font = f1; var w1 = ctx.measureText(letter).width;
+    ctx.font = f2; var w2 = sub ? ctx.measureText(sub).width + 2 : 0;
+    var total = w1 + w2, x0 = align === "right" ? x - total : (align === "center" ? x - total / 2 : x);
+    ctx.textBaseline = "middle"; ctx.lineWidth = Math.max(3, size / 4); ctx.strokeStyle = "rgba(255,255,255,.92)";
+    ctx.fillStyle = color;
+    ctx.font = f1; ctx.strokeText(letter, x0, y); ctx.fillText(letter, x0, y);
+    if (sub) { ctx.font = f2; ctx.strokeText(sub, x0 + w1 + 2, y + size * 0.32); ctx.fillText(sub, x0 + w1 + 2, y + size * 0.32); }
+    ctx.restore();
+    arrow(ctx, x0, y - size * 0.62, x0 + w1 + 2, y - size * 0.62, color, Math.max(1, size / 14), size * 0.3);
+  }
+  function cross(ctx, x, y, r, color, w) {
+    line(ctx, x - r, y - r, x + r, y + r, color, w); line(ctx, x - r, y + r, x + r, y - r, color, w);
+  }
+  function dot(ctx, x, y, r, color) { ctx.save(); ctx.fillStyle = color; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); ctx.restore(); }
+
+  /* =======================================================================
+     DECOR : une entrée par fond de tracé, la clé reprend le nom de l'image
+     de fond (SKCFG[...].bg). Coordonnées exprimées dans le repère du fond,
+     origine en haut à gauche de l'image, avant application des marges (pad).
+       pad  : marges ajoutées autour du fond (place pour les annotations)
+       rs   : facteur de résolution interne du canvas (2 à 3 : net au zoom 400 %)
+       pxPerCm : pixels du fond par centimètre du document d'origine
+                 (à renseigner UNIQUEMENT si une échelle doit être mesurable ;
+                  active alors l'affichage de la longueur tracée)
+       decorate(ctx)   : annotations présentes sur le DR vierge (repères, forces,
+                         échelle, axes) — visibles aussi sur les DR imprimés
+       correction(ctx) : tracé corrigé superposé, ou null s'il n'y en a pas
+     Primitives disponibles : arrow, line, text, vlabel (vecteur surmonté d'une
+     flèche), cross, dot.
+     ======================================================================= */
+  var DECOR = {
+    DEMO: {
+      pad: { t: 20, r: 180, b: 20, l: 20 }, rs: 2.4,
+      decorate: function (c) {
+        cross(c, 260, 190, 6, "#000", 2); text(c, "A", 278, 205, "#000", 20, "center", "700");
+        arrow(c, 260, 190, 260, 60, "#000", 3); vlabel(c, 272, 110, "F", "", "#000", 20);
+        text(c, "Repère", 640, 40, "#000", 18, "left", "700");
+        arrow(c, 640, 150, 720, 150, "#000", 2); arrow(c, 640, 150, 640, 70, "#000", 2);
+        vlabel(c, 728, 156, "x", "", "#000", 18); vlabel(c, 652, 74, "y", "", "#000", 18);
+      },
+      correction: function (c) {
+        arrow(c, 260, 190, 420, 190, CORR, 3.4);
+        vlabel(c, 350, 172, "F'", "", CORR, 20, "center");
+        text(c, "Correction", 640, 240, CORR, 18, "left", "800");
+      }
+    }
+  };
+
+  function distSeg(px, py, x1, y1, x2, y2) {
+    var dx = x2 - x1, dy = y2 - y1, L2 = dx * dx + dy * dy;
+    var t = L2 ? ((px - x1) * dx + (py - y1) * dy) / L2 : 0;
+    t = Math.max(0, Math.min(1, t));
+    var qx = x1 + t * dx, qy = y1 + t * dy;
+    return Math.hypot(px - qx, py - qy);
+  }
+  function strokeHit(ctx, s, x, y, r) {
+    var i;
+    if (s.t === "pen") {
+      for (i = 1; i < s.pts.length; i++)
+        if (distSeg(x, y, s.pts[i - 1][0], s.pts[i - 1][1], s.pts[i][0], s.pts[i][1]) <= r + s.w / 2) return true;
+      return s.pts.length === 1 && Math.hypot(x - s.pts[0][0], y - s.pts[0][1]) <= r + s.w / 2;
+    }
+    if (s.t === "line" || s.t === "arrow")
+      return distSeg(x, y, s.a[0], s.a[1], s.b[0], s.b[1]) <= r + s.w / 2;
+    if (s.t === "text") {
+      ctx.save(); ctx.font = "700 " + s.size + "px system-ui, Segoe UI, Arial, sans-serif";
+      var w = ctx.measureText(s.s).width; ctx.restore();
+      return x >= s.x - r && x <= s.x + w + r && y >= s.y - s.size / 2 - r && y <= s.y + s.size / 2 + r;
+    }
+    return false;
+  }
+
+  function Sketch(root) {
+    var self = this;
+    this.root = root; this.id = root.getAttribute("data-sketch");
+    this.cfg = SKCFG[this.id]; this.dec = DECOR[this.cfg.bg];
+    this.img = $(".sk-bg", root);
+    this.canvas = $("canvas", root); this.ctx = this.canvas.getContext("2d");
+    var p = this.dec.pad;
+    this.iw = +this.img.getAttribute("width"); this.ih = +this.img.getAttribute("height");
+    this.W = this.iw + p.l + p.r; this.H = this.ih + p.t + p.b; this.rs = this.dec.rs;
+    this.canvas.width = Math.round(this.W * this.rs); this.canvas.height = Math.round(this.H * this.rs);
+    this.strokes = []; this.cur = null; this.tool = "pen"; this.color = COLORS[0][0];
+    this.wFactor = 1; this.zoom = 1; this.erasing = false;
+    this.locked = false; this.revealed = false; this.showCorr = false;
+    state[this.id] = { validated: false, sketch: true, score: 0 };
+    this.selfDone = false;
+
+    $$("[data-tool]", root).forEach(function (b) {
+      b.addEventListener("click", function () { self.setTool(b.getAttribute("data-tool")); });
+    });
+    $$("[data-color]", root).forEach(function (b) {
+      b.addEventListener("click", function () {
+        self.color = b.getAttribute("data-color");
+        $$("[data-color]", root).forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+      });
+    });
+    $$("[data-width]", root).forEach(function (b) {
+      b.addEventListener("click", function () {
+        self.wFactor = { fin: 0.5, moyen: 1, epais: 2.1 }[b.getAttribute("data-width")];
+        $$("[data-width]", root).forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+      });
+    });
+    $$("[data-zoom]", root).forEach(function (b) {
+      b.addEventListener("click", function () { self.setZoom(b.getAttribute("data-zoom")); });
+    });
+    $("[data-act=drprint]", root).addEventListener("click", printDR);
+    $("[data-act=undo]", root).addEventListener("click", function () { if (!self.locked) { self.strokes.pop(); self.draw(); } });
+    var clr = $("[data-act=clear]", root), clrT;
+    clr.addEventListener("click", function () {
+      if (self.locked) return;
+      if (clr.dataset.armed) { self.strokes = []; self.draw(); delete clr.dataset.armed; clr.textContent = "Tout effacer"; clearTimeout(clrT); return; }
+      clr.dataset.armed = "1"; clr.textContent = "Confirmer l'effacement";
+      clrT = setTimeout(function () { delete clr.dataset.armed; clr.textContent = "Tout effacer"; }, 3000);
+    });
+    $("[data-act=full]", root).addEventListener("click", function () { self.toggleFull(); });
+    $(".btn-sketch", root).addEventListener("click", function () { if (MODE === "training") self.validate(); });
+    var tg = $(".sk-corr-toggle input", root);
+    tg.addEventListener("change", function () { self.showCorr = tg.checked; self.draw(); });
+    var sbtn = $(".btn-self", root);
+    if (sbtn) sbtn.addEventListener("click", function () { self.selfAssess(); });
+    $$(".selfeval input[data-crit]", root).forEach(function (cb) {
+      cb.addEventListener("change", function () { dirty = true; self.refreshSelf(); });
+    });
+
+    var cv = this.canvas;
+    cv.addEventListener("pointerdown", function (e) { self.down(e); });
+    cv.addEventListener("pointermove", function (e) { self.move(e); });
+    cv.addEventListener("pointerup", function (e) { self.up(e); });
+    cv.addEventListener("pointercancel", function () { self.cur = null; self.erasing = false; self.draw(); });
+
+    if (this.img.complete && this.img.naturalWidth) this.draw();
+    else this.img.addEventListener("load", function () { self.draw(); });
+    if (!this.dec.correction) $(".sk-corr-toggle", root).remove();
+  }
+  Sketch.prototype.setTool = function (t) {
+    this.tool = t;
+    this.root.classList.toggle("tool-erase", t === "erase");
+    $$("[data-tool]", this.root).forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-tool") === t ? "true" : "false"); });
+  };
+  var SK_ZOOMS = [1, 1.5, 2, 3, 4];
+  Sketch.prototype.setZoom = function (what) {
+    var i = SK_ZOOMS.indexOf(this.zoom); if (i < 0) i = 0;
+    if (what === "in") i = Math.min(SK_ZOOMS.length - 1, i + 1);
+    else if (what === "out") i = Math.max(0, i - 1);
+    else if (what !== "keep") i = 0;
+    this.zoom = SK_ZOOMS[i];
+    var stage = $(".sk-stage", this.root);
+    // conserve le centre de la vue d'un palier à l'autre
+    var cx = (stage.scrollLeft + stage.clientWidth / 2) / Math.max(1, stage.scrollWidth);
+    var cy = (stage.scrollTop + stage.clientHeight / 2) / Math.max(1, stage.scrollHeight);
+    stage.classList.toggle("zoomed", this.zoom > 1);
+    if (this.zoom > 1) { this.canvas.style.width = this.zoom * 100 + "%"; this.canvas.style.maxWidth = "none"; }
+    else { this.canvas.style.width = ""; this.canvas.style.maxWidth = ""; }
+    $(".zoom-val", this.root).textContent = Math.round(this.zoom * 100) + " %";
+    $("[data-zoom=out]", this.root).disabled = this.zoom === SK_ZOOMS[0];
+    $("[data-zoom=in]", this.root).disabled = this.zoom === SK_ZOOMS[SK_ZOOMS.length - 1];
+    requestAnimationFrame(function () {
+      stage.scrollLeft = cx * stage.scrollWidth - stage.clientWidth / 2;
+      stage.scrollTop = cy * stage.scrollHeight - stage.clientHeight / 2;
+    });
+  };
+  Sketch.prototype.pos = function (e) {
+    var r = this.canvas.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * this.W / r.width, y: (e.clientY - r.top) * this.H / r.height, k: this.W / r.width };
+  };
+  Sketch.prototype.down = function (e) {
+    if (this.locked || e.button > 0) return;
+    var p = this.pos(e), w = Math.max(0.6, 2.6 * this.wFactor * p.k);
+    dirty = true;
+    if (this.tool === "text") { e.preventDefault(); this.textAt(e, p); return; }
+    if (this.tool === "erase") {
+      e.preventDefault(); this.canvas.setPointerCapture(e.pointerId);
+      this.erasing = true; this.eraseAt(p); return;
+    }
+    this.canvas.setPointerCapture(e.pointerId);
+    if (this.tool === "pen") this.cur = { t: "pen", pts: [[p.x, p.y]], c: this.color, w: w };
+    else this.cur = { t: this.tool, a: [p.x, p.y], b: [p.x, p.y], c: this.color, w: w };
+    e.preventDefault();
+  };
+  Sketch.prototype.eraseAt = function (p) {
+    var r = Math.max(6, 11 * p.k), ctx = this.ctx, before = this.strokes.length;
+    this.strokes = this.strokes.filter(function (s) { return !strokeHit(ctx, s, p.x, p.y, r); });
+    if (this.strokes.length !== before) this.draw();
+  };
+  Sketch.prototype.move = function (e) {
+    if (this.erasing) { this.eraseAt(this.pos(e)); return; }
+    if (!this.cur) return;
+    var p = this.pos(e);
+    if (this.cur.t === "pen") this.cur.pts.push([p.x, p.y]);
+    else { this.cur.b = [p.x, p.y]; this.measure(); }
+    this.draw();
+  };
+  Sketch.prototype.up = function () {
+    if (this.erasing) { this.erasing = false; return; }
+    if (!this.cur) return;
+    var s = this.cur; this.cur = null;
+    var keep = s.t === "pen" ? s.pts.length > 1 : Math.hypot(s.b[0] - s.a[0], s.b[1] - s.a[1]) > 3;
+    if (keep) this.strokes.push(s);
+    this.draw();
+  };
+  Sketch.prototype.measure = function () {
+    var el = $(".sk-meas", this.root);
+    if (!this.dec.pxPerCm || !this.cur || !this.cur.b) return;
+    var L = Math.hypot(this.cur.b[0] - this.cur.a[0], this.cur.b[1] - this.cur.a[1]) / this.dec.pxPerCm;
+    el.textContent = "Longueur tracée : " + fr(L, 1) + " cm";
+  };
+  Sketch.prototype.textAt = function (e, p) {
+    var self = this, stage = $(".sk-stage", this.root), r = stage.getBoundingClientRect();
+    var inp = document.createElement("input");
+    inp.className = "sk-text"; inp.type = "text"; inp.setAttribute("aria-label", "Texte à placer sur le tracé");
+    inp.style.left = (e.clientX - r.left) + "px"; inp.style.top = (e.clientY - r.top - 12) + "px"; inp.style.color = this.color;
+    stage.appendChild(inp); setTimeout(function () { inp.focus(); }, 0);
+    var done = false;
+    function commit(save) {
+      if (done) return; done = true;
+      if (save && inp.value.trim()) self.strokes.push({ t: "text", x: p.x, y: p.y, s: inp.value.trim(), c: self.color, size: 17 * p.k * (0.8 + 0.3 * self.wFactor) });
+      inp.remove(); self.draw();
+    }
+    inp.addEventListener("keydown", function (ev) { if (ev.key === "Enter") commit(true); if (ev.key === "Escape") commit(false); });
+    inp.addEventListener("blur", function () { commit(true); });
+  };
+  Sketch.prototype.paint = function (ctx, opts) {
+    var p = this.dec.pad;
+    ctx.setTransform(this.rs, 0, 0, this.rs, 0, 0);
+    ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, this.W, this.H);
+    if (this.img.naturalWidth) ctx.drawImage(this.img, p.l, p.t, this.iw, this.ih);
+    ctx.save(); ctx.translate(p.l, p.t); this.dec.decorate(ctx); ctx.restore();
+    if (opts.student) {
+      var list = this.cur ? this.strokes.concat([this.cur]) : this.strokes;
+      list.forEach(function (s) {
+        if (s.t === "pen") {
+          ctx.save(); ctx.strokeStyle = s.c; ctx.lineWidth = s.w; ctx.lineCap = "round"; ctx.lineJoin = "round";
+          ctx.beginPath(); ctx.moveTo(s.pts[0][0], s.pts[0][1]);
+          for (var i = 1; i < s.pts.length; i++) ctx.lineTo(s.pts[i][0], s.pts[i][1]);
+          ctx.stroke(); ctx.restore();
+        } else if (s.t === "line") line(ctx, s.a[0], s.a[1], s.b[0], s.b[1], s.c, s.w);
+        else if (s.t === "arrow") arrow(ctx, s.a[0], s.a[1], s.b[0], s.b[1], s.c, s.w);
+        else if (s.t === "text") text(ctx, s.s, s.x, s.y, s.c, s.size, "left", "700");
+      });
+    }
+    if (opts.corr && this.dec.correction) { ctx.save(); ctx.translate(p.l, p.t); this.dec.correction(ctx); ctx.restore(); }
+  };
+  Sketch.prototype.draw = function () {
+    this.paint(this.ctx, { student: true, corr: this.showCorr && this.revealed });
+  };
+  Sketch.prototype.snapshot = function (opts, maxpx) {
+    var c = document.createElement("canvas");
+    var s = Math.min(Math.max(this.rs, (maxpx || 1600) / this.W), (maxpx || 1600) / this.W);
+    c.width = Math.round(this.W * s); c.height = Math.round(this.H * s);
+    var saved = this.rs; this.rs = s;
+    this.paint(c.getContext("2d"), opts); this.rs = saved;
+    try { return c.toDataURL("image/png"); } catch (e) { return ""; }
+  };
+  Sketch.prototype.validate = function () {
+    if (this.locked) return;
+    this.locked = true; state[this.id].validated = true;
+    this.root.classList.add("locked");
+    if (this.cur) this.cur = null;
+    $$(".sk-toolbar button", this.root).forEach(function (b) {
+      var keep = ["full", "drprint"].indexOf(b.getAttribute("data-act")) >= 0 || b.hasAttribute("data-zoom");
+      if (!keep) b.disabled = true;
+    });
+    this.setZoom("keep");
+    var btn = $(".btn-sketch", this.root); btn.disabled = true; btn.textContent = "Tracé validé";
+    $(".q-status", this.root).textContent = this.strokes.length ? "Tracé enregistré" : "Tracé validé vide";
+    this.checkReveal(); this.draw();
+  };
+  Sketch.prototype.checkReveal = function () {
+    if (!this.locked || this.revealed) return;
+    var missing = (this.cfg.deps || []).filter(function (d) { return !(state[d] && state[d].validated); });
+    var wait = $(".sk-wait", this.root);
+    if (missing.length) {
+      wait.textContent = "La correction et l'auto-évaluation s'afficheront après validation de : " +
+        missing.map(function (d) { return QCFG[d].label; }).join(", ") + ".";
+      return;
+    }
+    wait.textContent = "";
+    this.revealed = true; this.root.classList.add("revealed");
+    var tg = $(".sk-corr-toggle input", this.root);
+    if (tg) { tg.checked = true; this.showCorr = true; }
+    var ex = $(".q-expl", this.root); ex.hidden = false; ex.classList.add("reveal");
+    var se = $(".selfeval", this.root); if (se) { se.hidden = false; se.classList.add("reveal"); }
+    this.refreshSelf();
+    this.draw();
+  };
+  Sketch.prototype.critBoxes = function () { return $$(".selfeval input[data-crit]", this.root); };
+  Sketch.prototype.refreshSelf = function () {
+    if (this.selfDone) return;
+    var n = this.critBoxes().filter(function (c) { return c.checked; }).length;
+    $(".se-score", this.root).textContent = n + " / " + this.cfg.pts + " critère" + (this.cfg.pts > 1 ? "s" : "") + " coché" + (n > 1 ? "s" : "");
+  };
+  Sketch.prototype.selfAssess = function () {
+    if (this.selfDone) return;
+    var boxes = this.critBoxes(), n = boxes.filter(function (c) { return c.checked; }).length;
+    this.selfDone = true;
+    state[this.id] = { validated: true, sketch: true, score: this.cfg.pts ? n / this.cfg.pts : 0, self: n };
+    boxes.forEach(function (c) { c.disabled = true; });
+    var btn = $(".btn-self", this.root); btn.disabled = true; btn.textContent = "Auto-évaluation validée";
+    var txt = n + " point" + (n > 1 ? "s" : "") + " sur " + this.cfg.pts + " attribué" + (n > 1 ? "s" : "") + " à ce tracé";
+    $(".se-score", this.root).textContent = txt;
+    var pr = $(".se-print", this.root); if (pr) pr.textContent = "Auto-évaluation : " + txt + ".";
+    this.root.classList.add(n === this.cfg.pts ? "is-ok" : (n ? "is-half" : "is-ko"));
+    updateScore();
+  };
+
+  Sketch.prototype.toggleFull = function () {
+    var on = !this.root.classList.contains("is-full");
+    this.setZoom("reset");
+    this.root.classList.toggle("is-full", on);
+    document.body.classList.toggle("sk-full-open", on);
+    var b = $("[data-act=full]", this.root);
+    b.textContent = on ? "Quitter le plein écran" : "Plein écran";
+    b.setAttribute("aria-pressed", on ? "true" : "false");
+    if (on) this.root.scrollTop = 0; else this.root.scrollIntoView({ block: "start" });
+  };
+  Sketch.prototype.preparePrint = function () {
+    $(".sk-print-student", this.root).src = this.snapshot({ student: true, corr: false });
+    var pc = $(".sk-print-corr", this.root);
+    if (pc) pc.src = this.dec.correction ? this.snapshot({ student: false, corr: true }) : "";
+  };
+
+  $$(".sketch[data-sketch]").forEach(function (root) { var s = new Sketch(root); sketches[s.id] = s; });
+
+  // ====================== CORRECTION GLOBALE (MODE EXAMEN) ======================
+  function gradeAll() {
+    if (graded) return;
+    graded = true;
+    document.body.classList.add("graded", "corrections-open");
+    stopTimer();
+    $$(".q[data-q]").forEach(function (root) {
+      var id = root.getAttribute("data-q");
+      if (state[id] && state[id].validated) return;
+      var v = $(".q-input", root).value;
+      var r = v.trim() ? G.grade(v, QCFG[id].grader) : { ok: false, score: 0 };
+      if (r.invalid) r = { ok: false, score: 0, empty: !v.trim() };
+      if (!v.trim()) r.empty = true;
+      $(".q-msg", root).textContent = "";
+      applyResult(root, id, r);
+    });
+    $$(".fast-q").forEach(function (root) { if (root.__gradeFast) root.__gradeFast(); });
+    Object.keys(sketches).forEach(function (k) {
+      var s = sketches[k];
+      if (!s.locked) s.validate(); else s.checkReveal();
+    });
+    updateScore();
+    var r = $("#recap");
+    if (r) r.scrollIntoView({ block: "start" });
+  }
+
+  var submitBtn = $("#exam-submit");
+  if (submitBtn) {
+    submitBtn.addEventListener("click", function () {
+      var missing = 0;
+      $$(".q[data-q]").forEach(function (root) { if (!$(".q-input", root).value.trim()) missing++; });
+      $$(".fast-q .sol input").forEach(function (i) { if (!i.value.trim()) missing++; });
+      if (!submitBtn.dataset.armed) {
+        submitBtn.dataset.armed = "1";
+        submitBtn.textContent = "Confirmer : corriger définitivement ma copie";
+        $("#exam-warn").textContent = (missing ? missing + " réponse(s) encore vide(s), comptée(s) fausse(s). " : "") +
+          "Après correction, plus aucune réponse ne pourra être modifiée.";
+        return;
+      }
+      $("#exam-warn").textContent = "";
+      submitBtn.disabled = true;
+      gradeAll();
+    });
+  }
+
+  // ====================== CHRONOMÈTRE ======================
+  var tStart = 0, tAcc = 0, tPaused = false, tTick = null;
+  function elapsedMs() { return tAcc + (tPaused || !tStart ? 0 : Date.now() - tStart); }
+  function hms(ms) {
+    var s = Math.floor(ms / 1000), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60);
+    return h + ":" + String(m).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0");
+  }
+  function longTime(ms) {
+    var s = Math.floor(ms / 1000), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60);
+    return (h ? h + " h " + String(m).padStart(2, "0") + " min" : m + " min " + String(s % 60).padStart(2, "0") + " s");
+  }
+  function renderTimer() {
+    var el = $("#timer-val");
+    if (!el) return;
+    el.textContent = hms(elapsedMs());
+    el.classList.toggle("over", elapsedMs() > CONSEIL_MIN * 60000);
+  }
+  function startTimer() { tStart = Date.now(); tTick = setInterval(renderTimer, 1000); renderTimer(); }
+  function stopTimer() {
+    if (!tPaused && tStart) { tAcc += Date.now() - tStart; tPaused = true; }
+    if (tTick) { clearInterval(tTick); tTick = null; }
+    renderTimer();
+  }
+  // ====================== CHOIX DU MODE ======================
+  function startMode(mode) {
+    MODE = mode;
+    document.body.classList.remove("no-mode");
+    document.body.classList.add(mode === "exam" ? "mode-exam" : "mode-training");
+    if (mode === "training") { graded = true; document.body.classList.add("corrections-open"); }
+    startTimer();
+    updateScore();
+    window.scrollTo(0, 0);
+    var h1 = $(".cartouche h1"); if (h1) h1.setAttribute("tabindex", "-1"), h1.focus();
+  }
+  $$(".btn-mode").forEach(function (b) {
+    b.addEventListener("click", function () { startMode(b.getAttribute("data-mode")); });
+  });
+
+  // ====================== IMPRESSION DES DOCUMENTS RÉPONSES ======================
+  /* Intitulés des documents réponses dans la fenêtre « Imprimer les DR ».
+     Clé = nom du fond ; scale:true ajoute l'avertissement d'échelle. */
+  var DR_NAMES = {
+    DEMO: { doc: "DR1", q: "Q2.1", t: "Intitulé du document réponse", scale: false }
+  };
+
+  function printDR() {
+    var order = $$(".sketch[data-sketch]").map(function (el) { return el.getAttribute("data-sketch"); });
+    var w = window.open("", "_blank");
+    if (!w) { alert("La fenêtre d'impression a été bloquée par le navigateur. Autorise les fenêtres surgissantes pour ce fichier, puis réessaie."); return; }
+    var sheets = order.map(function (id) {
+      var s = sketches[id], n = DR_NAMES[s.cfg.bg] || { doc: "DR", q: s.cfg.label, t: "" };
+      var img = s.snapshot({ student: false, corr: false }, 2400);
+      return '<section class="sheet"><header><h2><span class="dr">' + n.doc + "</span> " + n.q + " — " + n.t + "</h2>" +
+        (n.scale ? '<p class="sc">Échelle : le segment repère de la figure vaut 1 m·s<sup>-1</sup>. Imprime à 100 % (sans « ajuster à la page ») pour conserver 1 m·s<sup>-1</sup> = 3 cm ; sinon, mesure ce segment et raisonne par proportion.</p>' : "") +
+        '<p class="nm">Nom : ______________________________</p></header>' +
+        '<div class="fig"><img src="' + img + '" alt="' + n.doc + " " + n.q + '"></div></section>';
+    }).join("");
+    var css = "@page{size:A4 landscape;margin:8mm}" +
+      "*{box-sizing:border-box}body{margin:0;font:14px/1.4 system-ui,Segoe UI,Arial,sans-serif;color:#1C2530;background:#E3E5E0}" +
+      ".bar{position:sticky;top:0;display:flex;gap:12px;align-items:center;background:#1C2530;color:#fff;padding:10px 16px;z-index:5}" +
+      ".bar b{font-size:15px}.bar p{margin:0;font-size:13px;color:#D7DDE2;flex:1}" +
+      ".bar button{border:0;background:#F2B705;color:#1C2530;font-weight:700;padding:9px 16px;border-radius:2px;cursor:pointer}" +
+      ".sheet{background:#fff;width:281mm;height:194mm;margin:14px auto;padding:4mm 2mm;display:flex;flex-direction:column;box-shadow:0 2px 10px rgba(0,0,0,.15)}" +
+      ".sheet header{flex:0 0 auto;border-bottom:1.5px solid #1C2530;padding-bottom:3mm;margin-bottom:3mm}" +
+      "h2{margin:0;font-size:13pt}.dr{background:#1C2530;color:#fff;padding:1px 7px;margin-right:4px}" +
+      ".sc{margin:2mm 0 0;font-size:9.5pt}.nm{margin:2mm 0 0;font-size:10pt}" +
+      ".fig{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}" +
+      ".fig img{max-width:100%;max-height:100%;width:auto;height:auto}" +
+      "@media print{body{background:#fff}.bar{display:none}.sheet{width:auto;height:190mm;margin:0;padding:0;box-shadow:none;break-after:page}" +
+      ".sheet:last-child{break-after:auto}}";
+    w.document.write('<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8">' +
+      "<title>Documents réponses à imprimer</title><style>" + css + "</style></head><body>" +
+      '<div class="bar"><b>Documents réponses</b><p>Quatre pages, une par document, à imprimer en A4 paysage à 100 %.</p>' +
+      '<button type="button" onclick="window.print()">Imprimer</button></div>' + sheets +
+      "<script>window.addEventListener('load',function(){setTimeout(function(){window.print();},400);});<" + "/script></body></html>");
+    w.document.close();
+  }
+
+  // ====================== PANNEAU DOCUMENTS ======================
+  var panel = $("#docpanel"), body = $(".dp-body"), zoom = 1, currentDoc = null, lastOpener = null;
+  var ZOOMS = [0.5, 0.75, 1, 1.25, 1.5, 2, 2.5, 3];
+  function setZoom(z) {
+    zoom = Math.max(ZOOMS[0], Math.min(ZOOMS[ZOOMS.length - 1], z));
+    body.style.setProperty("--z", zoom);
+    $("#dp-zoom").textContent = Math.round(zoom * 100) + " %";
+  }
+  function openDoc(key, opener) {
+    var sec = document.getElementById("doc-" + key);
+    if (!sec) return;
+    if (currentDoc === key && document.body.classList.contains("panel-open")) { closeDoc(); return; }
+    $$(".doc", panel).forEach(function (d) { d.classList.toggle("active", d === sec); });
+    $("#dp-title").innerHTML = sec.getAttribute("data-title") + "<small>" + sec.getAttribute("data-kind") + "</small>";
+    $$("[data-doc]").forEach(function (b) {
+      var on = b.getAttribute("data-doc") === key;
+      if (b.classList.contains("tab") || b.parentNode.classList.contains("dp-tabs")) b.setAttribute("aria-selected", on ? "true" : "false");
+      else b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+    if (currentDoc !== key) { body.scrollTop = 0; setZoom(1); }
+    currentDoc = key; lastOpener = opener || lastOpener;
+    document.body.classList.add("panel-open");
+    panel.setAttribute("aria-hidden", "false");
+  }
+  function closeDoc() {
+    document.body.classList.remove("panel-open");
+    panel.setAttribute("aria-hidden", "true");
+    $$("[data-doc]").forEach(function (b) { b.setAttribute(b.classList.contains("doc-chip") ? "aria-pressed" : "aria-selected", "false"); });
+    currentDoc = null;
+    if (lastOpener && document.contains(lastOpener)) lastOpener.focus();
+  }
+  $$("[data-doc]").forEach(function (b) {
+    b.addEventListener("click", function () { openDoc(b.getAttribute("data-doc"), b); });
+  });
+  $("#dp-close").addEventListener("click", closeDoc);
+  $("#dp-in").addEventListener("click", function () { var i = ZOOMS.indexOf(zoom); setZoom(ZOOMS[Math.min(ZOOMS.length - 1, i + 1)]); });
+  $("#dp-out").addEventListener("click", function () { var i = ZOOMS.indexOf(zoom); setZoom(ZOOMS[Math.max(0, i - 1)]); });
+  $("#dp-fit").addEventListener("click", function () { setZoom(1); });
+  $("#btn-docs").addEventListener("click", function () { openDoc(currentDoc || "DP1", this); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape") return;
+    var full = $(".sketch.is-full"); if (full) { sketches[full.getAttribute("data-sketch")].toggleFull(); return; }
+    if (document.body.classList.contains("panel-open")) closeDoc();
+  });
+
+  // ====================== IMPRESSION ======================
+  function preparePrint() {
+    updateScore();
+    Object.keys(sketches).forEach(function (k) { sketches[k].preparePrint(); });
+    var nom = $("#nom-eleve").value.trim();
+    $$(".print-nom").forEach(function (el) { el.textContent = nom || "________________"; });
+    var d = new Date();
+    $$(".print-date").forEach(function (el) { el.textContent = d.toLocaleDateString("fr-FR"); });
+    $$(".print-mode").forEach(function (el) {
+      el.textContent = MODE === "exam" ? (graded ? "examen (copie corrigée)" : "examen — copie non corrigée") : "entraînement";
+    });
+    $$(".print-time").forEach(function (el) { el.textContent = longTime(elapsedMs()); });
+  }
+  window.addEventListener("beforeprint", preparePrint);
+  $$(".btn-print").forEach(function (b) { b.addEventListener("click", function () { preparePrint(); window.print(); }); });
+
+  window.addEventListener("beforeunload", function (e) {
+    if (!dirty) return;
+    e.preventDefault(); e.returnValue = "";
+  });
+
+  renderTimer();
+  updateScore();
+  window.__app__ = { state: state, sketches: sketches, openDoc: openDoc, closeDoc: closeDoc,
+                     partStats: partStats, weighted: weighted, updateScore: updateScore,
+                     startMode: startMode, gradeAll: gradeAll, elapsedMs: elapsedMs,
+                     mode: function () { return MODE; }, isGraded: function () { return graded; } };
+})();
+</script>
+</body>
+</html>
