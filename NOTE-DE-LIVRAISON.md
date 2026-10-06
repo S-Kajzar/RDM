@@ -1,5 +1,19 @@
 # Note de livraison — Résistance des matériaux : traction, compression et cisaillement
 
+> **Mise à jour : accueil et découpage en deux exercices.** La page est désormais `index.html`. Son
+> accueil reprend la mise en page de la page « Ajustements » : un bandeau « Les cours » (Cours 1 —
+> Traction et compression, Cours 2 — Cisaillement, tous deux « En cours d'édition ») et une grille
+> d'exercices prête à accueillir d'autres cartes. Le sujet décrit ci-dessous est découpé en deux
+> exercices indépendants, chacun avec son accueil, son choix de mode, sa note et son récapitulatif :
+> **Exercice 1 — Traction et compression** (`?ex=traction` : parties 1 à 4 ci-dessous, 1 h 05) et
+> **Exercice 2 — Cisaillement** (`?ex=cisaillement` : parties 5 à 11 ci-dessous, renumérotées 1 à 7,
+> 1 h 20). Dans chaque exercice, les questions, figures et documents sont renumérotés à partir de 1
+> (DP1, DT1, DT2) ; les tracés deviennent Q1.5 (traction) et Q7.2 (cisaillement), chacun sur une feuille DR1.
+> Les contenus, réponses et tolérances sont inchangés. Le moteur applicatif lit désormais la durée
+> conseillée dans `window.__CONSEIL_MIN__` (elle dépend de l'exercice ouvert). Tests : 56 tests unitaires
+> et 7 parcours navigateur (accueil, cours, 20/20 dans chaque exercice, examen, impression, tracés).
+
+
 **Fichier livré** : `exercice-rdm-traction-compression-cisaillement.html` (512 Kio, dont 290 Kio d'images
 encodées ; `index.html` y redirige pour GitHub Pages).
 

@@ -1,4 +1,4 @@
-// Tests navigateur (Playwright + Chromium) des parcours entraînement et examen.
+// Tests navigateur (Playwright + Chromium) : accueil, cours, parcours entraînement et examen des deux exercices.
 //   NODE_PATH=$(npm root -g) node --test tests/navigateur.test.js
 const test = require("node:test");
 const assert = require("node:assert/strict");
@@ -7,22 +7,26 @@ const fs = require("node:fs");
 const { chromium } = require("playwright");
 const REP = require("./reponses.js");
 
-const FILE = path.join(__dirname, "..", "exercice-rdm-traction-compression-cisaillement.html");
+const FILE = path.join(__dirname, "..", "index.html");
 const URL = "file://" + FILE;
-const SKETCHES = ["sk_q1_5", "sk_q11_2"];
+const EXO = {
+  traction: { prefix: "t", sketch: "sk_t1_5", dr: /DR1 Q1\.5/, parts: 4, items: 24, points: 27 },
+  cisaillement: { prefix: "c", sketch: "sk_c7_2", dr: /DR1 Q7\.2/, parts: 7, items: 31, points: 34 },
+};
+const answers = (key) => Object.entries(REP).filter(([id]) => id.startsWith(EXO[key].prefix));
 let browser;
 
 test.before(async () => { browser = await chromium.launch(); });
 test.after(async () => { await browser.close(); });
 
-async function open(viewport) {
+async function open(query, viewport) {
   const context = await browser.newContext({ viewport: viewport || { width: 1366, height: 900 } });
   const page = await context.newPage();
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
   page.on("console", (m) => { if (m.type() === "error") errors.push(m.text()); });
   page.on("dialog", (d) => d.accept());
-  await page.goto(URL);
+  await page.goto(URL + (query || ""));
   return { context, page, errors };
 }
 
@@ -39,256 +43,211 @@ async function drawArrow(page, sk, x1, y1, x2, y2) {
 const nStrokes = (page, sk) => page.evaluate((id) => window.__app__.sketches[id].strokes.length, sk);
 const text = (page, sel) => page.locator(sel).first().innerText();
 
-test("page d'accueil : seul écran visible, aucune mention d'origine, un seul bouton d'impression", async () => {
+test("accueil : deux boutons de cours, deux cartes d'exercices, aucune mention d'origine", async () => {
   const { context, page, errors } = await open();
+  assert.ok(await page.locator("body.hub").count());
   assert.ok(await page.isVisible("#home"));
   assert.ok(!(await page.isVisible("main.page")));
   assert.ok(!(await page.isVisible(".banner")));
-  assert.equal(await page.locator(".home-facts > div").count(), 4);
-  assert.match(await text(page, ".home-facts"), /11 parties[\s\S]*2 h 25[\s\S]*4 documents[\s\S]*2 tracés/);
-  assert.equal(await page.locator(".btn-print").count(), 1);
+  assert.match(await text(page, "#home h1"), /Résistance des matériaux/);
+  const cours = await page.locator(".hub-course a.btn").evaluateAll((as) => as.map((a) => [a.textContent, a.getAttribute("href")]));
+  assert.deepEqual(cours, [["Cours 1 — Traction et compression", "?ex=cours-traction"], ["Cours 2 — Cisaillement", "?ex=cours-cisaillement"]]);
+  const cards = await page.locator(".ex-grid .mode-card").evaluateAll((cs) => cs.map((c) => [c.querySelector("h3").textContent, c.querySelector("a").getAttribute("href")]));
+  assert.deepEqual(cards, [["Traction et compression", "?ex=traction"], ["Cisaillement", "?ex=cisaillement"]]);
+  assert.equal(await page.locator("#home .btn-mode").count(), 0);
+  // pas de débordement horizontal sur téléphone
+  await page.setViewportSize({ width: 390, height: 844 });
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
   const src = fs.readFileSync(FILE, "utf8").replace(/data:[^"]+/g, "");
   assert.doesNotMatch(src, /\b(BTS|bac(calaur[ée]at)?|session \d|[ée]preuve|acad[ée]mie|sujet z[ée]ro|brevet)\b/i);
   assert.deepEqual(errors, []);
   await context.close();
 });
 
-test("entraînement : sujet entièrement juste = 20/20, verrouillage, corrections et impression", async () => {
-  const { context, page, errors } = await open();
-  await page.click("[data-mode=training]");
-  assert.ok(await page.isVisible("main.page"));
-  assert.ok(!(await page.isVisible("#exam-submit")));
-
-  // tracé de l'axe validé avant Q11.1 : la correction attend la question
-  await drawArrow(page, "sk_q11_2", 0.3, 0.4, 0.5, 0.4);
-  await page.click("#sk_q11_2 .btn-sketch");
-  assert.match(await text(page, "#sk_q11_2 .sk-wait"), /Q11\.1/);
-  assert.ok(!(await page.isVisible("#sk_q11_2 .selfeval")));
-  assert.ok(!(await page.isVisible("#sk_q11_2 .sk-corr-toggle")));
-
-  for (const [id, ans] of Object.entries(REP)) {
-    await page.fill(`#in-${id}`, ans);
-    if (id.endsWith("_2") || id === "q1_9") await page.press(`#in-${id}`, "Enter");
-    else await page.click(`#${id} .btn-validate`);
-    assert.match(await text(page, `#${id} .q-status`), /Juste/, id);
-    assert.ok(await page.isDisabled(`#in-${id}`), id + " verrouillée");
-    assert.ok(await page.isDisabled(`#${id} .btn-validate`));
-    assert.ok(await page.isVisible(`#${id} .q-expl`));
+test("cours : page « En cours d'édition » avec retour à l'accueil", async () => {
+  for (const [q, title] of [["cours-traction", "Traction et compression"], ["cours-cisaillement", "Cisaillement"]]) {
+    const { context, page, errors } = await open("?ex=" + q);
+    assert.equal((await text(page, "#home h1")).trim(), title);
+    assert.match(await text(page, "#home"), /En cours d'édition/);
+    await page.click("#home a[href='?']");
+    await page.waitForURL(/index\.html\?$/);
+    assert.ok(await page.locator(".ex-grid").count(), "retour à l'accueil");
+    assert.deepEqual(errors, []);
+    await context.close();
   }
-  // la correction de l'axe est apparue avec la validation de Q11.1
-  assert.ok(await page.isVisible("#sk_q11_2 .selfeval"));
-  assert.ok(await page.isChecked("#sk_q11_2 .sk-corr-toggle input"));
-
-  await drawArrow(page, "sk_q1_5", 0.6, 0.6, 0.6, 0.9);
-  await page.click("#sk_q1_5 .btn-sketch");
-  assert.ok(await page.isVisible("#sk_q1_5 .selfeval"));
-  for (const sk of SKETCHES) {
-    for (const cb of await page.locator(`#${sk} .selfeval input[data-crit]`).all()) await cb.check();
-    await page.click(`#${sk} .btn-self`);
-    assert.match(await text(page, `#${sk} .se-score`), /4 points sur 4/);
-    assert.ok(await page.isDisabled(`#${sk} .btn-self`));
-  }
-  assert.match(await text(page, "#score-val"), /20,0/);
-  assert.equal((await text(page, "#recap .final-note")).trim(), "20,0/20");
-  const notes = await page.locator("#recap-body .rc-note").allInnerTexts();
-  assert.equal(notes.length, 11);
-  notes.forEach((n) => assert.equal(n.trim(), "20,0"));
-  assert.match(await text(page, "#score-count"), /55 items validés sur 55 · 61,0 \/ 61 points/);
-
-  // chronomètre au format h:mm:ss
-  await page.waitForTimeout(1200);
-  assert.match(await text(page, "#timer-val"), /^0:\d{2}:\d{2}$/);
-  assert.notEqual(await text(page, "#timer-val"), "0:00:00");
-
-  // impression : en-tête de copie, corrections visibles, deux images par tracé
-  await page.fill("#nom-eleve", "Élève Test");
-  await page.evaluate(() => window.dispatchEvent(new Event("beforeprint")));
-  await page.emulateMedia({ media: "print" });
-  assert.ok(await page.isVisible(".print-summary"));
-  assert.ok(await page.isVisible(".print-note-line"));
-  assert.ok(!(await page.isVisible(".print-nograde")));
-  assert.ok(!(await page.isVisible(".banner")));
-  assert.ok(!(await page.isVisible(".rail")));
-  assert.match(await text(page, ".print-summary"), /Élève Test[\s\S]*entraînement[\s\S]*\d+ min \d{2} s[\s\S]*20,0\/20/);
-  for (const sk of SKETCHES) {
-    assert.match(await page.getAttribute(`#${sk} .sk-print-student`, "src"), /^data:image\/png/);
-    assert.match(await page.getAttribute(`#${sk} .sk-print-corr`, "src"), /^data:image\/png/);
-  }
-  assert.ok(await page.isVisible("#q1_1 .q-expl"));
-  const pdf = await page.pdf({ format: "A4" });
-  assert.ok(pdf.length > 100000);
-  assert.deepEqual(errors, []);
+  // adresse inconnue : accueil
+  const { context, page } = await open("?ex=inconnu");
+  assert.ok(await page.locator(".ex-grid").count());
   await context.close();
 });
 
-test("entraînement : demi-point d'unité, réponse fausse, saisie vide refusée, note provisoire pondérée", async () => {
-  const { context, page, errors } = await open();
+for (const key of Object.keys(EXO)) {
+  const X = EXO[key];
+  test(`${key} : accueil de l'exercice puis sujet entièrement juste = 20/20, impression`, async () => {
+    const { context, page, errors } = await open("?ex=" + key);
+    assert.equal(await page.locator("#home .btn-mode").count(), 2);
+    assert.match(await text(page, ".home-facts"), new RegExp(`${X.parts} parties`));
+    await page.click("[data-mode=training]");
+    assert.ok(await page.isVisible("main.page"));
+    assert.equal(await page.locator(".part").count(), X.parts);
+    assert.deepEqual(await page.locator(".rail .tab:not(.tab-home)").allInnerTexts(), ["DP1", "DT1", "DT2"]);
+    assert.ok(await page.isVisible(".rail .tab-home"));
+    assert.ok(await page.isVisible(".c-top a[href='?']"));
+
+    const sk = X.sketch;
+    const deps = await page.evaluate((id) => window.__SKCFG__[id].deps, sk);
+    await drawArrow(page, sk, 0.4, 0.4, 0.6, 0.4);
+    await page.click(`#${sk} .btn-sketch`);
+    if (deps.length) {
+      assert.match(await text(page, `#${sk} .sk-wait`), /Q7\.1/);
+      assert.ok(!(await page.isVisible(`#${sk} .selfeval`)));
+    }
+    for (const [id, ans] of answers(key)) {
+      await page.fill(`#in-${id}`, ans);
+      await page.click(`#${id} .btn-validate`);
+      assert.match(await text(page, `#${id} .q-status`), /Juste/, id);
+      assert.ok(await page.isDisabled(`#in-${id}`), id + " verrouillée");
+      assert.ok(await page.isVisible(`#${id} .q-expl`));
+    }
+    assert.ok(await page.isVisible(`#${sk} .selfeval`));
+    assert.ok(await page.isChecked(`#${sk} .sk-corr-toggle input`));
+    for (const cb of await page.locator(`#${sk} .selfeval input[data-crit]`).all()) await cb.check();
+    await page.click(`#${sk} .btn-self`);
+    assert.match(await text(page, `#${sk} .se-score`), /4 points sur 4/);
+
+    assert.match(await text(page, "#score-val"), /20,0/);
+    assert.equal((await text(page, "#recap .final-note")).trim(), "20,0/20");
+    const notes = await page.locator("#recap-body .rc-note").allInnerTexts();
+    assert.equal(notes.length, X.parts);
+    notes.forEach((n) => assert.equal(n.trim(), "20,0"));
+    assert.match(await text(page, "#score-count"), new RegExp(`${X.items} items validés sur ${X.items} · ${X.points},0 / ${X.points} points`));
+
+    await page.fill("#nom-eleve", "Élève Test");
+    await page.evaluate(() => window.dispatchEvent(new Event("beforeprint")));
+    await page.emulateMedia({ media: "print" });
+    assert.ok(!(await page.isVisible(".c-top")));
+    assert.ok(!(await page.isVisible(".print-nograde")));
+    assert.match(await text(page, ".print-summary"), /Élève Test[\s\S]*entraînement[\s\S]*durée conseillée : 1 h [0-9]{2}[\s\S]*20,0\/20/);
+    assert.match(await page.getAttribute(`#${sk} .sk-print-student`, "src"), /^data:image\/png/);
+    assert.match(await page.getAttribute(`#${sk} .sk-print-corr`, "src"), /^data:image\/png/);
+    const pdf = await page.pdf({ format: "A4" });
+    assert.ok(pdf.length > 50000);
+    await page.emulateMedia({ media: "screen" });
+
+    // fenêtre des documents réponses : la feuille vierge de l'exercice
+    const [popup] = await Promise.all([context.waitForEvent("page"), page.click(`#${sk} [data-act=drprint]`)]);
+    await popup.waitForLoadState();
+    assert.equal(await popup.locator(".sheet").count(), 1);
+    assert.match(await popup.locator(".sheet h2").innerText(), X.dr);
+    assert.deepEqual(errors, []);
+    await context.close();
+  });
+}
+
+test("traction : demi-point d'unité, saisie vide refusée, note provisoire pondérée", async () => {
+  const { context, page, errors } = await open("?ex=traction");
   await page.click("[data-mode=training]");
-  await page.click("#q1_1 .btn-validate");
-  assert.match(await text(page, "#q1_1 .q-msg"), /Saisis une réponse/);
-  assert.ok(!(await page.isDisabled("#in-q1_1")));
-
-  await page.fill("#in-q1_1", "833,85");
-  await page.click("#q1_1 .btn-validate");
-  assert.match(await text(page, "#q1_1 .q-status"), /unité manquante — ½ point/);
-  assert.match(await text(page, "#q1_1 .q-unit-msg"), /Unité manquante.*\(N\)/);
-  assert.ok(await page.locator("#q1_1.is-half").count());
+  await page.click("#t1_1 .btn-validate");
+  assert.match(await text(page, "#t1_1 .q-msg"), /Saisis une réponse/);
+  await page.fill("#in-t1_1", "833,85");
+  await page.click("#t1_1 .btn-validate");
+  assert.match(await text(page, "#t1_1 .q-unit-msg"), /Unité manquante.*\(N\)/);
   assert.match(await text(page, "#score-val"), /10,0/);
-
-  await page.fill("#in-q2_2", "100 kN");
-  await page.click("#q2_2 .btn-validate");
-  assert.match(await text(page, "#q2_2 .q-unit-msg"), /Unité incorrecte/);
-
-  await page.fill("#in-q1_2", "700 mm");
-  await page.click("#q1_2 .btn-validate");
-  assert.ok(await page.locator("#q1_2.is-ko").count());
-  // partie 1 : 0,5/2 → 5/20 (poids 30) ; partie 2 : 0,5/1 → 10/20 (poids 10) → (30×5 + 10×10)/40 = 6,25
+  await page.fill("#in-t2_2", "100 kN");
+  await page.click("#t2_2 .btn-validate");
+  assert.match(await text(page, "#t2_2 .q-unit-msg"), /Unité incorrecte/);
+  await page.fill("#in-t1_2", "700 mm");
+  await page.click("#t1_2 .btn-validate");
+  assert.ok(await page.locator("#t1_2.is-ko").count());
+  // partie 1 : 0,5/2 → 5/20 (30 min) ; partie 2 : 0,5/1 → 10/20 (10 min) → 6,25
   assert.match(await text(page, "#score-val"), /6,[23]/);
   assert.deepEqual(errors, []);
   await context.close();
 });
 
-test("examen : rien ne filtre avant la remise, y compris à l'impression ; remise en deux temps", async () => {
-  const { context, page, errors } = await open();
+test("traction en examen : rien ne filtre avant la remise, y compris à l'impression ; remise en deux temps", async () => {
+  const { context, page, errors } = await open("?ex=traction");
   await page.click("[data-mode=exam]");
   assert.ok(!(await page.isVisible("#score-val")));
-  assert.match(await text(page, ".exam-state"), /Note masquée/);
-  assert.ok(!(await page.isVisible("#q1_1 .btn-validate")));
-  assert.ok(!(await page.isVisible("#sk_q1_5 .btn-sketch")));
-  assert.ok(!(await page.isVisible("#recap-graded")));
+  assert.ok(!(await page.isVisible("#t1_1 .btn-validate")));
+  for (const [id, ans] of answers("traction")) if (id !== "t1_1" && id !== "t2_3") await page.fill(`#in-${id}`, ans);
+  await page.fill("#in-t3_1", "49050 N"); // signe oublié : faux
+  await drawArrow(page, "sk_t1_5", 0.6, 0.6, 0.6, 0.9);
+  assert.match(await text(page, "#score-count"), /21 réponse\(s\) renseignée\(s\) sur 23/);
 
-  for (const [id, ans] of Object.entries(REP)) if (id !== "q1_1" && id !== "q2_3") await page.fill(`#in-${id}`, ans);
-  await page.fill("#in-q3_1", "49050 N"); // signe oublié : faux
-  await drawArrow(page, "sk_q1_5", 0.6, 0.6, 0.6, 0.9);
-  assert.match(await text(page, "#score-count"), /51 réponse\(s\) renseignée\(s\) sur 53/);
-  // une réponse reste modifiable
-  await page.fill("#in-q2_2", "1 MPa");
-  await page.fill("#in-q2_2", REP.q2_2);
-
-  // impression avant la remise : copie non corrigée, aucune correction
   await page.evaluate(() => window.dispatchEvent(new Event("beforeprint")));
   await page.emulateMedia({ media: "print" });
   assert.ok(await page.isVisible(".print-nograde"));
   assert.ok(!(await page.isVisible(".print-note-line")));
-  assert.ok(!(await page.isVisible("#q2_2 .q-expl")));
-  assert.ok(!(await page.isVisible("#sk_q1_5 .q-expl")));
-  assert.ok(!(await page.isVisible("#sk_q1_5 .sk-print-corr")));
+  assert.ok(!(await page.isVisible("#t2_2 .q-expl")));
+  assert.ok(!(await page.isVisible("#sk_t1_5 .q-expl")));
+  assert.ok(!(await page.isVisible("#sk_t1_5 .sk-print-corr")));
   assert.ok(!(await page.isVisible("#recap-graded")));
-  assert.match(await text(page, ".print-summary"), /examen — copie non corrigée/);
   await page.emulateMedia({ media: "screen" });
 
   await page.click("#exam-submit");
   assert.match(await text(page, "#exam-warn"), /2 réponse\(s\) encore vide\(s\)/);
-  assert.ok(!(await page.locator("body.graded").count()));
   await page.click("#exam-submit");
   assert.ok(await page.locator("body.graded").count());
-  assert.ok(await page.isDisabled("#in-q2_2"));
-  assert.match(await text(page, "#q1_1 .q-status"), /Non répondue/);
-  assert.match(await text(page, "#q3_1 .q-status"), /Faux/);
-  assert.match(await text(page, "#q2_2 .q-status"), /Juste/);
-  assert.ok(await page.isVisible("#q2_2 .q-expl"));
-  for (const sk of SKETCHES) assert.ok(await page.isVisible(`#${sk} .selfeval`), sk);
-
+  assert.match(await text(page, "#t1_1 .q-status"), /Non répondue/);
+  assert.match(await text(page, "#t3_1 .q-status"), /Faux/);
+  assert.ok(await page.isVisible("#sk_t1_5 .selfeval"));
   const t1 = await text(page, "#timer-val");
   await page.waitForTimeout(1300);
   assert.equal(await text(page, "#timer-val"), t1, "chronomètre arrêté");
-
-  for (const sk of SKETCHES) {
-    for (const cb of await page.locator(`#${sk} .selfeval input[data-crit]`).all()) await cb.check();
-    await page.click(`#${sk} .btn-self`);
-  }
-  // P1 : 12/13 ; P2 : 3/4 ; P3 : 5/6 ; autres parties 20/20
-  // (30×240/13 + 10×15 + 15×100/6 + 90×20) / 145 = 18,99
-  assert.equal((await text(page, "#recap .final-note")).trim(), "19,0/20");
-  await page.evaluate(() => window.dispatchEvent(new Event("beforeprint")));
-  await page.emulateMedia({ media: "print" });
-  assert.ok(await page.isVisible(".print-note-line"));
-  assert.ok(!(await page.isVisible(".print-nograde")));
-  assert.match(await text(page, ".print-summary"), /examen \(copie corrigée\)[\s\S]*19,0\/20/);
+  for (const cb of await page.locator("#sk_t1_5 .selfeval input[data-crit]").all()) await cb.check();
+  await page.click("#sk_t1_5 .btn-self");
+  // P1 : 12/13 ; P2 : 3/4 ; P3 : 5/6 ; P4 : 4/4 → (30×18,46 + 10×15 + 15×16,67 + 10×20) / 65 = 17,8
+  assert.equal((await text(page, "#recap .final-note")).trim(), "17,8/20");
   assert.deepEqual(errors, []);
   await context.close();
 });
 
-test("tracés : outils, gomme, annuler, texte, zoom, plein écran, fenêtre des DR", async () => {
-  const { context, page, errors } = await open();
+test("cisaillement : outils de tracé, documents, téléphone", async () => {
+  const { context, page, errors } = await open("?ex=cisaillement");
   await page.click("[data-mode=training]");
-  const sk = "sk_q1_5";
+  const sk = "sk_c7_2";
   await drawArrow(page, sk, 0.2, 0.2, 0.4, 0.2);
   await drawArrow(page, sk, 0.2, 0.7, 0.4, 0.7);
-  await page.click(`#${sk} [data-tool=line]`);
-  const box = await page.locator(`#${sk} canvas`).boundingBox();
-  await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5);
-  await page.mouse.down();
-  await page.mouse.move(box.x + box.width * 0.7, box.y + box.height * 0.5, { steps: 3 });
-  await page.mouse.up();
-  assert.equal(await nStrokes(page, sk), 3);
-  // gomme : un clic sur la première flèche ne supprime qu'elle
-  await page.click(`#${sk} [data-tool=erase]`);
-  const box1 = await page.locator(`#${sk} canvas`).boundingBox();
-  await page.mouse.click(box1.x + box1.width * 0.3, box1.y + box1.height * 0.2);
   assert.equal(await nStrokes(page, sk), 2);
-  await page.click(`#${sk} [data-act=undo]`);
+  await page.click(`#${sk} [data-tool=erase]`);
+  const box = await page.locator(`#${sk} canvas`).boundingBox();
+  await page.mouse.click(box.x + box.width * 0.3, box.y + box.height * 0.2);
   assert.equal(await nStrokes(page, sk), 1);
-  // texte
+  await page.click(`#${sk} [data-act=undo]`);
+  assert.equal(await nStrokes(page, sk), 0);
   await page.click(`#${sk} [data-tool=text]`);
-  const box2 = await page.locator(`#${sk} canvas`).boundingBox(); // la page a pu défiler
+  const box2 = await page.locator(`#${sk} canvas`).boundingBox();
   await page.mouse.click(box2.x + box2.width * 0.8, box2.y + box2.height * 0.3);
   // le gabarit donne le focus au champ de texte au tick suivant
   await page.waitForFunction(() => document.activeElement && document.activeElement.classList.contains("sk-text"));
-  await page.keyboard.type("P");
+  await page.keyboard.type("S1");
   await page.keyboard.press("Enter");
-  assert.equal(await nStrokes(page, sk), 2);
-  // zoom et plein écran
+  assert.equal(await nStrokes(page, sk), 1);
   await page.click(`#${sk} [data-zoom=in]`);
   assert.equal((await text(page, `#${sk} .zoom-val`)).trim(), "150 %");
-  await page.click(`#${sk} [data-zoom=reset]`);
   await page.click(`#${sk} [data-act=full]`);
   assert.ok(await page.locator(`#${sk}.is-full`).count());
   await page.keyboard.press("Escape");
   assert.ok(!(await page.locator(`#${sk}.is-full`).count()));
-  // tout effacer : confirmation en deux temps
-  await page.click(`#${sk} [data-act=clear]`);
-  assert.equal(await nStrokes(page, sk), 2);
-  await page.click(`#${sk} [data-act=clear]`);
-  assert.equal(await nStrokes(page, sk), 0);
 
-  // fenêtre des documents réponses : les deux fonds vierges, un par page
-  const [popup] = await Promise.all([context.waitForEvent("page"), page.click(`#${sk} [data-act=drprint]`)]);
-  await popup.waitForLoadState();
-  assert.equal(await popup.locator(".sheet").count(), 2);
-  const heads = await popup.locator(".sheet h2").allInnerTexts();
-  assert.match(heads[0], /DR1 Q1\.5/);
-  assert.match(heads[1], /DR2 Q11\.2/);
-  assert.match(await popup.locator(".bar p").innerText(), /Deux pages/);
-  assert.match(await popup.locator(".sheet img").first().getAttribute("src"), /^data:image\/png/);
-  assert.deepEqual(errors, []);
-  await context.close();
-});
-
-test("documents : rail, boutons des en-têtes de question, fermeture ; rail remplacé par un bouton sous 760 px", async () => {
-  const { context, page, errors } = await open();
-  await page.click("[data-mode=training]");
   await page.click(".rail [data-doc=DT1]");
-  assert.ok(await page.locator("body.panel-open").count());
-  assert.ok(await page.isVisible("#doc-DT1"));
-  assert.match(await text(page, "#dp-title"), /DT1 : Formulaire — traction et compression/);
-  await page.click("#partie-4 .doc-chip[data-doc=DT3]");
-  assert.ok(await page.isVisible("#doc-DT3"));
-  assert.match(await text(page, "#doc-DT3"), /60/);
-  await page.click("#dp-in");
-  assert.equal((await text(page, "#dp-zoom")).trim(), "125 %");
+  assert.match(await text(page, "#dp-title"), /DT1 : Formulaire — cisaillement/);
+  await page.click("#partie-1 .doc-chip[data-doc=DT2]");
+  assert.match(await text(page, "#doc-DT2"), /Aire des sections usuelles/);
   await page.keyboard.press("Escape");
   assert.ok(!(await page.locator("body.panel-open").count()));
+  // figures renumérotées dans l'exercice
+  assert.match(await text(page, "#partie-1 figcaption"), /^Figure 1 — Levier et chape/);
   await context.close();
 
-  const m = await open({ width: 420, height: 800 });
+  const m = await open("?ex=cisaillement", { width: 420, height: 800 });
   await m.page.click("[data-mode=exam]");
   assert.ok(!(await m.page.isVisible(".rail")));
-  assert.ok(await m.page.isVisible("#btn-docs"));
+  assert.ok(await m.page.isVisible(".c-top a"));
   await m.page.click("#btn-docs");
   assert.ok(await m.page.isVisible("#doc-DP1"));
-  const overflow = await m.page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-  assert.ok(overflow <= 0, "pas de défilement horizontal");
+  assert.ok(await m.page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
   assert.deepEqual([...errors, ...m.errors], []);
   await m.context.close();
 });

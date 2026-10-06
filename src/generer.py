@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Génère la page d'exercices « Résistance des matériaux : traction, compression
-et cisaillement » à partir du gabarit et du contenu décrit dans ce fichier.
+"""Génère la page « Résistance des matériaux » (index.html) : un accueil sur le modèle de la page
+« Ajustements », deux cours (en cours d'édition) et deux exercices, Traction et compression
+(?ex=traction) et Cisaillement (?ex=cisaillement), à partir du gabarit et du contenu décrit ici.
 
     python3 src/generer.py
 
-Le bloc <style> du gabarit, le moteur de correction (Grading) et le moteur
-applicatif sont recopiés tels quels ; seules les entrées propres au sujet du
-moteur applicatif (DECOR, DR_NAMES, CONSEIL_MIN et le nombre de pages de la
-fenêtre « Imprimer les DR ») sont remplacées, chaque remplacement étant
-vérifié. Tout le reste de la page (accueil, documents, parties, questions,
-configuration) est produit ici.
+Le bloc <style> du gabarit, le moteur de correction (Grading) et le moteur applicatif sont recopiés
+tels quels ; seules les entrées propres au sujet du moteur applicatif sont remplacées, chaque
+remplacement étant vérifié : DECOR, DR_NAMES, le texte de la fenêtre « Imprimer les DR » et
+CONSEIL_MIN, lu dans window.__CONSEIL_MIN__ puisque la durée conseillée dépend de l'exercice ouvert.
+Un petit script d'aiguillage, exécuté avant les moteurs, installe le contenu demandé par l'adresse.
 """
 import base64
+import copy
 import html
 import json
 import pathlib
@@ -22,8 +23,8 @@ import struct
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 GABARIT = ROOT / "src" / "gabarit-exercice-interactif.html"
 IMAGES = ROOT / "src" / "images"
-SORTIE = ROOT / "exercice-rdm-traction-compression-cisaillement.html"
-TITRE = "Résistance des matériaux : traction, compression et cisaillement"
+SORTIE = ROOT / "index.html"
+TITRE = "Résistance des matériaux"
 
 
 # ============================================================ outils
@@ -860,7 +861,7 @@ DECOR_JS = r"""  var DECOR = {
 
 DR_NAMES_JS = """  var DR_NAMES = {
     POUTRE: { doc: "DR1", q: "Q1.5", t: "Poutre AC isolée : actions mécaniques extérieures", scale: false },
-    AXE: { doc: "DR2", q: "Q11.2", t: "Axe de chape : sections cisaillées", scale: false }
+    AXE: { doc: "DR1", q: "Q7.2", t: "Axe de chape : sections cisaillées", scale: false }
   };
 """
 
@@ -1065,33 +1066,47 @@ def part_points(p):
     return sum(1 if b["kind"] == "q" else len(b["criteria"]) for b in p["blocks"] if b["kind"] in ("q", "sk"))
 
 
-# Libellés des questions (pour les dépendances des tracés)
-QLABEL = {}
-for p in PARTS:
-    for b in p["blocks"]:
-        if b["kind"] in ("q", "sk"):
-            b["label"] = "Q" + p["num"] + "." + b["id"].split("_")[-1]
-            QLABEL[b["id"]] = b["label"]
-
-TOTAL_MIN = sum(p["minutes"] for p in PARTS)
-N_Q = sum(1 for p in PARTS for b in p["blocks"] if b["kind"] == "q")
-N_SK = sum(1 for p in PARTS for b in p["blocks"] if b["kind"] == "sk")
-
-
 def hm(minutes):
     h, m = divmod(minutes, 60)
     return f"{h} h {m:02d}" if h else f"{m} min"
 
 
+# ============================================================ EXERCICES (découpage du contenu)
+# Chaque exercice reprend une partie des PARTIES ci-dessus, renumérotées à partir de 1.
+# Les documents sont renommés exercice par exercice (DP1, DT1, DT2…) ; « docs » donne la correspondance.
+EXO_DEFS = [
+    {"key": "traction", "prefix": "t", "tag": "Exercice 1", "title": "Traction et compression",
+     "parts": PARTS[0:4], "docs": {"DP1": "DP1", "DT1": "DT1", "DT3": "DT2"}, "fig_shift": 0,
+     "hero": ("t1-siege-fil", "Siège suspendu : poutre AC articulée sur un mur, maintenue par le fil DE",
+              "Le fil d'acier DE porte le siège : on calcule sa tension, sa contrainte et son allongement."),
+     "card": "Un fil de maintien, une barre tendue, un tube comprimé et un fer plat à dimensionner : effort "
+             "normal, contrainte, loi de Hooke, allongement.",
+     "sub": "Quatre pièces sollicitées en traction ou en compression : calculer l'effort normal et la contrainte, "
+            "vérifier la condition de résistance, appliquer la loi de Hooke et dimensionner une section."},
+    {"key": "cisaillement", "prefix": "c", "tag": "Exercice 2", "title": "Cisaillement",
+     "parts": PARTS[4:11], "docs": {"DP1": "DP1", "DT2": "DT1", "DT3": "DT2"}, "fig_shift": 4,
+     "hero": ("c2-pince", "Pince à goupille : charges P sur les poignées, force de serrage dans les mâchoires",
+              "La goupille de la pince transmet tout l'effort entre les deux branches."),
+     "card": "Goupilles, boulons, vis et axe de chape : compter les sections cisaillées, calculer la contrainte "
+             "de cisaillement, dimensionner un diamètre.",
+     "sub": "Sept assemblages à vérifier ou à dimensionner : identifier le simple ou double cisaillement, "
+            "calculer l'effort tranchant et la contrainte, en déduire une section ou une charge admissible."},
+]
+
+HOUSE = ('<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.3" '
+         'stroke-linejoin="round" stroke-linecap="round"><path d="M3 11.5 12 4l9 7.5"/>'
+         '<path d="M5.5 9.8V20h4.5v-5.5h4V20h4.5V9.8"/></svg>')
+
+QLABEL = {}
+CUR = {"total": 1}
+
+
 def pct(minutes):
-    return fr(minutes / TOTAL_MIN * 100, 1)
+    return fr(minutes / CUR["total"] * 100, 1)
 
 
 def render_part(p):
     pts = part_points(p)
-    out = []
-    if p.get("chapitre"):
-        out.append(f'\n  <h2 class="chapitre">{p["chapitre"]}</h2>')
     body = "\n      ".join(p["intro"])
     blocks = []
     for b in p["blocks"]:
@@ -1104,7 +1119,7 @@ def render_part(p):
         else:
             blocks.append(b["html"])
     n = p["num"]
-    out.append(f"""
+    return f"""
   <section class="part" id="partie-{n}" aria-labelledby="t-partie-{n}">
     <header class="part-head"><div class="part-num" aria-hidden="true">{n}</div>
       <div><h2 id="t-partie-{n}"><span class="sr-only">Partie {n} : </span>{p['title']}</h2>
@@ -1112,26 +1127,207 @@ def render_part(p):
     <div class="part-body">
       {body}{''.join(blocks)}
     </div>
-  </section>""")
+  </section>"""
+
+
+DATA_RE = re.compile(r"data:image/png;base64,[A-Za-z0-9+/=]+")
+
+
+def map_text(html_, docs, fig_shift):
+    """Renomme les documents (DT3 → DT2…) et les figures, sans toucher aux images encodées."""
+    def one(seg):
+        seg = re.sub(r"\b(DP1|DT1|DT2|DT3)\b", lambda m: docs.get(m.group(1), m.group(1)), seg)
+        if fig_shift:
+            seg = re.sub(r"Figure (\d+) — ", lambda m: f"Figure {int(m.group(1)) - fig_shift} — ", seg)
+        return seg
+    out, last = [], 0
+    for m in DATA_RE.finditer(html_):
+        out.append(one(html_[last:m.start()]))
+        out.append(m.group(0))
+        last = m.end()
+    out.append(one(html_[last:]))
     return "".join(out)
 
 
-def render_docs():
+def prepare_exo(e):
+    """Copie et renumérote les parties d'un exercice ; calcule sa configuration."""
+    parts = copy.deepcopy(e["parts"])
+    idmap = {}
+    for i, p in enumerate(parts):
+        p["num"] = str(i + 1)
+        # « Cisaillement : goupille… » → « Goupille… » dans l'exercice Cisaillement
+        if p["title"].startswith(e["title"] + " : "):
+            t = p["title"][len(e["title"]) + 3:]
+            p["title"] = t[0].upper() + t[1:]
+        p.pop("chapitre", None)
+        for b in p["blocks"]:
+            if b["kind"] in ("q", "sk"):
+                suffix = b["id"].split("_")[-1]
+                new = (f"sk_{e['prefix']}{p['num']}_{suffix}" if b["kind"] == "sk"
+                       else f"{e['prefix']}{p['num']}_{suffix}")
+                idmap[b["id"]] = new
+                b["id"] = new
+                b["label"] = f"Q{p['num']}.{suffix}"
+                QLABEL[new] = b["label"]
+            elif b["kind"] == "qbar":
+                b["label"] = re.sub(r"Q\d+\.", f"Q{p['num']}.", b["label"])
+    for p in parts:
+        for b in p["blocks"]:
+            if b["kind"] == "sk":
+                b["deps"] = [idmap[d] for d in b["deps"]]
+    e["P"] = parts
+    e["minutes"] = sum(p["minutes"] for p in parts)
+    e["n_q"] = sum(1 for p in parts for b in p["blocks"] if b["kind"] == "q")
+    e["n_sk"] = sum(1 for p in parts for b in p["blocks"] if b["kind"] == "sk")
+    e["points"] = sum(part_points(p) for p in parts)
+    qcfg, skcfg, parts_cfg = {}, {}, []
+    for p in parts:
+        parts_cfg.append({"num": p["num"], "title": p["title"], "minutes": p["minutes"],
+                          "duration": hm(p["minutes"]), "points": part_points(p)})
+        for b in p["blocks"]:
+            if b["kind"] == "q":
+                qcfg[b["id"]] = {"label": b["label"], "part": p["num"], "pts": 1, "grader": b["grader"]}
+            elif b["kind"] == "sk":
+                skcfg[b["id"]] = {"bg": b["bg"], "deps": b["deps"], "label": b["label"], "part": p["num"],
+                                  "pts": len(b["criteria"]),
+                                  "criteria": [re.sub(r"<[^>]+>", "", c) for c in b["criteria"]]}
+    e["cfg"] = {"title": e["title"], "minutes": e["minutes"], "duree": hm(e["minutes"]),
+                "cartouche": f"{e['n_q']} questions notées (unités comprises) et {e['n_sk']} tracé"
+                             f"{'s' if e['n_sk'] > 1 else ''} auto-évalué{'s' if e['n_sk'] > 1 else ''}, "
+                             f"répartis en {len(parts)} parties pondérées par leur durée.",
+                "parts": parts_cfg, "qcfg": qcfg, "skcfg": skcfg}
+
+
+def render_docs(e):
     rail, tabs, secs = [], [], []
     first_dt = True
     for key, title, kind, is_dt, content in DOCS:
+        if key not in e["docs"]:
+            continue
+        k = e["docs"][key]
         if is_dt and first_dt:
-            rail.append('  <div class="grp" aria-hidden="true"></div>')
+            rail.append('<div class="grp" aria-hidden="true"></div>')
             first_dt = False
         cls = "tab dt" if is_dt else "tab"
-        rail.append(f'  <button type="button" class="{cls}" data-doc="{key}" aria-selected="false" title="{esc(title)}">{key}</button>')
-        tabs.append(f'    <button type="button" data-doc="{key}" aria-selected="false">{key}</button>')
-        secs.append(f'    <section class="doc" id="doc-{key}" data-title="{key} : {esc(title)}" data-kind="{kind}">{content}\n    </section>')
-    return "\n".join(rail), "\n".join(tabs), "\n".join(secs)
+        rail.append(f'<button type="button" class="{cls}" data-doc="{k}" aria-selected="false" title="{esc(title)}">{k}</button>')
+        tabs.append(f'<button type="button" data-doc="{k}" aria-selected="false">{k}</button>')
+        secs.append(f'<section class="doc" id="doc-{k}" data-title="{k} : {esc(title)}" data-kind="{kind}">'
+                    f'{map_text(content, e["docs"], 0)}\n</section>')
+    return "".join(rail), "".join(tabs), "\n".join(secs)
+
+
+def render_exo_home(e):
+    src, w, h = png(e["hero"][0])
+    docs = sorted(set(e["docs"].values()))
+    docs_txt = ", ".join(docs[:-1]) + " et " + docs[-1]
+    facts = ('<div class="home-facts">'
+             f'<div><b>{len(e["P"])} parties</b><span>{e["n_q"]} questions</span></div>'
+             f'<div><b>{hm(e["minutes"])}</b><span>durée conseillée</span></div>'
+             f'<div><b>{len(docs)} documents</b><span>{docs_txt}</span></div>'
+             f'<div><b>{e["n_sk"]} tracé</b><span>auto-évalué</span></div></div>')
+    return (f'<div class="home-top"><div class="home-top-l"><header class="home-head"><span class="mc-tag">{e["tag"]}</span>'
+            f'<h1 id="home-title">{e["title"]}</h1><p class="home-sub">{e["sub"]}</p></header>{facts}</div>'
+            f'<figure class="home-hero"><img src="{src}" alt="{esc(e["hero"][1])}" width="{w}" height="{h}">'
+            f'<figcaption class="small">{e["hero"][2]}</figcaption></figure></div>')
+
+
+MODES_HTML = """<h2 class="home-choose">Choisis ton mode de travail</h2>
+<div class="modes">
+  <article class="mode-card">
+    <div class="mc-head"><span class="mc-tag">Mode 1</span><h3>Mode entraînement</h3></div>
+    <p class="mc-lead">Pour apprendre en avançant, question par question.</p>
+    <ul><li>Chaque question se valide isolément ; la démarche corrigée s'affiche aussitôt.</li>
+      <li>La note pondérée s'actualise en continu dans le bandeau.</li>
+      <li>Les documents et le chronomètre restent disponibles, sans contrainte de temps.</li></ul>
+    <button type="button" class="btn btn-mode" data-mode="training">Commencer l'entraînement</button>
+  </article>
+  <article class="mode-card exam">
+    <div class="mc-head"><span class="mc-tag">Mode 2</span><h3>Mode examen</h3></div>
+    <p class="mc-lead">Pour se placer dans les conditions d'une évaluation.</p>
+    <ul><li>Aucune correction et aucune note pendant la composition ; les réponses restent modifiables.</li>
+      <li>Le chronomètre tourne, à comparer à la durée conseillée.</li>
+      <li>En fin de sujet, le bouton « J'ai fini, je fais corriger ma copie » dévoile d'un coup les corrections, les notes par partie et la note globale.</li></ul>
+    <button type="button" class="btn btn-mode" data-mode="exam">Composer en mode examen</button>
+  </article>
+</div>
+<p class="home-note small">Le mode se choisit une seule fois : pour en changer, reviens à l'accueil (onglet maison) et rouvre l'exercice. Rien n'est enregistré sur l'ordinateur.</p>
+<p class="home-back"><a class="btn ghost" href="?">""" + HOUSE + """ Retour à l'accueil</a></p>"""
+
+
+COURS = [("cours-traction", "Cours 1", "Traction et compression"),
+         ("cours-cisaillement", "Cours 2", "Cisaillement")]
+
+
+def render_hub():
+    src, w, h = png("accueil")
+    cards = "".join(
+        f'<article class="mode-card"><div class="mc-head"><span class="mc-tag">{e["tag"]}</span><h3>{e["title"]}</h3></div>'
+        f'<p>{e["card"]}</p><p class="small ex-meta">{len(e["P"])} parties · {e["n_q"]} questions · '
+        f'{e["n_sk"]} tracé · {hm(e["minutes"])}</p>'
+        f'<a class="btn" href="?ex={e["key"]}">Ouvrir l\'exercice</a></article>' for e in EXO_DEFS)
+    btns = "".join(f'<a class="btn" href="?ex={k}">{tag} — {t}</a>' for k, tag, t in COURS)
+    return (f'<div class="home-top"><div class="home-top-l"><header class="home-head"><h1 id="home-title">{TITRE}</h1>'
+            '<p class="home-sub">Traction, compression et cisaillement : calculer une contrainte et une déformation, '
+            'vérifier une pièce ou la dimensionner. Deux cours et des exercices interactifs, à faire en mode '
+            'entraînement ou en mode examen.</p></header></div>'
+            f'<figure class="home-hero"><img src="{src}" alt="À gauche, un siège suspendu par un fil et un tube '
+            f'comprimé ; à droite, une pince à goupille et un axe de chape" width="{w}" height="{h}">'
+            '<figcaption class="small">Quelques-unes des pièces étudiées dans les exercices.</figcaption></figure></div>'
+            '<section class="hub-course" aria-labelledby="hub-c"><div><h2 id="hub-c">Les cours</h2>'
+            '<p>Les notions, les formules et des exemples commentés, chapitre par chapitre.</p></div>'
+            f'<div class="hub-btns">{btns}</div></section>'
+            f'<h2 class="home-choose">Les exercices</h2><div class="ex-grid">{cards}</div>'
+            '<p class="home-note small">Chaque exercice propose ensuite le mode entraînement (correction question par '
+            'question) ou le mode examen (correction à la remise de la copie). Rien n\'est enregistré sur '
+            'l\'ordinateur.</p>')
+
+
+def render_cours(tag, title):
+    return (f'<div class="home-top home-top-single"><div class="home-top-l"><header class="home-head">'
+            f'<span class="mc-tag">{tag}</span><h1 id="home-title">{title}</h1>'
+            '<p class="home-sub">Ce cours est en cours d\'édition : il sera mis en ligne prochainement.</p>'
+            '</header></div></div>'
+            '<section class="hub-course en-cours" aria-labelledby="ec-t"><div><h2 id="ec-t">En cours d\'édition</h2>'
+            '<p>Le contenu de ce cours est en préparation.</p></div>'
+            f'<div class="hub-btns"><a class="btn" href="?">{HOUSE} Retour à l\'accueil</a></div></section>')
+
+
+ROUTER_JS = r"""<script>/* Aiguillage : accueil, cours ou exercice selon ?ex=… — s'exécute avant les moteurs du gabarit */
+(function () {
+  "use strict";
+  var EXOS = window.__EXOS__, ex = new URLSearchParams(location.search).get("ex") || "";
+  function $(s) { return document.querySelector(s); }
+  function tpl(id) { return document.getElementById(id).innerHTML; }
+  var home = $("#home .home-inner");
+  window.__PARTS__ = []; window.__QCFG__ = {}; window.__SKCFG__ = {}; window.__CONSEIL_MIN__ = 0;
+  if (Object.prototype.hasOwnProperty.call(EXOS, ex)) {
+    var E = EXOS[ex];
+    window.__PARTS__ = E.parts; window.__QCFG__ = E.qcfg; window.__SKCFG__ = E.skcfg;
+    window.__CONSEIL_MIN__ = E.minutes;
+    document.title = E.title + " — __TITRE__ — exercice interactif";
+    document.body.classList.add("exo-" + ex);
+    $(".rail").innerHTML = tpl("tpl-rail-" + ex) + '<div class="grp" aria-hidden="true"></div>' +
+      '<a class="tab tab-home" href="?" title="Retour à l\'accueil" aria-label="Retour à l\'accueil">__HOUSE__</a>';
+    $(".dp-tabs").innerHTML = tpl("tpl-tabs-" + ex);
+    $(".dp-body").innerHTML = tpl("tpl-docs-" + ex);
+    $("#parts").innerHTML = tpl("tpl-parts-" + ex);
+    home.innerHTML = tpl("tpl-home-" + ex) + tpl("tpl-modes");
+    $(".cartouche h1").textContent = E.title;
+    $(".cartouche .title p").textContent = E.cartouche;
+    Array.prototype.forEach.call(document.querySelectorAll(".print-conseil"), function (el) { el.textContent = E.duree; });
+  } else {
+    document.body.classList.add("hub");
+    var page = document.getElementById("tpl-" + ex) && /^cours-/.test(ex) ? "tpl-" + ex : "tpl-hub";
+    home.innerHTML = tpl(page);
+    if (page !== "tpl-hub") document.title = home.querySelector("h1").textContent + " — cours — __TITRE__";
+    else document.title = "__TITRE__ — cours et exercices interactifs";
+  }
+})();
+</script>"""
 
 
 CONTENT_CSS = """<style>
-/* ---------- compléments de contenu (hors gabarit) : écriture des calculs, séparateurs de chapitre ---------- */
+/* ---------- compléments de contenu (hors gabarit) : écriture des calculs, documents ---------- */
 .eq{margin:.35rem 0 .55rem; overflow-x:auto; line-height:2.1}
 .eq b{background:#fff; border:1px solid var(--trait); padding:0 .3rem; white-space:nowrap}
 .frac{display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 .12em; line-height:1.25}
@@ -1140,13 +1336,64 @@ CONTENT_CSS = """<style>
 .sqrt{white-space:nowrap; display:inline-flex; align-items:stretch; vertical-align:middle}
 .sqrt>.radix{display:flex; align-items:flex-end; font-size:1.1em; line-height:1; margin-right:-.12em}
 .sqrt>.rad{border-top:1.2px solid currentColor; border-left:1.2px solid currentColor; padding:.12em .2em 0 .25em; line-height:1.35; display:inline-flex; align-items:center}
-h2.chapitre{font:700 1.7rem/1.1 var(--f-titre); margin:8px 0 18px; padding:10px 16px; background:var(--encre); color:#fff; border-left:10px solid var(--jaune)}
 .doc-text ol,.doc-text ul{padding-left:1.2rem}
 .doc-text li{margin:.2rem 0}
-@media print{ .eq{overflow:visible; line-height:1.7} h2.chapitre{background:#fff; color:#000; border:2px solid #000; border-left-width:8px}
+
+/* ---------- accueil, cours et retour (d'après la page « Ajustements ») ---------- */
+a.btn{display:inline-flex; align-items:center; gap:8px; text-decoration:none}
+a.btn svg,.c-top svg{width:18px; height:18px; flex:0 0 auto}
+.tab-home{display:flex; align-items:center; justify-content:center; padding:8px 0 8px 4px; background:var(--encre); color:var(--jaune); text-decoration:none}
+.tab-home svg{width:22px; height:22px; display:block}
+.tab-home:hover{background:#2E3B47}
+.c-top{margin:0 0 12px}
+.c-top a{display:inline-flex; align-items:center; gap:6px; font:600 .95rem var(--f-titre); color:var(--encre); text-decoration:none; border:1.5px solid var(--encre); background:var(--papier); padding:5px 12px 5px 10px}
+.c-top a:hover{background:var(--jaune-pale)}
+#home{padding:20px 20px 32px}
+.home-top{display:grid; grid-template-columns:minmax(0,1.6fr) minmax(0,1fr); gap:14px; align-items:stretch; margin:0 0 14px}
+.home-top-single{grid-template-columns:1fr}
+.home-top-l{display:flex; flex-direction:column; gap:10px; min-width:0}
+.home-top .home-head{padding:14px 20px; flex:1}
+.home-top .home-head h1{margin:6px 0 6px; font-size:clamp(1.4rem,2.4vw,1.85rem)}
+.home-top .home-sub{font-size:.95rem}
+.home-top .home-hero{margin:0; padding:8px; display:flex; flex-direction:column; justify-content:center; min-width:0}
+.home-top .home-hero img{width:auto!important; max-width:100%; max-height:160px; margin:0 auto}
+body.hub .home-top .home-hero img{max-height:200px}
+.home-top .home-hero figcaption{font-size:.78rem; line-height:1.3; margin-top:4px}
+.home-top .home-facts{grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin:0}
+.home-top .home-facts div{padding:6px 10px}
+.home-top .home-facts b{font-size:1.02rem}
+.home-top .home-facts span{font-size:.76rem; line-height:1.3; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+@media (max-width:980px){ .home-top .home-facts{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (max-width:820px){ .home-top{grid-template-columns:1fr} }
+#home .home-choose{margin:0 0 8px; font-size:1.25rem}
+#home .mode-card{padding:12px 18px 14px}
+#home .mode-card .mc-lead{margin:2px 0 4px; font-size:.92rem}
+#home .mode-card ul{margin:0 0 10px; font-size:.9rem; line-height:1.45}
+#home .mode-card li{margin:.15rem 0}
+#home .mode-card .btn{padding:9px 16px}
+#home .home-note{margin:10px 0 0}
+.home-back{margin:12px 0 0}
+.hub-course{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:14px 22px; align-items:center; background:var(--encre); color:#fff; border-left:10px solid var(--jaune); padding:14px 22px; margin:0 0 20px}
+.hub-course h2{margin:0 0 4px; font:700 1.45rem var(--f-titre); color:var(--jaune)}
+.hub-course p{margin:0; color:#D7DDE2; max-width:70ch}
+.hub-btns{display:flex; flex-wrap:wrap; gap:10px; justify-content:flex-end}
+.hub-course .btn{background:var(--jaune); color:var(--encre); border-color:var(--jaune); padding:11px 18px; white-space:nowrap}
+.hub-course .btn:hover{background:#FFD24A}
+@media (max-width:640px){ .hub-course{grid-template-columns:minmax(0,1fr)} .hub-btns{justify-content:flex-start} .hub-course .btn{white-space:normal} }
+.ex-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:16px}
+.ex-grid .mode-card p{margin:4px 0 8px; font-size:.95rem}
+.ex-grid .mode-card .ex-meta{margin:0 0 12px; font-size:.85rem}
+.ex-grid .mode-card h3{font-size:1.2rem}
+.ex-grid .mc-head{flex-direction:column; align-items:flex-start; gap:6px}
+.ex-grid .mode-card .btn{margin-top:auto; align-self:flex-start}
+
+@media print{
+  .c-top,.home-back{display:none!important}
   /* correctif : dans le gabarit, « .sketch .q-expl[hidden] » l'emporte sur « body:not(.corrections-open) .q-expl »
      et imprimerait la correction des tracés en mode examen avant la remise de la copie */
-  body:not(.corrections-open) .sketch .q-expl[hidden]{display:none!important} }
+  body:not(.corrections-open) .sketch .q-expl[hidden]{display:none!important}
+  .eq{overflow:visible; line-height:1.7}
+}
 </style>"""
 
 
@@ -1165,54 +1412,47 @@ def build():
         assert n == 1, f"motif introuvable ou multiple : {pattern!r} ({n})"
         return new
 
-    app = sub_once(app, r"var CONSEIL_MIN = \d+;", f"var CONSEIL_MIN = {TOTAL_MIN};")
+    # entrées du moteur réservées au sujet ; la durée conseillée dépend de l'exercice ouvert
+    app = sub_once(app, r"var CONSEIL_MIN = \d+;", "var CONSEIL_MIN = window.__CONSEIL_MIN__ || 0;")
     app = sub_once(app, r"  var DECOR = \{\n.*?\n  \};\n", DECOR_JS, re.S)
     app = sub_once(app, r"  var DR_NAMES = \{\n.*?\n  \};\n", DR_NAMES_JS, re.S)
-    app = sub_once(app, r"Quatre pages, une par document", "Deux pages, une par document")
+    app = sub_once(app, r"Quatre pages, une par document", "Une page par document réponse")
 
-    rail, tabs, secs = render_docs()
-    hero_src, hw, hh = png("accueil")
+    templates, exos_cfg = [], {}
+    for e in EXO_DEFS:
+        prepare_exo(e)
+    for e in EXO_DEFS:
+        CUR["total"] = e["minutes"]
+        parts_html = map_text("".join(render_part(p) for p in e["P"]), e["docs"], e["fig_shift"])
+        rail, tabs, secs = render_docs(e)
+        k = e["key"]
+        templates += [f'<template id="tpl-rail-{k}">{rail}</template>',
+                      f'<template id="tpl-tabs-{k}">{tabs}</template>',
+                      f'<template id="tpl-docs-{k}">{secs}</template>',
+                      f'<template id="tpl-home-{k}">{render_exo_home(e)}</template>',
+                      f'<template id="tpl-parts-{k}">{parts_html}\n</template>']
+        exos_cfg[k] = e["cfg"]
+    templates.append(f'<template id="tpl-modes">{MODES_HTML}</template>')
+    templates.append(f'<template id="tpl-hub">{render_hub()}</template>')
+    for k, tag, t in COURS:
+        templates.append(f'<template id="tpl-{k}">{render_cours(tag, t)}</template>')
 
-    qcfg, skcfg, parts_cfg = {}, {}, []
-    for p in PARTS:
-        pts = part_points(p)
-        parts_cfg.append({"num": p["num"], "title": p["title"], "minutes": p["minutes"],
-                          "duration": hm(p["minutes"]), "points": pts})
-        for b in p["blocks"]:
-            if b["kind"] == "q":
-                qcfg[b["id"]] = {"label": b["label"], "part": p["num"], "pts": 1, "grader": b["grader"]}
-            elif b["kind"] == "sk":
-                skcfg[b["id"]] = {"bg": b["bg"], "deps": b["deps"], "label": b["label"], "part": p["num"],
-                                  "pts": len(b["criteria"]),
-                                  "criteria": [re.sub(r"<[^>]+>", "", c) for c in b["criteria"]]}
-
-    def js(o):
-        return json.dumps(o, ensure_ascii=False)
-
-    config = (f"<script>window.__PARTS__ = {js(parts_cfg)};\n"
-              f"window.__QCFG__ = {js(qcfg)};\n"
-              f"window.__SKCFG__ = {js(skcfg)};</script>")
-
-    n_trac = sum(1 for p in PARTS if int(p["num"]) <= 4)
-    n_cis = len(PARTS) - n_trac
-    duree = hm(TOTAL_MIN)
-    parts_html = "".join(render_part(p) for p in PARTS)
+    config = f"<script>window.__EXOS__ = {json.dumps(exos_cfg, ensure_ascii=False)};</script>"
+    router = ROUTER_JS.replace("__TITRE__", TITRE).replace("__HOUSE__", HOUSE.replace("'", "\\'"))
 
     page = f"""<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{TITRE} — exercice interactif</title>
-<meta name="description" content="Effort normal, contrainte normale, loi de Hooke, allongement ; effort tranchant, simple et double cisaillement, contrainte de cisaillement, dimensionnement d'axes, de goupilles et de boulons.">
+<title>{TITRE} — cours et exercices interactifs</title>
+<meta name="description" content="Traction, compression et cisaillement : effort normal, contrainte, loi de Hooke, allongement ; effort tranchant, simple et double cisaillement, dimensionnement d'axes, de goupilles et de boulons.">
 {style}
 {CONTENT_CSS}
 </head>
 <body class="no-mode">
 
-<nav class="rail" aria-label="Dossiers de présentation et dossier technique">
-{rail}
-</nav>
+<nav class="rail" aria-label="Dossiers de présentation et dossier technique"></nav>
 
 <aside id="docpanel" aria-label="Documents du sujet" aria-hidden="true">
   <div class="dp-head">
@@ -1222,65 +1462,26 @@ def build():
     <button type="button" id="dp-fit">Ajuster</button>
     <button type="button" id="dp-close">Fermer</button>
   </div>
-  <div class="dp-tabs" role="tablist" aria-label="Choisir un document">
-{tabs}
-  </div>
-  <div class="dp-body">
-{secs}
-  </div>
+  <div class="dp-tabs" role="tablist" aria-label="Choisir un document"></div>
+  <div class="dp-body"></div>
 </aside>
 
-<section id="home" aria-labelledby="home-title">
-  <div class="home-inner">
-    <header class="home-head">
-      <h1 id="home-title">{TITRE}</h1>
-      <p class="home-sub">Onze pièces mécaniques à vérifier ou à dimensionner : un fil, des barres et un tube tendus ou comprimés, puis des goupilles, des boulons, des vis et un axe cisaillés. {N_Q} questions et {N_SK} tracés, pour une durée conseillée de {duree}.</p>
-    </header>
-    <figure class="home-hero">
-      <img src="{hero_src}" alt="À gauche, un siège suspendu par un fil et un tube comprimé ; à droite, une pince à goupille et un axe de chape" width="{hw}" height="{hh}">
-      <figcaption>Quatre des onze situations étudiées : le fil d'un siège suspendu et un tube support (traction et compression), une pince et un axe de chape (cisaillement).</figcaption>
-    </figure>
-    <div class="home-facts">
-      <div><b>{len(PARTS)} parties</b><span>{n_trac} en traction-compression, {n_cis} en cisaillement</span></div>
-      <div><b>{duree}</b><span>durée conseillée, qui fixe la pondération</span></div>
-      <div><b>{len(DOCS)} documents</b><span>DP1 et DT1 à DT3 consultables</span></div>
-      <div><b>{N_SK} tracés</b><span>sur les figures, auto-évalués</span></div>
-    </div>
-    <h2 class="home-choose">Choisis ton mode de travail</h2>
-    <div class="modes">
-      <article class="mode-card">
-        <div class="mc-head"><span class="mc-tag">Mode 1</span><h3>Mode entraînement</h3></div>
-        <p class="mc-lead">Pour apprendre en avançant, question par question.</p>
-        <ul><li>Chaque question se valide isolément ; la démarche corrigée s'affiche aussitôt.</li>
-          <li>La note pondérée s'actualise en continu dans le bandeau.</li>
-          <li>Les documents et le chronomètre restent disponibles, sans contrainte de temps.</li></ul>
-        <button type="button" class="btn btn-mode" data-mode="training">Commencer l'entraînement</button>
-      </article>
-      <article class="mode-card exam">
-        <div class="mc-head"><span class="mc-tag">Mode 2</span><h3>Mode examen</h3></div>
-        <p class="mc-lead">Pour se placer dans les conditions d'une évaluation.</p>
-        <ul><li>Aucune correction et aucune note pendant la composition ; les réponses restent modifiables.</li>
-          <li>Le chronomètre tourne, à comparer à la durée conseillée.</li>
-          <li>En fin de sujet, le bouton « J'ai fini, je fais corriger ma copie » dévoile d'un coup les corrections, les notes par partie et la note globale.</li></ul>
-        <button type="button" class="btn btn-mode" data-mode="exam">Composer en mode examen</button>
-      </article>
-    </div>
-    <p class="home-note small">Le mode se choisit une seule fois : pour en changer, recharge la page. Rien n'est enregistré sur l'ordinateur.</p>
-  </div>
-</section>
+<section id="home" aria-labelledby="home-title"><div class="home-inner"></div></section>
 
 <main class="page">
   <section class="print-only print-summary">
     <p>Élève : <span class="print-nom"></span> | Copie imprimée le <span class="print-date"></span></p>
-    <p>Mode : <span class="print-mode"></span> | Temps de rédaction : <strong class="print-time"></strong> (durée conseillée : {duree})</p>
+    <p>Mode : <span class="print-mode"></span> | Temps de rédaction : <strong class="print-time"></strong> (durée conseillée : <span class="print-conseil"></span>)</p>
     <p class="print-note-line">Note finale pondérée : <strong class="final-note"></strong></p>
     <p class="print-nograde">Copie non corrigée : les corrections et la note n'apparaissent qu'après la remise de la copie en mode examen.</p>
   </section>
 
+  <nav class="c-top" aria-label="Navigation"><a href="?">{HOUSE} Accueil</a></nav>
+
   <header class="cartouche">
     <div class="title">
       <h1>{TITRE}</h1>
-      <p>{N_Q} questions notées (unités comprises) et {N_SK} tracés auto-évalués, répartis en {len(PARTS)} parties pondérées par leur durée.</p></div>
+      <p></p></div>
     <div class="nom"><label for="nom-eleve">Nom et prénom</label><input id="nom-eleve" type="text" autocomplete="name"></div>
   </header>
 
@@ -1290,10 +1491,11 @@ def build():
     <p><strong>Les unités sont notées.</strong> Pour toute question numérique, la valeur vaut la moitié des points et l'unité l'autre moitié : une valeur juste écrite sans unité, ou avec une unité fausse, ne rapporte qu'un demi-point.</p>
     <p><strong>Calculs.</strong> Garde les valeurs non arrondies dans ta calculatrice : les tolérances couvrent les arrondis des résultats intermédiaires demandés. Pour π, utilise la touche de ta calculatrice (3,14 est toléré).</p>
     <p>Le dossier de présentation (DP) et le dossier technique (DT) s'ouvrent avec les onglets sur le bord droit, ou avec les boutons des en-têtes de question.</p>
-    <p><strong>Les tracés comptent aussi.</strong> Quand la correction du tracé s'affiche, tu t'attribues toi-même les points à l'aide d'une grille de critères.</p>
+    <p><strong>Le tracé compte aussi.</strong> Quand sa correction s'affiche, tu t'attribues toi-même les points à l'aide d'une grille de critères.</p>
     <p><strong>Barème pondéré par la durée conseillée</strong> : chaque partie est notée sur 20, puis pèse au prorata de son temps. Le récapitulatif de fin de sujet donne le détail partie par partie.</p>
   </div>
-{parts_html}
+
+  <div id="parts"></div>
 
   <section class="recap" id="recap" aria-labelledby="t-recap">
     <header class="recap-head"><h2 id="t-recap">Récapitulatif et note finale</h2>
@@ -1314,7 +1516,8 @@ def build():
       <p class="final-detail small"></p>
     </div>
     <div class="recap-foot" id="recap-foot"><button type="button" class="btn btn-print">Imprimer ma copie</button>
-      <span class="small no-print">L'impression reprend tes réponses, les corrections, tes tracés et ce récapitulatif.</span></div>
+      <span class="small no-print">L'impression reprend tes réponses, les corrections, tes tracés et ce récapitulatif.</span>
+      <a class="btn ghost no-print" href="?">{HOUSE} Retour à l'accueil</a></div>
   </section>
 </main>
 
@@ -1327,16 +1530,21 @@ def build():
   <button type="button" class="btn-docs" id="btn-docs">Documents</button>
 </footer>
 
+{chr(10).join(templates)}
+
 {config}
+{router}
 {grading}
 {app}
 </body>
 </html>
 """
     SORTIE.write_text(page, encoding="utf-8")
-    imgs = sum(len(m) for m in re.findall(r"data:image/png;base64,[A-Za-z0-9+/=]+", page))
-    print(f"{SORTIE.name} : {len(page.encode('utf-8')) / 1024:.0f} Kio, dont images {imgs / 1024:.0f} Kio "
-          f"(base64) ; {len(PARTS)} parties, {N_Q} questions, {N_SK} tracés, {duree}")
+    imgs = sum(len(m) for m in DATA_RE.findall(page))
+    print(f"{SORTIE.name} : {len(page.encode('utf-8')) / 1024:.0f} Kio, dont images {imgs / 1024:.0f} Kio (base64)")
+    for e in EXO_DEFS:
+        print(f"  ?ex={e['key']} : {len(e['P'])} parties, {e['n_q']} questions, {e['n_sk']} tracé, "
+              f"{e['points']} points, {hm(e['minutes'])}")
 
 
 if __name__ == "__main__":
