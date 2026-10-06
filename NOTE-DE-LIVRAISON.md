@@ -1,5 +1,56 @@
 # Note de livraison — Résistance des matériaux : traction, compression et cisaillement
 
+## Mise à jour : niveau Bac pro (cours 1.1 et exercice 1.1)
+
+**Sources** : « Cours – Traction » et activités 2 (treuil de levage), 3 (maillon de chaîne), 4 (barre percée) et
+5 (vis d'assemblage). Pastille verte « Bac pro » sur ce cours et cet exercice ; aucune autre mention de niveau.
+
+**Accueil** : les cours sont présentés en grille de cartes — 1.1 Traction (Bac pro, disponible), 1.2 Traction et
+compression, 2.1 Cisaillement (Bac pro) et 2.2 Cisaillement, ces trois derniers « En cours d'édition ». Exercices :
+1.1 Traction (Bac pro, nouveau), 1.2 Traction et compression (l'ancien exercice 1, adresse `?ex=traction` inchangée),
+2 Cisaillement.
+
+**Cours 1.1 (interactif)** : courbe de l'essai redessinée et cliquable (zone élastique, Re, zone plastique, R,
+rupture, zone de sécurité) ; formule σ = F/S ; simulateur (force, diamètre, acier, coefficient de sécurité) avec
+jauge, verdict et un défi ; condition de résistance avec les deux tableaux du cours (un clic sur un acier le charge
+dans le simulateur) ; exemple résolu ; quiz de 6 questions noté avec étoiles ; impression du cours. Non repris :
+la résistance en compression (Rec, Rpc), Rr et l'allongement A % de la courbe d'origine, inutiles aux activités.
+
+**Exercice 1.1** : 5 parties, 30 questions, 1 tracé, 1 h 30 (10, 20, 15, 25 et 20 min). Documents adaptés du cours,
+avec peu de formules : DP1 méthode en 4 étapes, DT1 formulaire réduit (σ = F/S, Rpe = Re/s, s = Re/σ, P = m·g,
+aires du disque et du rectangle), DT2 aciers et coefficients de sécurité, DT3 sections de noyau des vis.
+
+Résultats recalculés : Re = 295 MPa ; s = 295/40 ≈ 7,38 ; S = 28,27 mm² ; P câble = 1 746,18 N ; P total =
+2 530,98 N ; σ ≈ 89,52 MPa ; Rpe = 45 MPa ; S1 = S2 = 24 mm² ; σ = 83,33 MPa ; s = 7,2 ; S1 = 360, S2 = 240,
+S3 = 210 mm² ; σ = 13,89 / 20,83 / 23,81 MPa ; Rpe = 49,17 MPa ; F/vis = 333,33 N ; Rpe = 86,67 MPa ;
+S mini = 3,85 mm² ; M3 ; σ maxi = 186,43 MPa ; M5.
+
+Corrections, interprétations et ajouts :
+- **Activité 2, exercice 2** : la condition de résistance n'est **pas** vérifiée (89,52 MPa > 45 MPa) ; la
+  correction l'explique (le câble ne rompt pas, mais la sécurité demandée n'est pas assurée).
+- **g** n'était pas donné : g = 9,81 N/kg figure dans les données.
+- **Section en dm²** (Q2.a) supprimée : elle ne servait qu'à recalculer la masse du câble, qui est donnée.
+- **« Poids du câble … avec le spéléologue »** reformulé : poids total porté par le haut du câble (câble + charge de
+  80 kg) ; l'énoncé parlait tantôt de « charge », tantôt de « spéléologue ».
+- **Activité 3** : la largeur de la partie droite (12 mm) est lue sur le dessin ; S1 = S2, ce que la correction
+  souligne. Questions renumérotées (Q2.a… → Q3.1…).
+- **Activité 4** : les trous traversent l'épaisseur de 15 mm (lecture du dessin, précisée dans l'énoncé). Les
+  cadres d'origine étant trop petits pour un tracé à l'échelle 1:1, la question Q1 devient un tracé sur un document
+  réponse quadrillé au millimètre (Q4.1, 4 critères, mesure des longueurs en cm). « Mpa » corrigé en MPa.
+- **Activité 5** : la vis choisie (M3) ne vérifie pas la condition avec Kt = 2,5 (186,43 > 86,67 MPa). **Question
+  ajoutée** Q5.7 : choisir le diamètre qui convient (M5, 12,7 mm²).
+- Le nom d'une enseigne de location (activité 2) est remplacé par « une agence de location de matériel ».
+- Les grilles d'auto-évaluation par compétences des activités ne sont pas reprises (le moteur note chaque question).
+- La numérotation des sources commence à l'activité 2 : l'activité 1 n'a pas été fournie.
+- Tolérances : valeurs exactes au plus près ; arrondi au centième ± 0,006, ou ± 0,1 % quand π ou un résultat
+  intermédiaire arrondi intervient ; unité notée pour moitié des points ; « S3 » accepté sous toutes ses formes
+  (« s3 », « la section 3 »).
+
+Tests : 86 tests unitaires (83 questions) et 9 parcours navigateur, dont le cours interactif et un 20/20 dans
+chacun des trois exercices.
+
+---
+
 > **Mise à jour : accueil et découpage en deux exercices.** La page est désormais `index.html`. Son
 > accueil reprend la mise en page de la page « Ajustements » : un bandeau « Les cours » (Cours 1 —
 > Traction et compression, Cours 2 — Cisaillement, tous deux « En cours d'édition ») et une grille
