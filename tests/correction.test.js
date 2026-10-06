@@ -1,4 +1,4 @@
-// Tests unitaires du moteur de correction appliqué aux 110 questions des quatre exercices.
+// Tests unitaires du moteur de correction appliqué aux questions des exercices et des études de cas.
 //   node --test tests/
 // Le moteur (Grading) et la configuration (__QCFG__) sont lus dans la page générée :
 // on teste exactement ce que l'élève utilisera.
@@ -144,7 +144,120 @@ const CASES = {
   c7_3: [["10,87 mm", 1], ["10,873 mm", 1], ["10,88 mm", 1], ["10,87", 0.5], ["15,38 mm", 0], ["7,69 mm", 0]],
   c7_4: [["70,04 MPa", 1], ["70 MPa", 1], ["70,00 MPa", 1], ["70,04", 0.5], ["140 MPa", 0], ["175 MPa", 0]],
   c7_5: [["7,78e-4 rad", 1], ["7,78×10^-4 rad", 1], ["0,000778 rad", 1], ["778 µrad", 1], ["0,778 mrad", 1],
-          ["7,78e-4", 0.5], ["7,78e-4 °", 0.5], ["7,78e-3 rad", 0], ["1,94e-3 rad", 0]],
+          ["7,78e-4", 0.5], ["7,78e-4 °", 0.5], ["7,78e-3 rad", 0], ["1,94e-3 rad", 0]],  u1_1: [["78,54 mm²", 1], ["78,5 mm²", 1], ["0,7854 cm²", 1], ["78,54", 0.5], ["314,16 mm²", 0]],
+  u1_2: [["53,5 kN", 1], ["53500 N", 1], ["54 kN", 1], ["53,5", 0.5], ["30 kN", 0]],
+  u1_3: [["681 MPa", 1], ["680 MPa", 1], ["681", 0.5], ["382 MPa", 0]],
+  u1_4: [["30 kN", 1], ["30000 N", 1], ["30", 0.5], ["53,5 kN", 0]],
+  u1_5: [["382 MPa", 1], ["379 MPa", 1], ["681 MPa", 0]],
+  u1_6: [["63 kN", 1], ["63000 N", 1], ["46,5 kN", 0]],
+  u1_7: [["802 MPa", 1], ["804 MPa", 1], ["592 MPa", 0]],
+  u1_8: [["46,5 kN", 1], ["46500 N", 1], ["63 kN", 0]],
+  u1_9: [["592 MPa", 1], ["592", 0.5], ["802 MPa", 0]],
+  u1_10: [["0,12", 1], ["0.12", 1], ["12", 0], ["1,12", 0]],
+  u1_11: [["0,04", 1], ["0,040", 1], ["0,12", 0]],
+  u1_12: [["oui", 1], ["Oui, Re et Rm augmentent", 1], ["non", 0]],
+  u1_13: [["non", 1], ["Non, l'acier devient fragile", 1], ["oui", 0]],
+  u2_1: [["630 MPa", 1], ["630", 0.5], ["63 MPa", 0]],
+  u2_2: [["126 MPa", 1], ["126", 0.5], ["12,6 MPa", 0]],
+  u2_3: [["2", 1], ["1", 0]],
+  u2_4: [["628,32 mm²", 1], ["6,2832 cm²", 1], ["628,3", 0.5], ["314,16 mm²", 0]],
+  u2_5: [["79168 N", 1], ["79,17 kN", 1], ["7917 daN", 1], ["79168", 0.5], ["39584 N", 0]],
+  u3_1: [["500000 N", 1], ["500 kN", 1], ["50000 daN", 1], ["50000 N", 0]],
+  u3_2: [["5000 mm²", 1], ["50 cm²", 1], ["500 mm²", 0]],
+  u3_3: [["125000 mm²", 1], ["0,125 m²", 1], ["12500 mm²", 0]],
+  u3_4: [["353,55 mm", 1], ["35,36 cm", 1], ["111,8 mm", 0]],
+  u3_5: [["2000000 mm²", 1], ["2 m²", 1], ["20000 cm²", 1], ["200000 mm²", 0]],
+  u3_6: [["1596 mm", 1], ["1,596 m", 1], ["1595,77 mm", 1], ["1414 mm", 0]],
+  u4_1: [["1,14e-3", 1], ["0,00114", 1], ["1,14×10^-3", 1], ["2,5e-3", 0]],
+  u4_2: [["85,5 MPa", 1], ["85,5", 0.5], ["136,5 MPa", 0]],
+  u4_3: [["3656,88 mm²", 1], ["36,57 cm²", 1], ["31415,9 mm²", 0]],
+  u4_4: [["312663 N", 1], ["312,66 kN", 1], ["312,7 kN", 1], ["312663", 0.5], ["136500 N", 0]],
+  u5_1: [["traction", 1], ["Le câble travaille en traction", 1], ["compression", 0], ["flexion", 0]],
+  u5_2: [["706,86 mm²", 1], ["706,5 mm²", 1], ["2827,43 mm²", 0]],
+  u5_3: [["13,86 MPa", 1], ["13,87 MPa", 1], ["138,6 MPa", 0]],
+  u5_4: [["70 MPa", 1], ["350 MPa", 0]],
+  u5_5: [["oui", 1], ["non", 0]],
+  u5_6: [["43000 mm", 1], ["43 m", 1], ["45,8 m", 0], ["42 m", 0]],
+  u5_7: [["6,60e-5", 1], ["6,6×10^-5", 1], ["0,000066", 1], ["6,6e-4", 0]],
+  u5_8: [["2,84 mm", 1], ["2,84", 0.5], ["28,4 mm", 0]],
+  u5_9: [["oui", 1], ["non", 0]],
+  u5_10: [["20100,5 N", 1], ["20,1 kN", 1], ["20100", 0.5], ["10300,5 N", 0]],
+  u5_11: [["28,44 MPa", 1], ["28,4 MPa", 1], ["13,86 MPa", 0]],
+  u5_12: [["oui", 1], ["non", 0]],
+  u5_13: [["1,35e-4", 1], ["1,354×10^-4", 1], ["1,35e-3", 0]],
+  u5_14: [["5,82 mm", 1], ["5,82", 0.5], ["2,84 mm", 0]],
+  u5_15: [["non", 1], ["Non, 5,82 mm > 5 mm", 1], ["oui", 0]],
+  v1_1: [["2", 1], ["2 sections", 1], ["1", 0]],
+  v1_2: [["1963,5 mm²", 1], ["19,63 cm²", 1], ["1963,5", 0.5], ["7854 mm²", 0]],
+  v1_3: [["314159 N", 1], ["314,16 kN", 1], ["314159", 0.5], ["157080 N", 0]],
+  v2_1: [["cisaillement", 1], ["La tôle est cisaillée", 1], ["compression", 0]],
+  v2_2: [["320 mm²", 1], ["3,2 cm²", 1], ["80 mm²", 0], ["400 mm²", 0]],
+  v2_3: [["64000 N", 1], ["64 kN", 1], ["6400 daN", 1], ["80000 N", 0]],
+  v2_4: [["compression", 1], ["Le poinçon est comprimé", 1], ["cisaillement", 0]],
+  v2_5: [["400 mm²", 1], ["4 cm²", 1], ["320 mm²", 0]],
+  v2_6: [["160 MPa", 1], ["160", 0.5], ["200 MPa", 0]],
+  v2_7: [["400 MPa", 1], ["64 MPa", 0]],
+  w1_1: [["12,5 mm", 1], ["12,5", 0.5], ["25 mm", 0]],
+  w1_2: [["0,4", 1], ["0,40", 1], ["2,5", 0]],
+  w1_3: [["0,75", 1], ["1,33", 0]],
+  w1_5: [["2,8", 1], ["2,7", 1], ["2,9", 1], ["2,5", 0], ["4", 0]],
+  w1_6: [["11,32 MPa", 1], ["11,32", 0.5], ["6,37 MPa", 0]],
+  w1_7: [["31,69 MPa", 1], ["30,56 MPa", 1], ["11,32 MPa", 0]],
+  w1_8: [["3,79", 1], ["3,93", 1], ["10,6", 0]],
+  w2_1: [["10000 N", 1], ["10 kN", 1], ["1000 N", 0]],
+  w2_2: [["1,5", 1], ["0,67", 0]],
+  w2_3: [["0,25", 1], ["0,17", 0]],
+  w2_4: [["1,63", 1], ["1,6", 1], ["1,68", 1], ["2,5", 0]],
+  w2_5: [["25 MPa", 1], ["16,67 MPa", 0]],
+  w2_6: [["40,75 MPa", 1], ["40 MPa", 1], ["25 MPa", 0]],
+  w2_7: [["0,2", 1], ["0,13", 0]],
+  w2_8: [["2,5", 1], ["2,4", 1], ["3", 0]],
+  w2_9: [["31,25 MPa", 1], ["25 MPa", 0]],
+  w2_10: [["78,13 MPa", 1], ["78,1 MPa", 1], ["31,25 MPa", 0]],
+  p1_1: [["3", 1], ["2", 0]],
+  p1_2: [["concourantes", 1], ["Elles sont concourantes en un même point", 1], ["parallèles", 0]],
+  p1_4: [["266 N", 1], ["270 N", 1], ["26,6 daN", 1], ["266", 0.5], ["381 N", 0]],
+  p1_5: [["381 N", 1], ["375 N", 1], ["266 N", 0]],
+  p2_1: [["C", 1], ["près du point C", 1], ["D", 0], ["en D", 0]],
+  p2_2: [["48,8 MPa", 1], ["48,8", 0.5], ["4,1 MPa", 0]],
+  p2_3: [["7,17", 1], ["7,2", 1], ["5", 0]],
+  p2_4: [["oui", 1], ["non", 0]],
+  p3_1: [["cisaillement", 1], ["L'axe est cisaillé", 1], ["traction", 0]],
+  p3_2: [["125 MPa", 1], ["250 MPa", 0]],
+  p3_3: [["25 MPa", 1], ["50 MPa", 0]],
+  p3_4: [["2", 1], ["1", 0]],
+  p3_5: [["50,27 mm²", 1], ["50,24 mm²", 1], ["201,06 mm²", 0]],
+  p3_6: [["2,65 MPa", 1], ["2,7 MPa", 1], ["5,3 MPa", 0]],
+  p3_7: [["oui", 1], ["non", 0]],
+  x1_1: [["2 cm", 1], ["20 mm", 1], ["2", 0.5], ["5 cm", 0]],
+  x1_2: [["100 t", 1], ["100 tonnes", 1], ["100000 kg", 1], ["100", 0.5], ["29 t", 0]],
+  x1_3: [["2000000 N", 1], ["2000 kN", 1], ["1000000 N", 0]],
+  x1_4: [["200000 N", 1], ["200 kN", 1], ["100000 N", 0]],
+  x1_5: [["2000 kN", 1], ["2000000 N", 1], ["200 kN", 0]],
+  x1_6: [["19T15S", 1], ["câble 19T15S", 1], ["12T15S", 0]],
+  x1_7: [["oui", 1], ["non", 0]],
+  x2_1: [["9 mm", 1], ["9,00 mm", 1], ["9", 0.5], ["18 mm", 0]],
+  x2_2: [["40,3 °C", 1], ["40,3 K", 1], ["40,3", 0.5], ["24,4 °C", 0]],
+  x2_3: [["-15,6 °C", 1], ["−15,6 °C", 1], ["15,6 °C", 0]],
+  x2_4: [["55,9 °C", 1], ["55,9 K", 1], ["24,7 °C", 0]],
+  x2_5: [["33,54 mm", 1], ["33,5 mm", 1], ["9 mm", 0]],
+  x2_6: [["42,54 mm", 1], ["33,54 mm", 0]],
+  x2_7: [["la dilatation", 1], ["dilatation thermique", 1], ["la charge", 0]],
+  x3_1: [["21,27 mm", 1], ["2,127 cm", 1], ["42,54 mm", 0]],
+  x3_2: [["oui", 1], ["non", 0]],
+  f1_1: [["2", 1], ["3", 0]],
+  f1_2: [["oui", 1], ["non", 0]],
+  f1_3: [["8400 N", 1], ["8,4 kN", 1], ["8400", 0.5], ["840 N", 0]],
+  f1_5: [["10600 N", 1], ["10,6 kN", 1], ["11000 N", 1], ["4200 N", 0]],
+  f1_6: [["4200 N", 1], ["4,2 kN", 1], ["10600 N", 0]],
+  f1_7: [["compression", 1], ["Le cylindre est comprimé", 1], ["traction", 0]],
+  f2_1: [["942,48 mm²", 1], ["942,48", 0.5], ["1256,64 mm²", 0]],
+  f2_2: [["11,74 MPa", 1], ["1,174e7 Pa", 1], ["11,74", 0.5], ["5,39 MPa", 0]],
+  f2_3: [["11,25 MPa", 1], ["11,74 MPa", 0]],
+  f2_4: [["220,6 MPa", 1], ["2,206e8 Pa", 1], ["22,06 MPa", 0]],
+  f2_5: [["18,79", 1], ["18,8", 1], ["10", 0]],
+  f2_6: [["10", 1], ["6", 0]],
+  f2_7: [["oui", 1], ["non", 0]],
 };
 
 test("chaque question a des cas de test et une réponse de référence", () => {
@@ -172,17 +285,17 @@ test("questions vides et saisies non numériques refusées sans être notées", 
   }
 });
 
-test("barème : points des parties cohérents, durées 65 et 80 min, tracés et dépendances", () => {
-  assert.deepEqual(Object.keys(EXOS), ["traction-n1", "traction", "cisaillement-n1", "cisaillement"]);
-  assert.equal(EXOS["traction-n1"].minutes, 90);
-  assert.equal(Object.keys(EXOS["traction-n1"].qcfg).length, 30);
-  assert.equal(EXOS["cisaillement-n1"].minutes, 70);
-  assert.equal(Object.keys(EXOS["cisaillement-n1"].qcfg).length, 27);
-  assert.equal(Object.keys(EXOS["cisaillement-n1"].skcfg).length, 3);
-  assert.equal(EXOS.traction.minutes, 65);
-  assert.equal(EXOS.cisaillement.minutes, 80);
-  assert.equal(Object.keys(EXOS.traction.qcfg).length, 23);
-  assert.equal(Object.keys(EXOS.cisaillement.qcfg).length, 30);
+test("barème : points des parties cohérents, durées, nombres de questions, tracés et dépendances", () => {
+  assert.deepEqual(Object.keys(EXOS), ["traction-n1", "cisaillement-n1", "traction", "cisaillement", "traction-essais",
+    "cisaillement-poinconnage", "concentration", "etude-potence", "etude-transbordeur", "etude-futuroscope"]);
+  const attendu = { "traction-n1": [90, 30, 1], "cisaillement-n1": [70, 27, 3], traction: [65, 23, 1], cisaillement: [80, 30, 1],
+    "traction-essais": [80, 43, 0], "cisaillement-poinconnage": [30, 10, 0], concentration: [50, 17, 1],
+    "etude-potence": [60, 15, 1], "etude-transbordeur": [55, 16, 0], "etude-futuroscope": [50, 13, 1] };
+  for (const [key, [min, nq, nsk]] of Object.entries(attendu)) {
+    assert.equal(EXOS[key].minutes, min, key);
+    assert.equal(Object.keys(EXOS[key].qcfg).length, nq, key);
+    assert.equal(Object.keys(EXOS[key].skcfg).length, nsk, key);
+  }
   for (const [key, E] of Object.entries(EXOS)) {
     let total = 0;
     for (const p of E.parts) {

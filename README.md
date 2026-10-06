@@ -5,21 +5,27 @@ GitHub Pages depuis `index.html`. Son accueil, sur le modèle de la page « Ajus
 
 | Adresse | Contenu |
 |---|---|
-| `index.html` | accueil : grille des cours, grille des exercices (pastilles Niveau 1 / Niveau 2) |
+| `index.html` | accueil : cours, exercices et études de cas (pastilles Niveau 1 / Niveau 2) |
 | `?ex=cours-traction-n1` | Cours 1.1 — Traction (Niveau 1) : courbe de l'essai cliquable, simulateur, quiz |
-| `?ex=cours-cisaillement-n1` | Cours 2.1 — Cisaillement (Niveau 1) : animation, simulateur, jeu des sections, quiz |
-| `?ex=cours-traction`, `?ex=cours-cisaillement` | cours 1.2 et 2.2 (Niveau 2) — « En cours d'édition » |
+| `?ex=cours-cisaillement-n1` | Cours 1.2 — Cisaillement (Niveau 1) : animation, simulateur, jeu des sections, quiz |
+| `?ex=cours-rdm` | Cours 2 — Résistance des matériaux (Niveau 2) : cartes, sollicitations, jeu, simulateur de Hooke, synthèse, quiz |
 | `?ex=traction-n1` | Exercice 1.1 — Traction (Niveau 1) : 5 parties, 30 questions, 1 tracé, 1 h 30 |
-| `?ex=traction` | Exercice 1.2 — Traction et compression (Niveau 2) : 4 parties, 23 questions, 1 tracé, 1 h 05 |
-| `?ex=cisaillement-n1` | Exercice 2.1 — Cisaillement (Niveau 1) : 3 parties, 27 questions, 3 tracés, 1 h 10 |
+| `?ex=cisaillement-n1` | Exercice 1.2 — Cisaillement (Niveau 1) : 3 parties, 27 questions, 3 tracés, 1 h 10 |
+| `?ex=traction` | Exercice 2.1 — Traction et compression (Niveau 2) : 4 parties, 23 questions, 1 tracé, 1 h 05 |
 | `?ex=cisaillement` | Exercice 2.2 — Cisaillement (Niveau 2) : 7 parties, 30 questions, 1 tracé, 1 h 20 |
+| `?ex=traction-essais` | Exercice 2.3 — Traction (Niveau 2) : 5 parties, 43 questions, 1 h 20 |
+| `?ex=cisaillement-poinconnage` | Exercice 2.4 — Cisaillement (Niveau 2) : 2 parties, 10 questions, 30 min |
+| `?ex=concentration` | Exercice 2.5 — Concentration de contraintes (Niveau 2) : 2 parties, 17 questions, 1 tracé, 50 min |
+| `?ex=etude-potence` | Étude 1 — Potence de trottinette : 3 parties, 15 questions, 1 tracé, 1 h |
+| `?ex=etude-transbordeur` | Étude 2 — Pont transbordeur : 3 parties, 16 questions, 55 min |
+| `?ex=etude-futuroscope` | Étude 3 — Futuroscope, sièges basculants : 2 parties, 13 questions, 1 tracé, 50 min |
 
 Chaque exercice propose le mode entraînement ou le mode examen, avec sa propre note pondérée par
 la durée de ses parties. Corrections apportées au contenu d'origine, tolérances et questions ajoutées :
 [`NOTE-DE-LIVRAISON.md`](NOTE-DE-LIVRAISON.md).
 
 **Ajouter un exercice** : décrire ses parties dans `src/generer.py` (liste `PARTS`), puis l'ajouter à
-`EXO_DEFS` ; la carte apparaît d'elle-même sur l'accueil.
+`EXO_DEFS` (avec `"etude": True` pour la rubrique « Études de cas ») ; la carte apparaît d'elle-même sur l'accueil.
 
 ## Régénérer la page
 
@@ -34,7 +40,7 @@ python3 src/generer.py           # écrit index.html
 ## Tester
 
 ```sh
-node --test tests/correction.test.js                          # moteur de correction : 110 questions, cas justes, faux et limites
+node --test tests/correction.test.js                          # moteur de correction : 209 questions, cas justes, faux et limites
 NODE_PATH=$(npm root -g) node --test tests/navigateur.test.js # accueil, cours, parcours entraînement / examen, impression, tracés, DR
 ```
 
