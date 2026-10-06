@@ -1,5 +1,67 @@
 # Note de livraison — Résistance des matériaux : traction, compression et cisaillement
 
+## Niveau 2 : renumérotation, cours 2, exercices 2.3 à 2.5, études de cas
+
+**Source** : séquence « RDM » (cours de niveau 2 et exercices 1 à 11, études « transbordeur » et « basculeur de sièges »).
+
+**Renumérotation** (les adresses ne changent pas) : exercices 1.1 traction N1, **1.2** cisaillement N1 (ex-2.1),
+**2.1** traction et compression N2 (ex-1.2), 2.2 cisaillement N2 ; cours 1.1 traction N1, **1.2** cisaillement N1
+(ex-2.1), **2** résistance des matériaux N2, cours unique sans séparation traction / cisaillement. Les cartes « En
+cours d'édition » disparaissent ; les anciennes adresses `?ex=cours-traction` et `?ex=cours-cisaillement` mènent à
+l'accueil. Nouvelle rubrique **Études de cas** (Étude 1, 2, 3).
+
+**Cours 2 (interactif)** : but de la RDM, hypothèses (cartes à retourner : homogène, isotrope), poutre, torseur de
+cohésion (N, Ty, Tz, Mt, Mfy, Mfz), sollicitations simples avec leur torseur (onglets) et jeu « quelle
+sollicitation ? », contraintes σ et τ, traction-compression (essai, courbe OA–D, Re, Rm, loi de Hooke, simulateur
+d'une barre de 1 m et 100 mm² selon le matériau, condition σ ≤ Rpe = Re/cs), cisaillement (τ ≤ Rpg = Reg/cs),
+concentration de contraintes (σmax = Kt·σnom, simulation par éléments finis). L'**exercice 1 (synthèse)** devient
+la section 8 : notation, unité et relation de dix grandeurs à choisir, avec vérification et solution. Quiz de 8 questions.
+
+**Exercice 2.3 — Traction** (exercices 2 à 6 ; 5 parties, 43 questions, 1 h 20) :
+- *Trempe* : les deux enregistrements, illisibles à l'écran avec l'échelle « 5,5 mm = 5 250 N », sont **redessinés**
+  avec un axe gradué en kN (un trait par kN), aux valeurs relevées sur l'original : brut Fe = 30 kN, Fm = 53,5 kN ;
+  trempé Fe = 46,5 kN, Fm = 63 kN (tolérance de lecture 3 %). S0 = 78,54 mm² ; Rm ≈ 681 / 802 MPa ; Re ≈ 382 /
+  592 MPa ; ε = 0,12 / 0,04. La conclusion devient deux questions oui / non (résistance accrue, ductilité réduite).
+- *Chaîne* : 63 daN/mm² = 630 MPa ; Rp = 630/5 = 126 MPa ; deux brins Ø20 : S = 628,32 mm² ; F ≈ 79 168 N.
+- *Poutre en H* : 500 000 N ; S = 5 000 mm² ; platine 125 000 mm², b ≈ 353,55 mm ; sol 0,25 MPa : 2 m², d ≈ 1 596 mm.
+- *Train d'atterrissage* : Δε = 1,14 × 10⁻³ ; Δσ = 85,5 MPa (E = 75 000 MPa) ; S ≈ 3 656,88 mm² ; ΔF ≈ 312 663 N.
+- *Ascenseur* : S ≈ 706,86 mm² ; σ ≈ 13,86 MPa ≤ Rpe = 70 MPa ; L0 = 45,80 − 2,80 = 43 m (treuil à 1 m au-dessus du
+  toit du 15e, haut de la cabine au RDC) ; ε ≈ 6,60 × 10⁻⁵ ; Δl ≈ 2,84 mm (acceptable) ; Fmax = 9 800 + 1 050 × 9,81 =
+  20 100,5 N ; σmax ≈ 28,44 MPa (résiste) ; εmax ≈ 1,35 × 10⁻⁴ ; Δlmax ≈ 5,82 mm > 5 mm : **non acceptable**.
+
+**Exercice 2.4 — Cisaillement** (exercices 7 et 8 ; 2 parties, 10 questions, 30 min) : chape Ø50, double
+cisaillement : F = 2 × 80 × 1 963,50 ≈ 314 159 N ; poinçonnage : S = 4 a e = 320 mm², F = 64 000 N ; poinçon
+comprimé : σ = 64 000 / 400 = 160 MPa ; Re mini = 2,5 × 160 = 400 MPa.
+
+**Exercice 2.5 — Concentration de contraintes** (exercices 9 et 10 ; 2 parties, 17 questions, 1 tracé sur l'abaque,
+50 min). Abaques en DT2 à DT4, avec la définition de σnom propre à chacun.
+- *Vérin* : t = 12,5 mm ; r/t = 0,4 ; d/D = 0,75 ; **Kt ≈ 2,8** (vérifié par suivi de la courbe 0,40 sur l'image) ;
+  σnom ≈ 11,32 MPa ; σmax ≈ 31,69 MPa ; cs ≈ 3,79 (tolérances couvrant Kt de 2,7 à 2,9).
+- *Plat* : épaulement h/d = 1,5, r/d = 0,25, Kt ≈ 1,63, σnom = 25 MPa, σr ≈ 40,75 MPa ; perçage d/h = 0,2 (trou dans
+  la partie de 40 mm), Kt ≈ 2,5, σnom = 10 000 / (32 × 10) = 31,25 MPa, σp ≈ 78,13 MPa.
+
+**Étude 1 — Potence de trottinette** (exercice 11 ; 3 parties, 15 questions, 1 tracé, 1 h). Construction graphique
+sur la figure agrandie avec une zone de dynamique (échelle adaptée à l'écran : 1 cm pour 50 N) : concours I des
+droites de A (verticale) et de D (selon y') ; **C ≈ 266 N, D ≈ 381 N** (tolérance 8 %). Simulation : 48,8 MPa près de
+C, cs ≈ 7,17 > 5. Axe Ø8 en double cisaillement (chape à deux pattes) : Reg = 125 MPa, Rpg = 25 MPa, τ ≈ 2,65 MPa.
+
+**Étude 2 — Pont transbordeur** (3 parties, 16 questions, 55 min) : 2 cm ; charge utile 100 t ; P = 2 000 000 N ;
+200 kN par suspente ; 2 000 kN avec cs = 10 → **19T15S** (service 2 270 kN, 12T15S insuffisant) ; ΔL1 ≈ 9,00 mm ;
+ΔT = 40,3 − (−15,6) = 55,9 °C ; ΔL2 ≈ 33,54 mm ; total ≈ 42,54 mm, dilatation prépondérante ; écart ± 21,27 mm
+> 20 mm : équipement nécessaire. Le diagramme d'exigences et l'extrait réglementaire sont retranscrits en texte.
+
+**Étude 3 — Futuroscope** (2 parties, 13 questions, 1 tracé, 50 min) : P = 8 400 N ; construction sur le DR (zone de
+dynamique ajoutée sous la figure, 1 cm pour 1 000 N, mesure en cm du document) : **A ≈ 10 600 N, B ≈ 4 200 N**
+(tolérances 7 % et 10 %), cohérent avec l'effort de 10 600 N donné ensuite ; cylindre comprimé ; S ≈ 942,48 mm² ;
+σmax simulée 11,74 MPa ; σ = 11,25 MPa ; Re = 220,6 MPa ; cs ≈ 18,79 ≥ 10 (matériel destiné au public) : validé.
+
+**Retraits** : numéros de questions d'origine (dont le cadre « Question 2.20 » du DR), noms de logiciel, de
+constructeur, d'organisme et de modèle de bus, noms de personnes et d'association. La page passe à 4,1 Mio
+(3,4 Mio d'images).
+
+**Tests** : 227 tests unitaires (209 questions) et 18 parcours navigateur, dont un sujet entièrement juste = 20/20
+pour chacun des sept exercices et des trois études, et le cours 2.
+
 ## Niveaux : pastilles « Niveau 1 » et « Niveau 2 »
 
 La pastille « Bac pro » devient **Niveau 1** (verte) ; les exercices d'origine et les cours à venir du même niveau

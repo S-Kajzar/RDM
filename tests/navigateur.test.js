@@ -1,4 +1,4 @@
-// Tests navigateur (Playwright + Chromium) : accueil, cours, parcours entraînement et examen des deux exercices.
+// Tests navigateur (Playwright + Chromium) : accueil, cours, parcours entraînement et examen des exercices et études.
 //   NODE_PATH=$(npm root -g) node --test tests/navigateur.test.js
 const test = require("node:test");
 const assert = require("node:assert/strict");
@@ -15,6 +15,15 @@ const EXO = {
   "traction-n1": { prefix: "b", sketch: "sk_b4_1", dr: /DR1 Q4\.1/, parts: 5, items: 31, points: 34 },
   traction: { prefix: "t", sketch: "sk_t1_5", dr: /DR1 Q1\.5/, parts: 4, items: 24, points: 27 },
   cisaillement: { prefix: "c", sketch: "sk_c7_2", dr: /DR1 Q7\.2/, parts: 7, items: 31, points: 34 },
+  "traction-essais": { prefix: "u", parts: 5, items: 43, points: 43, docs: ["DP1", "DT1"] },
+  "cisaillement-poinconnage": { prefix: "v", parts: 2, items: 10, points: 10, docs: ["DP1", "DT1"] },
+  concentration: { prefix: "w", sketch: "sk_w1_4", dr: /DR1 Q1\.4/, parts: 2, items: 18, points: 20,
+    docs: ["DP1", "DT1", "DT2", "DT3", "DT4"] },
+  "etude-potence": { prefix: "p", sketch: "sk_p1_3", dr: /DR1 Q1\.3/, parts: 3, items: 16, points: 20, pxPerCm: 60,
+    docs: ["DP1", "DT1", "DT2", "DT3"] },
+  "etude-transbordeur": { prefix: "x", parts: 3, items: 16, points: 16, docs: ["DP1", "DT1", "DT2", "DT3"] },
+  "etude-futuroscope": { prefix: "f", sketch: "sk_f1_4", dr: /DR1 Q1\.4/, parts: 2, items: 14, points: 18, pxPerCm: 56.7,
+    docs: ["DP1", "DT1", "DT2", "DT3"] },
 };
 const answers = (key) => Object.entries(REP).filter(([id]) => id.startsWith(EXO[key].prefix));
 let browser;
@@ -46,7 +55,7 @@ async function drawArrow(page, sk, x1, y1, x2, y2) {
 const nStrokes = (page, sk) => page.evaluate((id) => window.__app__.sketches[id].strokes.length, sk);
 const text = (page, sel) => page.locator(sel).first().innerText();
 
-test("accueil : quatre cartes de cours, quatre cartes d'exercices, pastilles Niveau 1 et Niveau 2", async () => {
+test("accueil : trois cours, sept exercices, trois études de cas, pastilles Niveau 1 et Niveau 2", async () => {
   const { context, page, errors } = await open();
   assert.ok(await page.locator("body.hub").count());
   assert.ok(await page.isVisible("#home"));
@@ -56,42 +65,88 @@ test("accueil : quatre cartes de cours, quatre cartes d'exercices, pastilles Niv
   const card = (sel) => page.locator(sel).evaluateAll((cs) => cs.map((c) => [
     c.querySelector(".mc-tag").textContent.trim(), c.querySelector("h3").textContent, c.querySelector("a").getAttribute("href")]));
   assert.deepEqual(await card(".cours-grid .mode-card"), [
-    ["Cours 1.1 Niveau 1", "Traction", "?ex=cours-traction-n1"], ["Cours 1.2 Niveau 2", "Traction et compression", "?ex=cours-traction"],
-    ["Cours 2.1 Niveau 1", "Cisaillement", "?ex=cours-cisaillement-n1"], ["Cours 2.2 Niveau 2", "Cisaillement", "?ex=cours-cisaillement"]]);
-  assert.equal(await page.locator(".cours-grid .en-edition").count(), 2);
-  assert.deepEqual(await card(".ex-grid:not(.cours-grid) .mode-card"), [
-    ["Exercice 1.1 Niveau 1", "Traction", "?ex=traction-n1"], ["Exercice 1.2 Niveau 2", "Traction et compression", "?ex=traction"],
-    ["Exercice 2.1 Niveau 1", "Cisaillement", "?ex=cisaillement-n1"], ["Exercice 2.2 Niveau 2", "Cisaillement", "?ex=cisaillement"]]);
+    ["Cours 1.1 Niveau 1", "Traction", "?ex=cours-traction-n1"], ["Cours 1.2 Niveau 1", "Cisaillement", "?ex=cours-cisaillement-n1"],
+    ["Cours 2 Niveau 2", "Résistance des matériaux", "?ex=cours-rdm"]]);
+  assert.equal(await page.locator(".en-edition").count(), 0);
+  assert.deepEqual(await card(".exo-grid .mode-card"), [
+    ["Exercice 1.1 Niveau 1", "Traction", "?ex=traction-n1"], ["Exercice 1.2 Niveau 1", "Cisaillement", "?ex=cisaillement-n1"],
+    ["Exercice 2.1 Niveau 2", "Traction et compression", "?ex=traction"], ["Exercice 2.2 Niveau 2", "Cisaillement", "?ex=cisaillement"],
+    ["Exercice 2.3 Niveau 2", "Traction", "?ex=traction-essais"],
+    ["Exercice 2.4 Niveau 2", "Cisaillement", "?ex=cisaillement-poinconnage"],
+    ["Exercice 2.5 Niveau 2", "Concentration de contraintes", "?ex=concentration"]]);
+  assert.deepEqual(await card(".etude-grid .mode-card"), [
+    ["Étude 1 Niveau 2", "Potence de trottinette", "?ex=etude-potence"],
+    ["Étude 2 Niveau 2", "Pont transbordeur", "?ex=etude-transbordeur"],
+    ["Étude 3 Niveau 2", "Futuroscope : sièges basculants", "?ex=etude-futuroscope"]]);
   assert.equal(await page.locator("#home .btn-mode").count(), 0);
   // pas de débordement horizontal sur téléphone
   await page.setViewportSize({ width: 390, height: 844 });
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
   const src = fs.readFileSync(FILE, "utf8").replace(/data:[^"]+/g, "");
-    assert.doesNotMatch(src, /\b(BTS|bac(calaur[ée]at)?|session \d|[ée]preuve|acad[ée]mie|sujet z[ée]ro|brevet)\b/i);
+  assert.doesNotMatch(src, /\b(BTS|STI2D|bac(calaur[ée]at)?|session \d|[ée]preuve|acad[ée]mie|sujet z[ée]ro|brevet|SolidWorks|Freyssinet|Cofrac|Citaro)\b/i);
+  assert.doesNotMatch(src, /Question \d+\.\d+\.\d+|Question 2\.2\d/);
   assert.deepEqual(errors, []);
   await context.close();
 });
 
-test("cours : page « En cours d'édition » avec retour à l'accueil", async () => {
-  for (const [q, title] of [["cours-traction", "Traction et compression"], ["cours-cisaillement", "Cisaillement"]]) {
+test("adresses : anciens cours et adresse inconnue ramènent à l'accueil", async () => {
+  for (const q of ["cours-traction", "cours-cisaillement", "inconnu"]) {
     const { context, page, errors } = await open("?ex=" + q);
-    assert.equal((await text(page, "#home h1")).trim(), title);
-    assert.match(await text(page, "#home"), /En cours d'édition/);
-    await page.click("#home a[href='?']");
-    await page.waitForURL(/index\.html\?$/);
-    assert.ok(await page.locator(".cours-grid").count(), "retour à l'accueil");
+    assert.ok(await page.locator(".cours-grid").count(), q);
     assert.deepEqual(errors, []);
     await context.close();
   }
-  // adresse inconnue : accueil
-  const { context, page } = await open("?ex=inconnu");
-  assert.ok(await page.locator(".cours-grid").count());
+});
+
+test("cours 2 (niveau 2) : cartes, sollicitations, jeu, simulateur de Hooke, synthèse, quiz", async () => {
+  const { context, page, errors } = await open("?ex=cours-rdm");
+  assert.match(await text(page, "#home .home-head"), /Cours 2[\s\S]*Niveau 2[\s\S]*Résistance des matériaux/);
+  assert.equal(await page.locator(".cours-sec").count(), 9);
+  await page.click(".k2-carte >> nth=1");
+  assert.ok(await page.isVisible(".k2-carte >> nth=1 >> .k2-dos"));
+  assert.match(await text(page, ".k2-carte >> nth=1"), /toutes les directions/);
+  await page.click(".k2-tab[data-sol=torsion]");
+  assert.ok(await page.isVisible(".k2-pane[data-sol=torsion]"));
+  assert.ok(!(await page.isVisible(".k2-pane[data-sol=traction]")));
+  assert.match(await text(page, ".k2-pane[data-sol=torsion]"), /arbres de transmission/);
+  const lignes = page.locator(".k2-jeu-l");
+  const n = await lignes.count();
+  for (let i = 0; i < n; i++) {
+    const ok = await lignes.nth(i).getAttribute("data-ok");
+    await lignes.nth(i).locator(`button[data-v="${i === 0 ? "torsion" : ok}"]`).click();
+  }
+  assert.equal((await text(page, "#k2-jeu-s")).trim(), `${n - 1} / ${n}`);
+  assert.match(await text(page, ".k2-jeu-l >> nth=0 >> .jeu-fb"), /traction/);
+  // barre de 1 m et 100 mm² en aluminium sous 10 000 N
+  await page.selectOption("#k2-m", "70000");
+  assert.match(await text(page, "#k2-sig"), /100,0 MPa/);
+  assert.match(await text(page, "#k2-eps"), /1,43 × 10\s*−3/);
+  assert.match(await text(page, "#k2-dl"), /1,429 mm/);
+  // synthèse : une erreur, puis la solution
+  await page.selectOption(".k2-syn tbody tr >> nth=2 >> .syn-not", "σ");
+  await page.selectOption(".k2-syn tbody tr >> nth=2 >> .syn-unit", "N");
+  await page.click("#k2-syn-ok");
+  assert.match(await text(page, "#k2-syn-s"), /^0 \/ 10/);
+  await page.click("#k2-syn-sol");
+  assert.match(await text(page, "#k2-syn-s"), /^10 \/ 10/);
+  assert.equal(await page.locator(".k2-syn select.ko").count(), 0);
+  const q = await page.locator(".quiz-q").count();
+  for (let i = 0; i < q; i++) {
+    const fs = page.locator(".quiz-q").nth(i);
+    await fs.locator(`input[value="${await fs.getAttribute("data-ok")}"]`).check();
+  }
+  assert.equal((await text(page, "#qz-score")).trim(), `${q} / ${q}`);
+  assert.equal((await text(page, "#qz-stars")).trim(), "★★★");
+  await page.click(".cours-foot a[href='?ex=concentration']");
+  await page.waitForURL(/\?ex=concentration$/);
+  assert.equal(await page.locator("#home .btn-mode").count(), 2);
+  assert.deepEqual(errors, []);
   await context.close();
 });
 
-test("cours 2.1 (niveau 1) : animation, simulateur à 1 ou 2 sections, jeu, quiz", async () => {
+test("cours 1.2 (niveau 1) : animation, simulateur à 1 ou 2 sections, jeu, quiz", async () => {
   const { context, page, errors } = await open("?ex=cours-cisaillement-n1");
-  assert.match(await text(page, "#home .home-head"), /Cours 2\.1[\s\S]*Niveau 1[\s\S]*Cisaillement/);
+  assert.match(await text(page, "#home .home-head"), /Cours 1\.2[\s\S]*Niveau 1[\s\S]*Cisaillement/);
   const set = (sel, v) => page.locator(sel).evaluate((e, x) => { e.value = x; e.dispatchEvent(new Event("input")); }, v);
   await set("#gl-s", "100");
   assert.match(await text(page, "#gl-txt"), /Rupture/);
@@ -181,17 +236,18 @@ for (const key of Object.keys(EXO)) {
     assert.ok(await page.isVisible("main.page"));
     assert.equal(await page.locator(".part").count(), X.parts);
     assert.deepEqual(await page.locator(".rail .tab:not(.tab-home)").allInnerTexts(),
-      /-n1$/.test(key) ? ["DP1", "DT1", "DT2", "DT3"] : ["DP1", "DT1", "DT2"]);
+      X.docs || (/-n1$/.test(key) ? ["DP1", "DT1", "DT2", "DT3"] : ["DP1", "DT1", "DT2"]));
     assert.ok(await page.isVisible(".rail .tab-home"));
     assert.ok(await page.isVisible(".c-top a[href='?']"));
 
-    const sk = X.sketch, sks = X.sketches || [sk];
+    const sk = X.sketch, sks = X.sketches || (sk ? [sk] : []);
     for (const k of sks) {
       const deps = await page.evaluate((id) => window.__SKCFG__[id].deps, k);
       await drawArrow(page, k, 0.4, 0.4, 0.6, 0.4);
       await page.click(`#${k} .btn-sketch`);
       if (deps.length) {
-        assert.match(await text(page, `#${k} .sk-wait`), /Q7\.1/);
+        const lab = await page.evaluate((d) => window.__QCFG__[d].label, deps[0]);
+        assert.match(await text(page, `#${k} .sk-wait`), new RegExp(lab.replace(".", "\\.")));
         assert.ok(!(await page.isVisible(`#${k} .selfeval`)));
       }
     }
@@ -223,8 +279,17 @@ for (const key of Object.keys(EXO)) {
     await page.emulateMedia({ media: "print" });
     assert.ok(!(await page.isVisible(".c-top")));
     assert.ok(!(await page.isVisible(".print-nograde")));
-    assert.match(await text(page, ".print-summary"), /Élève Test[\s\S]*entraînement[\s\S]*durée conseillée : 1 h [0-9]{2}[\s\S]*20,0\/20/);
+    assert.match(await text(page, ".print-summary"), /Élève Test[\s\S]*entraînement[\s\S]*durée conseillée : (1 h [0-9]{2}|[0-9]+ min)[\s\S]*20,0\/20/);
     if (key === "traction-n1") assert.ok(await page.evaluate(() => window.__app__.sketches.sk_b4_1.dec.pxPerCm === 50));
+    if (X.pxPerCm) assert.equal(await page.evaluate((id) => window.__app__.sketches[id].dec.pxPerCm, sk), X.pxPerCm);
+    if (!sk) {
+      assert.equal(await page.locator(".sketch").count(), 0);
+      assert.doesNotMatch(await text(page, ".cartouche"), /tracé/);
+      await page.emulateMedia({ media: "screen" });
+      assert.deepEqual(errors, []);
+      await context.close();
+      return;
+    }
     assert.match(await page.getAttribute(`#${sk} .sk-print-student`, "src"), /^data:image\/png/);
     assert.match(await page.getAttribute(`#${sk} .sk-print-corr`, "src"), /^data:image\/png/);
     const pdf = await page.pdf({ format: "A4" });
