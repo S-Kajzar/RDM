@@ -10,6 +10,7 @@ const REP = require("./reponses.js");
 const FILE = path.join(__dirname, "..", "index.html");
 const URL = "file://" + FILE;
 const EXO = {
+  "traction-bp": { prefix: "b", sketch: "sk_b4_1", dr: /DR1 Q4\.1/, parts: 5, items: 31, points: 34 },
   traction: { prefix: "t", sketch: "sk_t1_5", dr: /DR1 Q1\.5/, parts: 4, items: 24, points: 27 },
   cisaillement: { prefix: "c", sketch: "sk_c7_2", dr: /DR1 Q7\.2/, parts: 7, items: 31, points: 34 },
 };
@@ -43,41 +44,96 @@ async function drawArrow(page, sk, x1, y1, x2, y2) {
 const nStrokes = (page, sk) => page.evaluate((id) => window.__app__.sketches[id].strokes.length, sk);
 const text = (page, sel) => page.locator(sel).first().innerText();
 
-test("accueil : deux boutons de cours, deux cartes d'exercices, aucune mention d'origine", async () => {
+test("accueil : quatre cartes de cours, trois cartes d'exercices, pastilles Bac pro", async () => {
   const { context, page, errors } = await open();
   assert.ok(await page.locator("body.hub").count());
   assert.ok(await page.isVisible("#home"));
   assert.ok(!(await page.isVisible("main.page")));
   assert.ok(!(await page.isVisible(".banner")));
   assert.match(await text(page, "#home h1"), /Résistance des matériaux/);
-  const cours = await page.locator(".hub-course a.btn").evaluateAll((as) => as.map((a) => [a.textContent, a.getAttribute("href")]));
-  assert.deepEqual(cours, [["Cours 1 — Traction et compression", "?ex=cours-traction"], ["Cours 2 — Cisaillement", "?ex=cours-cisaillement"]]);
-  const cards = await page.locator(".ex-grid .mode-card").evaluateAll((cs) => cs.map((c) => [c.querySelector("h3").textContent, c.querySelector("a").getAttribute("href")]));
-  assert.deepEqual(cards, [["Traction et compression", "?ex=traction"], ["Cisaillement", "?ex=cisaillement"]]);
+  const card = (sel) => page.locator(sel).evaluateAll((cs) => cs.map((c) => [
+    c.querySelector(".mc-tag").textContent.trim(), c.querySelector("h3").textContent, c.querySelector("a").getAttribute("href")]));
+  assert.deepEqual(await card(".cours-grid .mode-card"), [
+    ["Cours 1.1 Bac pro", "Traction", "?ex=cours-traction-bp"], ["Cours 1.2", "Traction et compression", "?ex=cours-traction"],
+    ["Cours 2.1 Bac pro", "Cisaillement", "?ex=cours-cisaillement-bp"], ["Cours 2.2", "Cisaillement", "?ex=cours-cisaillement"]]);
+  assert.equal(await page.locator(".cours-grid .en-edition").count(), 3);
+  assert.deepEqual(await card(".ex-grid:not(.cours-grid) .mode-card"), [
+    ["Exercice 1.1 Bac pro", "Traction", "?ex=traction-bp"], ["Exercice 1.2", "Traction et compression", "?ex=traction"],
+    ["Exercice 2", "Cisaillement", "?ex=cisaillement"]]);
   assert.equal(await page.locator("#home .btn-mode").count(), 0);
   // pas de débordement horizontal sur téléphone
   await page.setViewportSize({ width: 390, height: 844 });
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
   const src = fs.readFileSync(FILE, "utf8").replace(/data:[^"]+/g, "");
-  assert.doesNotMatch(src, /\b(BTS|bac(calaur[ée]at)?|session \d|[ée]preuve|acad[ée]mie|sujet z[ée]ro|brevet)\b/i);
+  // seule mention de niveau admise : la pastille « Bac pro » demandée
+  assert.doesNotMatch(src.replace(/Bac pro/g, ""), /\b(BTS|bac(calaur[ée]at)?|session \d|[ée]preuve|acad[ée]mie|sujet z[ée]ro|brevet)\b/i);
   assert.deepEqual(errors, []);
   await context.close();
 });
 
 test("cours : page « En cours d'édition » avec retour à l'accueil", async () => {
-  for (const [q, title] of [["cours-traction", "Traction et compression"], ["cours-cisaillement", "Cisaillement"]]) {
+  for (const [q, title] of [["cours-traction", "Traction et compression"], ["cours-cisaillement-bp", "Cisaillement"],
+    ["cours-cisaillement", "Cisaillement"]]) {
     const { context, page, errors } = await open("?ex=" + q);
     assert.equal((await text(page, "#home h1")).trim(), title);
     assert.match(await text(page, "#home"), /En cours d'édition/);
     await page.click("#home a[href='?']");
     await page.waitForURL(/index\.html\?$/);
-    assert.ok(await page.locator(".ex-grid").count(), "retour à l'accueil");
+    assert.ok(await page.locator(".cours-grid").count(), "retour à l'accueil");
     assert.deepEqual(errors, []);
     await context.close();
   }
   // adresse inconnue : accueil
   const { context, page } = await open("?ex=inconnu");
-  assert.ok(await page.locator(".ex-grid").count());
+  assert.ok(await page.locator(".cours-grid").count());
+  await context.close();
+});
+
+test("cours 1.1 (bac pro) : courbe cliquable, simulateur, quiz noté", async () => {
+  const { context, page, errors } = await open("?ex=cours-traction-bp");
+  assert.match(await text(page, "#home h1"), /Traction/);
+  assert.match(await text(page, "#home .home-head"), /Bac pro/);
+  // courbe : une étape affiche son explication et met la courbe en valeur
+  await page.click(".etape[data-zone=plast]");
+  assert.ok(await page.isVisible(".etape-txt[data-zone=plast]"));
+  assert.ok(await page.locator(".essai-svg .z-plast.on").count());
+  await page.click(".essai-svg .pt[data-zone=re] circle:not(.hit)");
+  assert.ok(await page.isVisible(".etape-txt[data-zone=re]"));
+  assert.ok(!(await page.isVisible(".etape-txt[data-zone=plast]")));
+  // simulateur : réglages du défi (F = 10 000 N, E295, s = 5)
+  const set = (sel, v) => page.locator(sel).evaluate((e, x) => { e.value = x; e.dispatchEvent(new Event("input")); }, v);
+  await set("#s-f", "10000"); await page.selectOption("#s-m", "295"); await page.selectOption("#s-s", "5");
+  await set("#s-d", "14.5");
+  assert.match(await text(page, "#r-v"), /σ > Rpe/);
+  await set("#s-d", "15");
+  assert.match(await text(page, "#r-sig"), /56,59 MPa/);
+  assert.match(await text(page, "#r-rpe"), /59,00 MPa/);
+  assert.match(await text(page, "#r-v"), /la pièce résiste/);
+  // un clic sur une ligne du tableau des aciers règle le simulateur
+  await page.click(".mat-table tr[data-re='360']");
+  assert.equal(await page.inputValue("#s-m"), "360");
+  // quiz : 5 bonnes réponses sur 6
+  const n = await page.locator(".quiz-q").count();
+  for (let i = 0; i < n; i++) {
+    const fs = page.locator(".quiz-q").nth(i);
+    const ok = await fs.getAttribute("data-ok");
+    await fs.locator(`input[value="${i === 2 ? (ok === "0" ? "1" : "0") : ok}"]`).check();
+  }
+  assert.equal((await text(page, "#qz-score")).trim(), "5 / 6");
+  assert.equal(await page.locator(".quiz-q.is-ko").count(), 1);
+  assert.ok(await page.locator(".quiz-q input:disabled").count() > 0);
+  await page.click("#qz-reset");
+  assert.equal((await text(page, "#qz-score")).trim(), "0 / 6");
+  assert.equal(await page.locator(".quiz-q.done").count(), 0);
+  // impression : le cours s'imprime (l'accueil ne disparaît pas)
+  await page.emulateMedia({ media: "print" });
+  assert.ok(await page.isVisible("#c-quiz"));
+  assert.ok(!(await page.isVisible(".cours-foot")));
+  await page.emulateMedia({ media: "screen" });
+  await page.click(".cours-foot a[href='?ex=traction-bp']");
+  await page.waitForURL(/\?ex=traction-bp$/);
+  assert.equal(await page.locator("#home .btn-mode").count(), 2);
+  assert.deepEqual(errors, []);
   await context.close();
 });
 
@@ -90,7 +146,8 @@ for (const key of Object.keys(EXO)) {
     await page.click("[data-mode=training]");
     assert.ok(await page.isVisible("main.page"));
     assert.equal(await page.locator(".part").count(), X.parts);
-    assert.deepEqual(await page.locator(".rail .tab:not(.tab-home)").allInnerTexts(), ["DP1", "DT1", "DT2"]);
+    assert.deepEqual(await page.locator(".rail .tab:not(.tab-home)").allInnerTexts(),
+      key === "traction-bp" ? ["DP1", "DT1", "DT2", "DT3"] : ["DP1", "DT1", "DT2"]);
     assert.ok(await page.isVisible(".rail .tab-home"));
     assert.ok(await page.isVisible(".c-top a[href='?']"));
 
@@ -128,6 +185,7 @@ for (const key of Object.keys(EXO)) {
     assert.ok(!(await page.isVisible(".c-top")));
     assert.ok(!(await page.isVisible(".print-nograde")));
     assert.match(await text(page, ".print-summary"), /Élève Test[\s\S]*entraînement[\s\S]*durée conseillée : 1 h [0-9]{2}[\s\S]*20,0\/20/);
+    if (key === "traction-bp") assert.ok(await page.evaluate(() => window.__app__.sketches.sk_b4_1.dec.pxPerCm === 50));
     assert.match(await page.getAttribute(`#${sk} .sk-print-student`, "src"), /^data:image\/png/);
     assert.match(await page.getAttribute(`#${sk} .sk-print-corr`, "src"), /^data:image\/png/);
     const pdf = await page.pdf({ format: "A4" });

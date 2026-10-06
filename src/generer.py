@@ -805,14 +805,336 @@ PARTS.append({
 })
 
 
+# ============================================================ PARTIES — EXERCICE 1.1 (niveau bac pro)
+# Documents propres à cet exercice (DP1, DT1 à DT3), écrits directement sous leur nom final.
+H_LIRE = "Lis la valeur dans le DT2. " + UNITE
+RPE = "<i>R</i><sub>pe</sub>"
+RE = "<i>R</i><sub>e</sub>"
+SIG = "<i>σ</i>"
+PARTS_BP = []
+
+PARTS_BP.append({
+    "num": "1", "minutes": 10, "title": "Treuil de levage : coefficient de sécurité d'un câble",
+    "intro": [
+        "<p>Vous êtes technicien dans une agence de location de matériel. Après une maintenance corrective sur "
+        "les treuils, votre chef d'atelier vous demande de mettre à jour leur documentation technique.</p>",
+        figure("bp-treuil", "Treuil électrique de levage suspendu à une poutre, câble et crochet",
+               "Figure 1 — Treuil électrique de levage", 340),
+        data_box([
+            "Câble de diamètre 8 mm et de longueur 300 m, en acier <b>E295</b>",
+            f"Contrainte dans le câble : {SIG} = 40 MPa",
+        ]),
+    ],
+    "blocks": [
+        QBAR("Q1.1 – Q1.3", ["DT1", "DT2"]),
+        Q("q1_1", f"Déterminer la résistance élastique {RE} de l'acier du câble.", H_LIRE,
+          num(295, "MPa", absTol=0.5, variants=[var(295e6, "Pa", relTol=0.001)]),
+          f"{RE} = 295 MPa",
+          "<p>Dans le tableau des matériaux (DT2), on cherche la ligne <b>E295</b> et on lit la colonne "
+          f"<i>R</i><sub>e</sub> min : <b>{RE} = 295 MPa</b>. Le nombre dans le nom de la nuance donne d'ailleurs "
+          "cette valeur.</p>"),
+        Q("q1_2", f"Le câble résiste-t-il ? Compare la contrainte {SIG} à {RE}.", H_OUINON, YES,
+          "Oui",
+          f"<p>{SIG} = 40 MPa est bien plus petite que {RE} = 295 MPa : le câble reste dans sa zone élastique, "
+          "il <b>résiste</b>. Il reprendra sa longueur quand on relâchera la charge.</p>"),
+        Q("q1_3", "Calculer le coefficient de sécurité <i>s</i> de cette installation.", H_C_SANS,
+          num(7.375, absTol=0.006),
+          "<i>s</i> ≈ 7,38",
+          "<p>Le coefficient de sécurité dit combien de fois la contrainte pourrait être multipliée avant "
+          "d'atteindre la limite élastique :</p>" +
+          eq("<i>s</i> = " + frac(RE, SIG) + " = " + frac("295", "40") + " ≈ <b>7,38</b>") +
+          "<p>Le coefficient de sécurité n'a pas d'unité (MPa divisé par MPa). D'après le DT2, une valeur de 5 à 8 "
+          "convient pour un appareil de levage.</p>"),
+    ],
+})
+
+PARTS_BP.append({
+    "num": "2", "minutes": 20, "title": "Treuil de levage : câble dans un puits",
+    "intro": [
+        "<p>Un treuil descend une charge au fond d'un puits de 800 m de profondeur. On vérifie que le câble, "
+        "qui doit porter la charge <em>et son propre poids</em>, résiste.</p>",
+        data_box([
+            "Câble en acier <b>E360</b>, de diamètre <i>d</i> = 6 mm",
+            "Masse du câble (800 m) : 178 kg ; masse de la charge : 80 kg",
+            "<i>g</i> = 9,81 N/kg",
+            "Coefficient de sécurité souhaité : <i>s</i> = 8",
+        ]),
+    ],
+    "blocks": [
+        QBAR("Q2.1 – Q2.6", ["DT1", "DT2"]),
+        Q("q2_1", "Calculer la section <i>S</i> du câble.", H_C,
+          num(28.2743, "mm2", relTol=0.001, variants=[var(0.282743, "cm2", relTol=0.001)]),
+          "<i>S</i> ≈ 28,27 mm²",
+          "<p>La section du câble est un disque :</p>" +
+          eq("<i>S</i> = " + frac("π × <i>d</i>²", "4") + " = " + frac("π × 6²", "4") + " ≈ <b>28,27 mm²</b>")),
+        Q("q2_2", "Calculer le poids <i>P</i><sub>câble</sub> du câble.", H_C,
+          num(1746.18, "N", relTol=0.001, variants=[var(1.74618, "kN", relTol=0.001)]),
+          "<i>P</i><sub>câble</sub> = 1 746,18 N",
+          "<p>Le poids se calcule à partir de la masse :</p>" +
+          eq("<i>P</i> = <i>m</i> × <i>g</i> = 178 × 9,81 = <b>1 746,18 N</b>") +
+          "<p>Attention : la masse est en kg, le poids (une force) en newtons.</p>"),
+        Q("q2_3", "Calculer le poids total <i>P</i><sub>total</sub> que doit porter le haut du câble (câble de 800 m "
+          "et charge).", H_C,
+          num(2530.98, "N", relTol=0.001, variants=[var(2.53098, "kN", relTol=0.001)]),
+          "<i>P</i><sub>total</sub> = 2 530,98 N",
+          "<p>En haut du puits, le câble porte la charge <em>et</em> tout le câble déroulé :</p>" +
+          eq("<i>P</i><sub>total</sub> = (178 + 80) × 9,81 = 258 × 9,81 = <b>2 530,98 N</b>") +
+          "<p>Ici, le câble pèse plus de deux fois plus lourd que la charge !</p>"),
+        Q("q2_4", f"Calculer la contrainte {SIG} dans le câble.", H_C,
+          num(89.5155, "MPa", relTol=0.001, variants=[var(89.5155e6, "Pa", relTol=0.001)]),
+          f"{SIG} ≈ 89,52 MPa",
+          eq(f"{SIG} = " + frac("<i>F</i>", "<i>S</i>") + " = " + frac("2 530,98", "28,27") +
+             " ≈ <b>89,52 MPa</b>") +
+          "<p>La force est en N et la section en mm² : le résultat est en N/mm², c'est-à-dire en MPa.</p>"),
+        Q("q2_5", f"Calculer la résistance pratique {RPE} de ce câble.", H_C,
+          num(45, "MPa", absTol=0.006, variants=[var(45e6, "Pa", relTol=0.001)]),
+          f"{RPE} = 45 MPa",
+          f"<p>Pour l'acier E360, {RE} = 360 MPa (DT2). Avec un coefficient de sécurité de 8 :</p>" +
+          eq(f"{RPE} = " + frac(RE, "<i>s</i>") + " = " + frac("360", "8") + " = <b>45 MPa</b>")),
+        Q("q2_6", "La condition de résistance est-elle vérifiée ?", H_OUINON,
+          {"type": "yesno", "value": False},
+          "Non",
+          f"<p>Condition de résistance : {SIG} ≤ {RPE}. Ici {SIG} ≈ 89,52 MPa est <b>plus grande</b> que "
+          f"{RPE} = 45 MPa : la condition n'est <b>pas vérifiée</b>.</p>"
+          "<p>Le câble ne casserait pas tout de suite (89,52 MPa reste sous les 360 MPa de la limite élastique), "
+          "mais la sécurité demandée n'est pas assurée : il faut un câble plus gros ou un acier plus résistant.</p>"),
+    ],
+})
+
+PARTS_BP.append({
+    "num": "3", "minutes": 15, "title": "Maillon de chaîne : joue de chaîne",
+    "intro": [
+        "<p>Après une maintenance corrective, vous remplacez une chaîne de transmission. On vous demande de "
+        "déterminer le coefficient de sécurité de la nouvelle installation.</p>",
+        figure("bp-chaine", "Chaîne à rouleaux : maillons intérieur, extérieur et de jonction, rouleau, douille, axe, "
+               "plaques", "Figure 2 — Constitution d'une chaîne à rouleaux", 420),
+        figure("bp-maillon", "Joue de chaîne cotée : entraxe 15, largeur 12, diamètre extérieur 18, trou de diamètre "
+               "6, épaisseur 2 mm, sections 1 et 2", "Figure 3 — Joue de chaîne (épaisseur 2 mm)", 380),
+        data_box([
+            "Joue en acier de résistance élastique <i>R</i><sub>e</sub> = 600 MPa",
+            "Effort de traction : <i>F</i> = 2 000 N ; épaisseur de la joue : 2 mm",
+            "Section 1 : partie droite de largeur 12 mm ; section 2 : au droit du trou (Ø18 extérieur, trou Ø6)",
+        ]),
+    ],
+    "blocks": [
+        QBAR("Q3.1 – Q3.5", ["DT1"]),
+        Q("q3_1", "Calculer l'aire de la section 1.", H_EX,
+          num(24, "mm2", absTol=0.05), "<i>S</i><sub>1</sub> = 24 mm²",
+          "<p>La section 1 est un rectangle de 12 mm (largeur) sur 2 mm (épaisseur) :</p>" +
+          eq("<i>S</i><sub>1</sub> = 12 × 2 = <b>24 mm²</b>")),
+        Q("q3_2", "Calculer l'aire de la section 2.", H_EX,
+          num(24, "mm2", absTol=0.05), "<i>S</i><sub>2</sub> = 24 mm²",
+          "<p>Au droit du trou, il ne reste de la matière que de part et d'autre du trou : la largeur utile vaut "
+          "18 − 6 = 12 mm.</p>" +
+          eq("<i>S</i><sub>2</sub> = (18 − 6) × 2 = <b>24 mm²</b>") +
+          "<p>Les deux sections sont égales : la joue a été dessinée pour que le trou ne la fragilise pas.</p>"),
+        Q("q3_3", "Calculer la contrainte <i>σ</i><sub>1</sub> dans la section 1.", H_C,
+          num(83.3333, "MPa", absTol=0.006), "<i>σ</i><sub>1</sub> ≈ 83,33 MPa",
+          eq("<i>σ</i><sub>1</sub> = " + frac("<i>F</i>", "<i>S</i><sub>1</sub>") + " = " + frac("2 000", "24") +
+             " ≈ <b>83,33 MPa</b>")),
+        Q("q3_4", "Calculer la contrainte <i>σ</i><sub>2</sub> dans la section 2.", H_C,
+          num(83.3333, "MPa", absTol=0.006), "<i>σ</i><sub>2</sub> ≈ 83,33 MPa",
+          eq("<i>σ</i><sub>2</sub> = " + frac("<i>F</i>", "<i>S</i><sub>2</sub>") + " = " + frac("2 000", "24") +
+             " ≈ <b>83,33 MPa</b>") + "<p>Même section, même effort : même contrainte.</p>"),
+        Q("q3_5", "Calculer le coefficient de sécurité <i>s</i> de cette joue de chaîne.", H_C_SANS,
+          num(7.2, absTol=0.006), "<i>s</i> = 7,2",
+          eq("<i>s</i> = " + frac(RE, SIG) + " = " + frac("600", "83,33") + " ≈ <b>7,2</b>") +
+          "<p>La joue pourrait supporter un effort 7,2 fois plus grand avant d'atteindre sa limite élastique.</p>"),
+    ],
+})
+
+
+def _dr_sections_svg():
+    """Document réponse de la barre percée : trois cadres quadrillés au millimètre (5 px = 1 mm)."""
+    out = ['<svg xmlns="http://www.w3.org/2000/svg" width="900" height="400" viewBox="0 0 900 400">',
+           '<rect width="900" height="400" fill="#fff"/>',
+           '<text x="450" y="38" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" '
+           'font-weight="700" fill="#1C2530">Sections droites à l\'échelle 1:1 — 1 petit carreau = 1 mm</text>']
+    for k, fx in enumerate((70, 355, 640)):
+        fy, fw, fh = 90, 190, 250
+        for i in range(0, fw + 1, 5):
+            c = "#C5CDD6" if i % 25 == 0 else "#E6EAEE"
+            out.append(f'<line x1="{fx + i}" y1="{fy}" x2="{fx + i}" y2="{fy + fh}" stroke="{c}" stroke-width="1"/>')
+        for j in range(0, fh + 1, 5):
+            c = "#C5CDD6" if j % 25 == 0 else "#E6EAEE"
+            out.append(f'<line x1="{fx}" y1="{fy + j}" x2="{fx + fw}" y2="{fy + j}" stroke="{c}" stroke-width="1"/>')
+        out.append(f'<rect x="{fx}" y="{fy}" width="{fw}" height="{fh}" fill="none" stroke="#1C2530" stroke-width="2"/>')
+        out.append(f'<text x="{fx + fw / 2}" y="{fy - 12}" text-anchor="middle" font-family="Arial,sans-serif" '
+                   f'font-size="22" font-weight="700" fill="#1C2530">S{k + 1}</text>')
+    out.append("</svg>")
+    return "".join(out)
+
+
+DR_SECTIONS_SVG = _dr_sections_svg()
+
+PARTS_BP.append({
+    "num": "4", "minutes": 25, "title": "Barre percée : quelle section est la plus sollicitée ?",
+    "intro": [
+        "<p>La barre ci-dessous, de section rectangulaire 24 mm × 15 mm, est tirée par un effort de 5 000 N. Elle "
+        "est percée de deux trous Ø4 et d'un trou Ø10, qui traversent toute son épaisseur de 15 mm. On étudie trois "
+        "sections : S1 (sans trou), S2 (au droit des deux trous Ø4) et S3 (au droit du trou Ø10).</p>",
+        figure("bp-barre", "Barre de section 24 × 15 tirée par deux forces de 5000 N, percée de deux trous de "
+               "diamètre 4 et d'un trou de diamètre 10 ; sections S1, S2, S3 repérées en rouge",
+               "Figure 4 — Barre percée", 560),
+        data_box([
+            "Effort de traction : <i>F</i> = 5 000 N",
+            "Section pleine : 24 mm (hauteur) × 15 mm (épaisseur)",
+            "S2 : deux trous Ø4, d'axes à 8 mm du haut et à 8 mm du bas ; S3 : un trou Ø10 au milieu",
+            "Barre en acier <b>E295</b> ; coefficient de sécurité <i>s</i> = 6",
+        ]),
+    ],
+    "blocks": [
+        QBAR("Q4.1", ["DP1"], ans="sur le document réponse"),
+        SK("sk_q4_1", "Q4.1", "SECTIONS",
+           "Dessiner les trois sections S1, S2 et S3 à l'échelle 1:1 dans les cadres du document réponse.",
+           ["Les trois sections sont des rectangles de 15 mm de large et 24 mm de haut (15 × 24 petits carreaux).",
+            "S1 est entièrement pleine (hachurée ou coloriée).",
+            "S2 montre deux bandes vides de 4 mm de haut, centrées à 8 mm du haut et à 8 mm du bas.",
+            "S3 montre une seule bande vide de 10 mm de haut, au milieu de la section."],
+           [],
+           "<p>Outils : <b>Ligne</b> pour les contours, <b>Crayon</b> pour hachurer la matière. Un petit carreau "
+           "vaut 1 mm ; l'outil Ligne affiche la longueur tracée.</p>"
+           "<p>Un trou qui traverse la barre enlève, dans la section, une bande de matière aussi haute que son "
+           "diamètre.</p>",
+           "<p>Les trois sections ont le même contour : un rectangle de 15 mm de large (l'épaisseur) et 24 mm de "
+           "haut.</p><ul><li><b>S1</b> : rien n'est enlevé, toute la section est pleine.</li>"
+           "<li><b>S2</b> : chaque trou Ø4 enlève une bande de 4 mm de haut sur toute la largeur. Il reste trois "
+           "bandes de matière : 6 mm, 4 mm et 6 mm.</li>"
+           "<li><b>S3</b> : le trou Ø10 enlève une bande de 10 mm au milieu. Il reste deux bandes de 7 mm.</li>"
+           "</ul>"),
+        QBAR("Q4.2 – Q4.10", ["DT1", "DT2"]),
+        Q("q4_2", "Calculer l'aire de la section S1.", H_EX,
+          num(360, "mm2", absTol=0.5), "<i>S</i><sub>1</sub> = 360 mm²",
+          eq("<i>S</i><sub>1</sub> = 24 × 15 = <b>360 mm²</b>")),
+        Q("q4_3", "Calculer l'aire de la section S2.", H_EX,
+          num(240, "mm2", absTol=0.5), "<i>S</i><sub>2</sub> = 240 mm²",
+          "<p>On enlève à la section pleine les deux bandes de 4 mm × 15 mm :</p>" +
+          eq("<i>S</i><sub>2</sub> = 360 − 2 × (4 × 15) = 360 − 120 = <b>240 mm²</b>") +
+          "<p>Autre méthode : il reste 6 + 4 + 6 = 16 mm de hauteur de matière, soit 16 × 15 = 240 mm².</p>"),
+        Q("q4_4", "Calculer l'aire de la section S3.", H_EX,
+          num(210, "mm2", absTol=0.5), "<i>S</i><sub>3</sub> = 210 mm²",
+          eq("<i>S</i><sub>3</sub> = 360 − 10 × 15 = 360 − 150 = <b>210 mm²</b>")),
+        Q("q4_5", "Calculer la contrainte <i>σ</i><sub>1</sub> dans la section S1.", H_C,
+          num(13.8889, "MPa", absTol=0.006), "<i>σ</i><sub>1</sub> ≈ 13,89 MPa",
+          eq("<i>σ</i><sub>1</sub> = " + frac("5 000", "360") + " ≈ <b>13,89 MPa</b>")),
+        Q("q4_6", "Calculer la contrainte <i>σ</i><sub>2</sub> dans la section S2.", H_C,
+          num(20.8333, "MPa", absTol=0.006), "<i>σ</i><sub>2</sub> ≈ 20,83 MPa",
+          eq("<i>σ</i><sub>2</sub> = " + frac("5 000", "240") + " ≈ <b>20,83 MPa</b>")),
+        Q("q4_7", "Calculer la contrainte <i>σ</i><sub>3</sub> dans la section S3.", H_C,
+          num(23.8095, "MPa", absTol=0.006), "<i>σ</i><sub>3</sub> ≈ 23,81 MPa",
+          eq("<i>σ</i><sub>3</sub> = " + frac("5 000", "210") + " ≈ <b>23,81 MPa</b>")),
+        Q("q4_8", "Quelle est la section la plus sollicitée ?", "Réponds par le nom de la section (S1, S2 ou S3).",
+          {"type": "intset", "value": [3]}, "S3",
+          "<p>La section la plus sollicitée est celle où la contrainte est la plus grande, c'est-à-dire celle qui a "
+          "le <b>moins de matière</b> : <b>S3</b> (210 mm², 23,81 MPa). C'est là que la barre casserait en "
+          "premier.</p>"),
+        Q("q4_9", f"Déterminer la résistance pratique {RPE} de la barre.", H_C,
+          num(49.1667, "MPa", absTol=0.006, variants=[var(49.1667e6, "Pa", relTol=0.001)]),
+          f"{RPE} ≈ 49,17 MPa",
+          f"<p>Acier E295 : {RE} = 295 MPa (DT2).</p>" +
+          eq(f"{RPE} = " + frac(RE, "<i>s</i>") + " = " + frac("295", "6") + " ≈ <b>49,17 MPa</b>")),
+        Q("q4_10", "La condition de résistance est-elle vérifiée pour les trois sections ?", H_OUINON, YES,
+          "Oui",
+          f"<p>Il suffit de vérifier la section la plus sollicitée : {SIG}<sub>3</sub> ≈ 23,81 MPa ≤ {RPE} ≈ "
+          "49,17 MPa. Si S3 résiste, S1 et S2, moins chargées, résistent aussi : la condition est <b>vérifiée</b> "
+          "pour toute la barre.</p>"),
+    ],
+})
+
+PARTS_BP.append({
+    "num": "5", "minutes": 20, "title": "Vis d'assemblage d'un couvercle",
+    "intro": [
+        "<p>Un joint plat est placé entre un couvercle et un carter. Pour bien l'écraser, il faut une force totale "
+        "de 2 000 N, répartie sur 6 vis d'assemblage identiques. Chaque vis, tirée par le serrage, travaille en "
+        "traction.</p>",
+        figure("bp-vis", "Couvercle fixé sur un carter par 6 vis, joint plat entre les deux ; diamètre de vis à "
+               "déterminer", "Figure 5 — Couvercle, joint plat et vis", 260),
+        data_box([
+            "Force totale de serrage : <i>F</i> = 2 000 N, répartie sur 6 vis",
+            "Vis en acier : <i>R</i><sub>e</sub> = 260 MPa ; coefficient de sécurité <i>s</i> = 3",
+            "Section du noyau des vis : DT3",
+        ]),
+    ],
+    "blocks": [
+        QBAR("Q5.1 – Q5.7", ["DT1", "DT3"]),
+        Q("q5_1", "Déterminer la force <i>F</i><sub>vis</sub> exercée sur une vis.", H_C,
+          num(333.3333, "N", absTol=0.006), "<i>F</i><sub>vis</sub> ≈ 333,33 N",
+          "<p>Les 6 vis se partagent l'effort à parts égales :</p>" +
+          eq("<i>F</i><sub>vis</sub> = " + frac("2 000", "6") + " ≈ <b>333,33 N</b>")),
+        Q("q5_2", f"Calculer la résistance pratique {RPE} des vis.", H_C,
+          num(86.6667, "MPa", absTol=0.006), f"{RPE} ≈ 86,67 MPa",
+          eq(f"{RPE} = " + frac(RE, "<i>s</i>") + " = " + frac("260", "3") + " ≈ <b>86,67 MPa</b>")),
+        Q("q5_3", "Calculer la section minimale <i>S</i><sub>mini</sub> d'une vis pour respecter la condition de "
+          "résistance.", H_C,
+          num(3.8462, "mm2", absTol=0.006), "<i>S</i><sub>mini</sub> ≈ 3,85 mm²",
+          f"<p>La condition {SIG} = <i>F</i> / <i>S</i> ≤ {RPE} donne <i>S</i> ≥ <i>F</i> / {RPE} :</p>" +
+          eq("<i>S</i><sub>mini</sub> = " + frac("333,33", "86,67") + " ≈ <b>3,85 mm²</b>")),
+        Q("q5_4", "À l'aide du DT3, choisir le diamètre <i>d</i> de vis qui convient.",
+          "Valeur du tableau. " + UNITE,
+          num(3, "mm", absTol=0.01), "<i>d</i> = 3 mm (vis M3)",
+          "<p>On cherche dans le DT3 la première section de noyau <b>supérieure ou égale</b> à 3,85 mm² : 2,98 mm² "
+          "(d = 2,5) est trop petite, <b>4,47 mm²</b> convient. On choisit <b>d = 3 mm</b>.</p>"),
+        Q("q5_5", "Le filetage concentre les contraintes : la contrainte maximale vaut <i>σ</i><sub>maxi</sub> = "
+          "<i>σ</i> × <i>K</i><sub>t</sub>, avec <i>K</i><sub>t</sub> = 2,5. Calculer <i>σ</i><sub>maxi</sub> pour la "
+          "vis choisie.", H_C,
+          num(186.4281, "MPa", relTol=0.001), "<i>σ</i><sub>maxi</sub> ≈ 186,43 MPa",
+          "<p>On calcule d'abord la contrainte dans le noyau de la vis M3 (4,47 mm²), puis on la multiplie par "
+          "<i>K</i><sub>t</sub> :</p>" +
+          eq(f"{SIG} = " + frac("333,33", "4,47") + " ≈ 74,57 MPa") +
+          eq("<i>σ</i><sub>maxi</sub> = 74,57 × 2,5 ≈ <b>186,43 MPa</b>")),
+        Q("q5_6", "La condition de résistance est-elle vérifiée avec cette vis ?", H_OUINON,
+          {"type": "yesno", "value": False}, "Non",
+          f"<p><i>σ</i><sub>maxi</sub> ≈ 186,43 MPa est plus grande que {RPE} ≈ 86,67 MPa : la condition n'est "
+          "<b>pas vérifiée</b>. La concentration de contrainte au fond des filets oblige à choisir une vis plus "
+          "grosse.</p>"),
+        Q("q5_7", "Quel diamètre de vis faut-il choisir pour que la condition soit vérifiée malgré "
+          "<i>K</i><sub>t</sub> = 2,5 ?", "Valeur du tableau. " + UNITE,
+          num(5, "mm", absTol=0.01), "<i>d</i> = 5 mm (vis M5)",
+          f"<p>Il faut <i>σ</i> × 2,5 ≤ {RPE}, donc une section au moins 2,5 fois plus grande :</p>" +
+          eq("<i>S</i> ≥ 2,5 × 3,85 ≈ 9,62 mm²") +
+          "<p>Dans le DT3, la vis M4 (7,75 mm²) est encore trop petite ; la vis <b>M5</b> (12,7 mm²) convient. "
+          "Vérification : <i>σ</i><sub>maxi</sub> = 333,33 / 12,7 × 2,5 ≈ 65,6 MPa ≤ 86,67 MPa.</p>"),
+    ],
+})
+
+
 # ============================================================ TRACÉS (fonds et décor)
 SK_BG = {
     # clé : (image, largeur déclarée, hauteur déclarée)
     "POUTRE": ("t1-siege-fil", 810, 460),
     "AXE": ("c7-axe-chape", 860, 373),
+    "SECTIONS": ("svg:DR_SECTIONS_SVG", 900, 400),
 }
 
+
+def bg_src(name):
+    if name.startswith("svg:"):
+        return "data:image/svg+xml;base64," + base64.b64encode(globals()[name[4:]].encode()).decode()
+    return png(name)[0]
+
 DECOR_JS = r"""  var DECOR = {
+    // Document réponse de la barre percée : 5 px = 1 mm ; section 15 × 24 mm dessinée à 55 px du bord gauche
+    // de chaque cadre et à 65 px de son bord haut
+    SECTIONS: {
+      pad: { t: 10, r: 10, b: 10, l: 10 }, rs: 2.4, pxPerCm: 50,
+      decorate: function () {},
+      correction: function (c) {
+        var mm = 5, frames = [70, 355, 640];
+        // bandes de matière (en mm depuis le haut de la section) pour S1, S2, S3
+        var solid = [[[0, 24]], [[0, 6], [10, 14], [18, 24]], [[0, 7], [17, 24]]];
+        frames.forEach(function (fx, k) {
+          var x0 = fx + 55, y0 = 90 + 65, w = 15 * mm;
+          solid[k].forEach(function (b) {
+            c.save(); c.fillStyle = "rgba(198,40,40,.30)"; c.fillRect(x0, y0 + b[0] * mm, w, (b[1] - b[0]) * mm);
+            c.strokeStyle = CORR; c.lineWidth = 2.4; c.strokeRect(x0, y0 + b[0] * mm, w, (b[1] - b[0]) * mm); c.restore();
+          });
+          c.save(); c.setLineDash([6, 4]); c.strokeStyle = CORR; c.lineWidth = 1.6;
+          c.strokeRect(x0, y0, w, 24 * mm); c.restore();
+        });
+        text(c, "15 mm", 70 + 55 + 37, 155 + 120 + 22, CORR, 15, "center", "700");
+        text(c, "24 mm", 70 + 55 + 75 + 34, 215, CORR, 15, "center", "700");
+      }
+    },
     // Figure 1 (siège suspendu), agrandie 2,5 fois : A(100;328) E(100;108) D(385;323) C(595;328)
     POUTRE: {
       pad: { t: 20, r: 170, b: 40, l: 30 }, rs: 2.4,
@@ -860,6 +1182,7 @@ DECOR_JS = r"""  var DECOR = {
 """
 
 DR_NAMES_JS = """  var DR_NAMES = {
+    SECTIONS: { doc: "DR1", q: "Q4.1", t: "Barre percée : sections S1, S2 et S3 à l'échelle 1:1", scale: false },
     POUTRE: { doc: "DR1", q: "Q1.5", t: "Poutre AC isolée : actions mécaniques extérieures", scale: false },
     AXE: { doc: "DR1", q: "Q7.2", t: "Axe de chape : sections cisaillées", scale: false }
   };
@@ -962,6 +1285,77 @@ comme dans une chape) ; il est cisaillé dans deux plans.</li>
 ]
 
 
+# Documents de l'exercice 1.1 (niveau bac pro), tirés du cours de traction : peu de formules.
+MATERIAUX = [("S185 (A33)", 290, 185), ("S235 (E24)", 340, 235), ("S275 (E28)", 410, 275), ("S355 (E36)", 490, 355),
+             ("E295 (A50)", 470, 295), ("E335 (A60)", 570, 335), ("E360 (A70)", 670, 360)]
+COEFS = [("1,5 à 2", "Cas exceptionnels de grande légèreté ; charges surévaluées."),
+         ("2 à 3", "Construction où l'on recherche la légèreté (aviation) ; hypothèses les plus défavorables "
+                   "(charpente avec vent ou neige)."),
+         ("3 à 4", "Bonne construction, calculs soignés, haubans fixes."),
+         ("4 à 5", "Construction courante (légers efforts dynamiques non pris en compte) ; treuils."),
+         ("5 à 8", "Calculs sommaires, efforts difficiles à évaluer (chocs, mouvements alternatifs, appareils de "
+                   "levage, manutention)."),
+         ("8 à 10", "Matériaux non homogènes ; chocs ; élingues de levage."),
+         ("10 à 15", "Chocs très importants, très mal connus (presses) ; ascenseurs.")]
+NOYAUX = [(1.6, 0.35, 1.08), (2, 0.4, 1.79), (2.5, 0.45, 2.98), (3, 0.5, 4.47), (4, 0.7, 7.75), (5, 0.8, 12.7),
+          (6, 1, 17.9), (8, 1.25, 32.9), (10, 1.5, 52.3), (12, 1.75, 76.2)]
+
+
+def _frn(x):
+    return f"{x:g}".replace(".", ",")
+
+
+DOCS += [
+    ("BDP1", "Méthode — vérifier une pièce en traction", "Dossier présentation", False, """
+<div class="doc-text"><h3>Vérifier une pièce en traction : 4 étapes</h3>
+<ol>
+<li><strong>La force</strong> <i>F</i> qui tire sur la pièce, en newtons (N). Si l'on connaît une masse :
+<i>P</i> = <i>m</i> × <i>g</i>, avec <i>g</i> = 9,81 N/kg. Si plusieurs pièces se partagent l'effort, on le divise.</li>
+<li><strong>La section</strong> <i>S</i> qui travaille, en mm² : la « tranche » de la pièce, perpendiculaire à
+la force. Un trou enlève de la matière, donc de la section.</li>
+<li><strong>La contrainte</strong> <i>σ</i> = <i>F</i> / <i>S</i>, en MPa (1 MPa = 1 N/mm²).</li>
+<li><strong>La comparaison</strong> avec la résistance pratique <i>R</i><sub>pe</sub> = <i>R</i><sub>e</sub> / <i>s</i> :
+si <i>σ</i> ≤ <i>R</i><sub>pe</sub>, la pièce résiste en toute sécurité.</li>
+</ol>
+<h3>Conseils</h3>
+<ul>
+<li>Force en N et section en mm² : la contrainte sort directement en MPa.</li>
+<li>Toujours écrire l'unité : elle compte pour la moitié des points.</li>
+<li>La section la plus petite est la plus sollicitée : c'est elle qu'il faut vérifier.</li>
+</ul></div>"""),
+    ("BDT1", "Formulaire — traction", "Dossier technique", True, """
+<div class="doc-text"><h3>Les relations à connaître</h3>
+<table class="t"><thead><tr><th>Grandeur</th><th>Relation</th><th>Unités</th></tr></thead><tbody>
+<tr><td>Contrainte normale</td><td><i>σ</i> = <i>F</i> / <i>S</i></td><td>MPa ; N ; mm²</td></tr>
+<tr><td>Résistance pratique</td><td><i>R</i><sub>pe</sub> = <i>R</i><sub>e</sub> / <i>s</i></td><td>MPa</td></tr>
+<tr><td>Condition de résistance</td><td><i>σ</i> ≤ <i>R</i><sub>pe</sub></td><td>MPa</td></tr>
+<tr><td>Coefficient de sécurité obtenu</td><td><i>s</i> = <i>R</i><sub>e</sub> / <i>σ</i></td><td>sans unité</td></tr>
+<tr><td>Poids</td><td><i>P</i> = <i>m</i> × <i>g</i></td><td>N ; kg ; N/kg</td></tr>
+</tbody></table>
+<h3>Aire des sections</h3>
+<table class="t"><tbody>
+<tr><th>Disque de diamètre <i>d</i></th><td><i>S</i> = π × <i>d</i>² / 4</td></tr>
+<tr><th>Rectangle <i>a</i> × <i>b</i></th><td><i>S</i> = <i>a</i> × <i>b</i></td></tr>
+</tbody></table>
+<p>1 MPa = 1 N/mm² · 1 kN = 1 000 N</p></div>"""),
+    ("BDT2", "Matériaux et coefficients de sécurité", "Dossier technique", True,
+     '<div class="doc-text"><h3>Caractéristiques de quelques aciers</h3><table class="t"><thead><tr><th>Nuance</th>'
+     '<th><i>R</i> min (MPa)<br><small>rupture</small></th><th><i>R</i><sub>e</sub> min (MPa)<br>'
+     '<small>limite élastique</small></th></tr></thead><tbody>' +
+     "".join(f"<tr><td>{n}</td><td>{r}</td><td>{e}</td></tr>" for n, r, e in MATERIAUX) +
+     '</tbody></table><h3>Choix du coefficient de sécurité <i>s</i></h3><table class="t"><thead><tr><th><i>s</i></th>'
+     '<th>Conditions générales de calcul (sauf réglementation particulière)</th></tr></thead><tbody>' +
+     "".join(f"<tr><td><b>{c}</b></td><td>{t}</td></tr>" for c, t in COEFS) + "</tbody></table></div>"),
+    ("BDT3", "Vis : section du noyau", "Dossier technique", True,
+     '<div class="doc-text"><h3>Vis à filetage métrique : section résistante du noyau</h3>'
+     '<table class="t"><thead><tr><th>Diamètre <i>d</i> (mm)</th><th>Pas (mm)</th><th>Section du noyau (mm²)</th>'
+     '</tr></thead><tbody>' +
+     "".join(f"<tr><td>{_frn(d)}</td><td>{_frn(p)}</td><td>{_frn(a)}</td></tr>" for d, p, a in NOYAUX) +
+     '</tbody></table><p>Une vis travaille dans son noyau (le cylindre au fond des filets) : on choisit la '
+     'première section supérieure ou égale à la section minimale calculée.</p></div>'),
+]
+
+
 # ============================================================ rendu HTML
 def render_q(q, part):
     qid, label = q["id"], q["label"]
@@ -994,7 +1388,7 @@ def render_qbar(b):
 def render_sk(s, part, total_pts):
     sid, label = s["id"], s["label"]
     img_name, w, h = SK_BG[s["bg"]]
-    src, _, _ = png(img_name)
+    src = bg_src(img_name)
     crit = "".join(f'<label class="se-item"><input type="checkbox" data-crit="{i}"><span>{c}</span></label>'
                    for i, c in enumerate(s["criteria"]))
     n = len(s["criteria"])
@@ -1075,7 +1469,15 @@ def hm(minutes):
 # Chaque exercice reprend une partie des PARTIES ci-dessus, renumérotées à partir de 1.
 # Les documents sont renommés exercice par exercice (DP1, DT1, DT2…) ; « docs » donne la correspondance.
 EXO_DEFS = [
-    {"key": "traction", "prefix": "t", "tag": "Exercice 1", "title": "Traction et compression",
+    {"key": "traction-bp", "prefix": "b", "tag": "Exercice 1.1", "level": "Bac pro", "title": "Traction",
+     "parts": PARTS_BP, "docs": {"BDP1": "DP1", "BDT1": "DT1", "BDT2": "DT2", "BDT3": "DT3"}, "fig_shift": 0,
+     "hero": ("bp-treuil", "Treuil électrique de levage suspendu à une poutre, câble et crochet",
+              "Un treuil de levage : son câble travaille en traction."),
+     "card": "Un câble de treuil, une joue de chaîne, une barre percée et des vis d'assemblage : section, "
+             "contrainte, résistance pratique et coefficient de sécurité.",
+     "sub": "Cinq situations de maintenance pour vérifier une pièce tendue : lire une résistance dans un tableau, "
+            "calculer une section et une contrainte, comparer à la résistance pratique, choisir une vis."},
+    {"key": "traction", "prefix": "t", "tag": "Exercice 1.2", "title": "Traction et compression",
      "parts": PARTS[0:4], "docs": {"DP1": "DP1", "DT1": "DT1", "DT3": "DT2"}, "fig_shift": 0,
      "hero": ("t1-siege-fil", "Siège suspendu : poutre AC articulée sur un mur, maintenue par le fil DE",
               "Le fil d'acier DE porte le siège : on calcule sa tension, sa contrainte et son allongement."),
@@ -1216,16 +1618,20 @@ def render_docs(e):
     return "".join(rail), "".join(tabs), "\n".join(secs)
 
 
+def pastille(level):
+    return f' <span class="pastille">{level}</span>' if level else ""
+
+
 def render_exo_home(e):
     src, w, h = png(e["hero"][0])
-    docs = sorted(set(e["docs"].values()))
-    docs_txt = ", ".join(docs[:-1]) + " et " + docs[-1]
+    docs = sorted(set(e["docs"].values()), key=lambda k: (k[:2] != "DP", k))
+    docs_txt = (", ".join(docs[:-1]) + " et " + docs[-1]) if len(docs) < 4 else f"{docs[0]} à {docs[-1]}"
     facts = ('<div class="home-facts">'
              f'<div><b>{len(e["P"])} parties</b><span>{e["n_q"]} questions</span></div>'
              f'<div><b>{hm(e["minutes"])}</b><span>durée conseillée</span></div>'
              f'<div><b>{len(docs)} documents</b><span>{docs_txt}</span></div>'
              f'<div><b>{e["n_sk"]} tracé</b><span>auto-évalué</span></div></div>')
-    return (f'<div class="home-top"><div class="home-top-l"><header class="home-head"><span class="mc-tag">{e["tag"]}</span>'
+    return (f'<div class="home-top"><div class="home-top-l"><header class="home-head"><span class="mc-tag">{e["tag"]}</span>{pastille(e.get("level"))}'
             f'<h1 id="home-title">{e["title"]}</h1><p class="home-sub">{e["sub"]}</p></header>{facts}</div>'
             f'<figure class="home-hero"><img src="{src}" alt="{esc(e["hero"][1])}" width="{w}" height="{h}">'
             f'<figcaption class="small">{e["hero"][2]}</figcaption></figure></div>')
@@ -1254,37 +1660,51 @@ MODES_HTML = """<h2 class="home-choose">Choisis ton mode de travail</h2>
 <p class="home-back"><a class="btn ghost" href="?">""" + HOUSE + """ Retour à l'accueil</a></p>"""
 
 
-COURS = [("cours-traction", "Cours 1", "Traction et compression"),
-         ("cours-cisaillement", "Cours 2", "Cisaillement")]
+COURS = [
+    {"key": "cours-traction-bp", "tag": "Cours 1.1", "level": "Bac pro", "title": "Traction", "ready": True,
+     "desc": "L'essai de traction, la contrainte, la condition de résistance ; avec un simulateur et un quiz."},
+    {"key": "cours-traction", "tag": "Cours 1.2", "title": "Traction et compression", "ready": False,
+     "desc": "Effort normal, loi de Hooke, allongement et dimensionnement."},
+    {"key": "cours-cisaillement-bp", "tag": "Cours 2.1", "level": "Bac pro", "title": "Cisaillement", "ready": False,
+     "desc": "Simple et double cisaillement, contrainte de cisaillement, condition de résistance."},
+    {"key": "cours-cisaillement", "tag": "Cours 2.2", "title": "Cisaillement", "ready": False,
+     "desc": "Effort tranchant, dimensionnement des goupilles, boulons et axes, glissement."},
+]
 
 
 def render_hub():
     src, w, h = png("accueil")
     cards = "".join(
-        f'<article class="mode-card"><div class="mc-head"><span class="mc-tag">{e["tag"]}</span><h3>{e["title"]}</h3></div>'
+        f'<article class="mode-card"><div class="mc-head"><span class="mc-tag">{e["tag"]}{pastille(e.get("level"))}'
+        f'</span><h3>{e["title"]}</h3></div>'
         f'<p>{e["card"]}</p><p class="small ex-meta">{len(e["P"])} parties · {e["n_q"]} questions · '
         f'{e["n_sk"]} tracé · {hm(e["minutes"])}</p>'
         f'<a class="btn" href="?ex={e["key"]}">Ouvrir l\'exercice</a></article>' for e in EXO_DEFS)
-    btns = "".join(f'<a class="btn" href="?ex={k}">{tag} — {t}</a>' for k, tag, t in COURS)
+    cours = "".join(
+        f'<article class="mode-card cours-card{"" if c["ready"] else " en-edition"}"><div class="mc-head">'
+        f'<span class="mc-tag">{c["tag"]}{pastille(c.get("level"))}</span><h3>{c["title"]}</h3></div>'
+        f'<p>{c["desc"]}</p>' +
+        ('<p class="small ex-meta">Disponible</p>' if c["ready"] else '<p class="small ex-meta etat">En cours d\'édition</p>') +
+        f'<a class="btn{"" if c["ready"] else " ghost"}" href="?ex={c["key"]}">'
+        f'{"Lire le cours" if c["ready"] else "Voir"}</a></article>' for c in COURS)
     return (f'<div class="home-top"><div class="home-top-l"><header class="home-head"><h1 id="home-title">{TITRE}</h1>'
-            '<p class="home-sub">Traction, compression et cisaillement : calculer une contrainte et une déformation, '
-            'vérifier une pièce ou la dimensionner. Deux cours et des exercices interactifs, à faire en mode '
+            '<p class="home-sub">Traction, compression et cisaillement : calculer une contrainte, vérifier une pièce '
+            'ou la dimensionner. Des cours et des exercices interactifs de deux niveaux, à faire en mode '
             'entraînement ou en mode examen.</p></header></div>'
             f'<figure class="home-hero"><img src="{src}" alt="À gauche, un siège suspendu par un fil et un tube '
             f'comprimé ; à droite, une pince à goupille et un axe de chape" width="{w}" height="{h}">'
             '<figcaption class="small">Quelques-unes des pièces étudiées dans les exercices.</figcaption></figure></div>'
-            '<section class="hub-course" aria-labelledby="hub-c"><div><h2 id="hub-c">Les cours</h2>'
-            '<p>Les notions, les formules et des exemples commentés, chapitre par chapitre.</p></div>'
-            f'<div class="hub-btns">{btns}</div></section>'
+            f'<h2 class="home-choose">Les cours</h2><div class="ex-grid cours-grid">{cours}</div>'
             f'<h2 class="home-choose">Les exercices</h2><div class="ex-grid">{cards}</div>'
-            '<p class="home-note small">Chaque exercice propose ensuite le mode entraînement (correction question par '
+            '<p class="home-note small">La pastille <span class="pastille">Bac pro</span> signale les cours et '
+            'exercices de premier niveau. Chaque exercice propose le mode entraînement (correction question par '
             'question) ou le mode examen (correction à la remise de la copie). Rien n\'est enregistré sur '
             'l\'ordinateur.</p>')
 
 
-def render_cours(tag, title):
+def render_cours(c):
     return (f'<div class="home-top home-top-single"><div class="home-top-l"><header class="home-head">'
-            f'<span class="mc-tag">{tag}</span><h1 id="home-title">{title}</h1>'
+            f'<span class="mc-tag">{c["tag"]}</span>{pastille(c.get("level"))}<h1 id="home-title">{c["title"]}</h1>'
             '<p class="home-sub">Ce cours est en cours d\'édition : il sera mis en ligne prochainement.</p>'
             '</header></div></div>'
             '<section class="hub-course en-cours" aria-labelledby="ec-t"><div><h2 id="ec-t">En cours d\'édition</h2>'
@@ -1292,12 +1712,335 @@ def render_cours(tag, title):
             f'<div class="hub-btns"><a class="btn" href="?">{HOUSE} Retour à l\'accueil</a></div></section>')
 
 
+# ============================================================ COURS 1.1 — TRACTION (niveau bac pro), interactif
+ESSAI_SVG = """<svg class="essai-svg" viewBox="0 0 600 320" role="img" aria-labelledby="essai-t">
+<title id="essai-t">Courbe de l'essai de traction : contrainte en fonction de l'allongement</title>
+<defs><pattern id="hach" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+<line x1="0" y1="0" x2="0" y2="6" stroke="#1B7A43" stroke-width="2"/></pattern>
+<marker id="fl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0 0 10 5 0 10z" fill="#1C2530"/></marker></defs>
+<g class="z z-secu" data-zone="secu"><polygon points="60,280 97,205 60,205" fill="url(#hach)"/>
+<line x1="60" y1="205" x2="540" y2="205" stroke="#1B7A43" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="545" y="209" class="lab" fill="#1B7A43">Rpe</text></g>
+<line x1="60" y1="130" x2="540" y2="130" class="guide"/><text x="545" y="134" class="lab">Re</text>
+<line x1="60" y1="46" x2="540" y2="46" class="guide"/><text x="545" y="50" class="lab">R</text>
+<line x1="60" y1="285" x2="60" y2="18" stroke="#1C2530" stroke-width="2" marker-end="url(#fl)"/>
+<line x1="55" y1="280" x2="535" y2="280" stroke="#1C2530" stroke-width="2" marker-end="url(#fl)"/>
+<text x="68" y="24" class="ax">contrainte σ (MPa)</text><text x="530" y="300" class="ax" text-anchor="end">allongement ΔL (mm)</text>
+<path class="z z-elas" data-zone="elas" d="M60 280 L130 130"/>
+<path class="z z-plast" data-zone="plast" d="M130 130 q6 -6 11 0 t11 0 t11 0 t11 0"/>
+<path class="z z-plast" data-zone="plast" d="M174 130 C 215 60, 260 46, 300 46"/>
+<path class="z z-rupt" data-zone="rupt" d="M300 46 C 360 46, 420 62, 470 100"/>
+<g class="pt" data-zone="re"><circle class="hit" cx="130" cy="130" r="16"/><circle cx="130" cy="130" r="7"/><text x="122" y="118" text-anchor="end">Re</text></g>
+<g class="pt" data-zone="rm"><circle class="hit" cx="300" cy="46" r="16"/><circle cx="300" cy="46" r="7"/><text x="300" y="34" text-anchor="middle">R</text></g>
+<g class="pt" data-zone="rupt"><circle class="hit" cx="470" cy="100" r="16"/><circle cx="470" cy="100" r="7"/><text x="478" y="92">rupture</text></g>
+</svg>"""
+
+ETAPES = [
+    ("elas", "Zone élastique", "La pièce s'allonge un peu, proportionnellement à l'effort, et <b>reprend sa longueur</b> "
+     "quand on relâche — comme un ressort. C'est dans cette zone que doivent travailler les pièces."),
+    ("re", "Limite élastique Re", "Fin de la zone élastique. Au-delà de <b>Re</b>, la déformation devient "
+     "permanente. Re se lit dans les tableaux de matériaux, en MPa : c'est le nombre du nom de la nuance (E295 → 295 MPa)."),
+    ("plast", "Zone plastique", "La pièce <b>reste allongée</b> même quand on relâche l'effort : elle est déformée "
+     "pour de bon, donc hors d'usage."),
+    ("rm", "Résistance à la rupture R", "La plus grande contrainte que supporte l'éprouvette. Ensuite, elle "
+     "s'amincit à un endroit (striction)…"),
+    ("rupt", "Rupture", "…et finit par casser. On ne fait <b>jamais</b> travailler une pièce près de ce point."),
+    ("secu", "Zone de sécurité", "Sous la résistance pratique <b>Rpe = Re / s</b>, on garde une marge : c'est la zone "
+     "où l'on fait travailler les pièces. Le coefficient de sécurité <i>s</i> fixe cette marge."),
+]
+
+QUIZ = [
+    ("Une contrainte s'exprime en…", ["MPa (ou N/mm²)", "N", "mm²", "kg"], 0,
+     "σ = F / S : des newtons divisés par des mm², soit des N/mm², c'est-à-dire des MPa."),
+    ("Même force, section deux fois plus petite : la contrainte est…",
+     ["deux fois plus grande", "deux fois plus petite", "identique"], 0,
+     "On divise la même force par une section deux fois plus petite : la contrainte double."),
+    ("Dans la zone élastique, quand on relâche l'effort, la pièce…",
+     ["reprend sa longueur", "reste allongée", "casse"], 0,
+     "C'est la définition de la zone élastique : la déformation disparaît."),
+    ("Acier E235, coefficient de sécurité s = 5. Que vaut Rpe ?", ["47 MPa", "1 175 MPa", "230 MPa", "235 MPa"], 0,
+     "Re = 235 MPa (le nombre de la nuance), Rpe = Re / s = 235 / 5 = 47 MPa."),
+    ("σ = 60 MPa et Rpe = 47 MPa : la pièce résiste-t-elle en toute sécurité ?", ["Non", "Oui"], 0,
+     "La condition σ ≤ Rpe n'est pas respectée : 60 MPa > 47 MPa."),
+    ("Pour un appareil de levage (manutention), on choisit un coefficient de sécurité…",
+     ["entre 5 et 8", "entre 1,5 et 2", "entre 3 et 4"], 0,
+     "Tableau des coefficients : 5 à 8 pour les appareils de levage, car les efforts sont difficiles à évaluer."),
+]
+
+
+def render_cours_bp():
+    ep_src, ew, eh = png("bp-eprouvette")
+    steps = "".join(f'<button type="button" class="etape" data-zone="{z}" aria-pressed="false">'
+                    f'<b>{i + 1}</b> {t}</button>' for i, (z, t, _) in enumerate(ETAPES))
+    expl = "".join(f'<p class="etape-txt" data-zone="{z}" hidden><strong>{t}.</strong> {d}</p>' for z, t, d in ETAPES)
+    mats = "".join(f'<option value="{e}"{" selected" if n.startswith("E295") else ""}>{n} — Re = {e} MPa</option>'
+                   for n, r, e in MATERIAUX)
+    mat_rows = "".join(f'<tr data-re="{e}" tabindex="0"><td>{n}</td><td>{r}</td><td>{e}</td></tr>'
+                       for n, r, e in MATERIAUX)
+    coef_rows = "".join(f"<tr><td><b>{c}</b></td><td>{t}</td></tr>" for c, t in COEFS)
+    quiz = "".join(
+        f'<fieldset class="quiz-q" data-ok="{ok}"><legend><span class="q-num">{i + 1}</span> {q}</legend>' +
+        "".join(f'<label><input type="radio" name="qz{i}" value="{j}"> {o}</label>' for j, o in enumerate(opts)) +
+        f'<p class="quiz-fb" aria-live="polite"></p><p class="quiz-why" hidden>{why}</p></fieldset>'
+        for i, (q, opts, ok, why) in enumerate(QUIZ))
+    nav = "".join(f'<a href="#{a}">{n}. {t}</a>' for n, (a, t) in enumerate(
+        [("c-essai", "L'essai"), ("c-sigma", "La contrainte"), ("c-cond", "La condition de résistance"),
+         ("c-quiz", "Quiz")], 1))
+    return f"""<div class="cours" id="cours-bp">
+<div class="home-top home-top-single"><div class="home-top-l"><header class="home-head"><span class="mc-tag">Cours 1.1</span>{pastille("Bac pro")}
+<h1 id="home-title">Traction</h1><p class="home-sub">Comprendre l'essai de traction, calculer une contrainte et vérifier
+qu'une pièce résiste. Environ 20 minutes : explore la courbe, joue avec le simulateur, puis teste-toi avec le quiz.</p>
+</header></div></div>
+<nav class="cours-nav no-print" aria-label="Étapes du cours">{nav}</nav>
+
+<section class="part cours-sec" id="c-essai" aria-labelledby="c-essai-t"><header class="part-head"><div class="part-num" aria-hidden="true">1</div>
+<div><h2 id="c-essai-t" style="padding:14px 16px">L'essai de traction</h2></div></header><div class="part-body">
+<div class="cours-split"><figure class="fig" style="max-width:220px"><img src="{ep_src}" width="{ew}" height="{eh}"
+alt="Éprouvette cylindrique serrée entre deux mors, tirée par deux forces F opposées"><figcaption>L'éprouvette, de longueur
+initiale L<sub>0</sub> et de section S<sub>0</sub>, est tirée entre deux mors.</figcaption></figure>
+<div><p>On tire sur une pièce cylindrique, appelée <strong>éprouvette</strong>, avec une force de plus en plus grande. Elle
+s'allonge, se déforme, puis finit par casser. La machine enregistre la courbe ci-dessous.</p>
+<p class="cours-defi">À toi : clique sur chaque étape pour découvrir ce qui arrive à l'éprouvette.</p>
+<div class="etapes" role="group" aria-label="Étapes de l'essai">{steps}</div></div></div>
+<div class="essai">{ESSAI_SVG}<div class="essai-txt">{expl}<p class="etape-vide">Choisis une étape ou clique sur un point de la courbe.</p></div></div>
+</div></section>
+
+<section class="part cours-sec" id="c-sigma" aria-labelledby="c-sigma-t"><header class="part-head"><div class="part-num" aria-hidden="true">2</div>
+<div><h2 id="c-sigma-t" style="padding:14px 16px">La contrainte σ (sigma)</h2></div></header><div class="part-body">
+<p>La contrainte représente l'effort que subit chaque millimètre carré de la section. On la calcule en divisant la force
+par la section :</p>
+<div class="formule"><span class="f-main"><i>σ</i> = {frac("<i>F</i>", "<i>S</i>")}</span>
+<span class="f-units"><i>σ</i> en MPa (N/mm²)<br><i>F</i> en newtons (N)<br><i>S</i> en mm²</span></div>
+<p><strong>Retiens :</strong> plus la section est petite, plus la contrainte est grande.</p>
+<div class="simu" id="simu"><h3>Simulateur</h3>
+<div class="simu-grid">
+<label><span>Force <i>F</i> : <output id="o-f">5 000 N</output></span><input type="range" id="s-f" min="100" max="20000" step="100" value="5000"></label>
+<label><span>Diamètre <i>d</i> : <output id="o-d">8 mm</output></span><input type="range" id="s-d" min="2" max="20" step="0.5" value="8"></label>
+<label><span>Matériau</span><select id="s-m">{mats}</select></label>
+<label><span>Coefficient de sécurité <i>s</i></span><select id="s-s">{"".join(f'<option{" selected" if v == 5 else ""}>{v}</option>' for v in (2, 3, 4, 5, 6, 8, 10))}</select></label>
+</div>
+<div class="simu-out"><div><span>Section</span><b id="r-s"></b></div><div><span>Contrainte σ</span><b id="r-sig"></b></div>
+<div><span>Résistance pratique Rpe</span><b id="r-rpe"></b></div></div>
+<div class="jauge" aria-hidden="true"><div class="jauge-bar" id="r-bar"></div><div class="jauge-lim"></div></div>
+<p class="simu-verdict" id="r-v" aria-live="polite"></p>
+<details class="simu-defi"><summary>Défi : avec <i>F</i> = 10 000 N, de l'acier E295 et <i>s</i> = 5, quel est le plus petit diamètre du simulateur qui résiste ?</summary>
+<p>Rpe = 295 / 5 = 59 MPa ; il faut <i>S</i> ≥ 10 000 / 59 ≈ 169,5 mm², soit <i>d</i> ≥ 14,7 mm. Dans le simulateur :
+<b>d = 15 mm</b> (176,7 mm², σ ≈ 56,6 MPa).</p></details>
+</div></div></section>
+
+<section class="part cours-sec" id="c-cond" aria-labelledby="c-cond-t"><header class="part-head"><div class="part-num" aria-hidden="true">3</div>
+<div><h2 id="c-cond-t" style="padding:14px 16px">La condition de résistance</h2></div></header><div class="part-body">
+<p>Pour des raisons de sécurité, la contrainte doit rester inférieure à une limite appelée <strong>résistance pratique
+à l'extension</strong>, notée <i>R</i><sub>pe</sub> :</p>
+<div class="formule"><span class="f-main"><i>σ</i> = {frac("<i>F</i>", "<i>S</i>")} ≤ <i>R</i><sub>pe</sub> = {frac("<i>R</i><sub>e</sub>", "<i>s</i>")}</span>
+<span class="f-units"><i>R</i><sub>e</sub> : résistance élastique (MPa)<br><i>s</i> : coefficient de sécurité (sans unité)</span></div>
+<p>Le coefficient de sécurité obtenu se calcule aussi : <i>s</i> = <i>R</i><sub>e</sub> / <i>σ</i>. Plus il est grand,
+plus la pièce a de la marge.</p>
+<div class="cours-tables"><div><h3>Quelques aciers</h3><p class="small no-print">Clique sur une ligne pour l'essayer dans le simulateur.</p>
+<table class="t mat-table"><thead><tr><th>Nuance</th><th>R min (MPa)</th><th>Re min (MPa)</th></tr></thead><tbody>{mat_rows}</tbody></table></div>
+<div><h3>Choisir le coefficient de sécurité</h3><table class="t"><thead><tr><th>s</th><th>Conditions de calcul</th></tr></thead><tbody>{coef_rows}</tbody></table></div></div>
+<div class="exemple"><h3>Exemple résolu</h3><p>Un câble Ø8 en acier E295 porte 10 kN ; on veut <i>s</i> = 5.</p><ol>
+<li><i>S</i> = π × 8² / 4 ≈ 50,27 mm²</li><li><i>σ</i> = 10 000 / 50,27 ≈ 198,9 MPa</li>
+<li><i>R</i><sub>pe</sub> = 295 / 5 = 59 MPa</li><li>198,9 MPa &gt; 59 MPa : le câble <strong>ne convient pas</strong>.</li></ol></div>
+</div></section>
+
+<section class="part cours-sec" id="c-quiz" aria-labelledby="c-quiz-t"><header class="part-head"><div class="part-num" aria-hidden="true">4</div>
+<div><h2 id="c-quiz-t" style="padding:14px 16px">Quiz : vérifie tes connaissances</h2></div></header><div class="part-body">
+<p>Choisis une réponse : la correction s'affiche aussitôt.</p>
+<div class="quiz">{quiz}</div>
+<div class="quiz-score" aria-live="polite"><span id="qz-score">0 / {len(QUIZ)}</span><span id="qz-stars" aria-hidden="true"></span>
+<button type="button" class="btn ghost" id="qz-reset">Recommencer</button></div>
+</div></section>
+
+<div class="cours-foot no-print"><a class="btn" href="?ex=traction-bp">S'entraîner : Exercice 1.1</a>
+<button type="button" class="btn ghost" id="cours-print">Imprimer le cours</button>
+<a class="btn ghost" href="?">{HOUSE} Retour à l'accueil</a></div>
+</div>"""
+
+
+COURS_JS = r"""
+  function initCoursBp(root) {
+    function q(s) { return root.querySelector(s); }
+    function qa(s) { return Array.prototype.slice.call(root.querySelectorAll(s)); }
+    function fr(x, d) { return x.toLocaleString("fr-FR", { minimumFractionDigits: d, maximumFractionDigits: d }); }
+    // 1. courbe de l'essai : étapes cliquables
+    function show(zone) {
+      qa("[data-zone]").forEach(function (el) {
+        var on = el.getAttribute("data-zone") === zone;
+        if (el.classList.contains("etape")) el.setAttribute("aria-pressed", on ? "true" : "false");
+        else if (el.classList.contains("etape-txt")) el.hidden = !on;
+        else el.classList.toggle("on", on);
+      });
+      q(".etape-vide").hidden = true;
+    }
+    qa(".etape, .essai-svg [data-zone]").forEach(function (el) {
+      el.addEventListener("click", function () { show(el.getAttribute("data-zone")); });
+    });
+    // 2. simulateur
+    var F = q("#s-f"), D = q("#s-d"), M = q("#s-m"), SF = q("#s-s");
+    function calc() {
+      var f = +F.value, d = +D.value, re = +M.value, s = +SF.value;
+      var S = Math.PI * d * d / 4, sig = f / S, rpe = re / s, ok = sig <= rpe;
+      q("#o-f").textContent = fr(f, 0) + " N";
+      q("#o-d").textContent = fr(d, d % 1 ? 1 : 0) + " mm";
+      q("#r-s").textContent = fr(S, 2) + " mm²";
+      q("#r-sig").textContent = fr(sig, 2) + " MPa";
+      q("#r-rpe").textContent = fr(rpe, 2) + " MPa";
+      var bar = q("#r-bar");
+      bar.style.width = Math.min(100, sig / rpe * 50) + "%";
+      bar.classList.toggle("ko", !ok);
+      q("#r-v").className = "simu-verdict " + (ok ? "ok" : "ko");
+      q("#r-v").textContent = ok ? "✔ σ ≤ Rpe : la pièce résiste, avec la marge de sécurité choisie."
+        : (sig <= re ? "✘ σ > Rpe : la marge de sécurité n'est pas respectée (mais σ reste sous Re)."
+                     : "✘ σ > Re : la pièce se déforme définitivement !");
+    }
+    [F, D, M, SF].forEach(function (el) { el.addEventListener("input", calc); el.addEventListener("change", calc); });
+    qa(".mat-table tr[data-re]").forEach(function (tr) {
+      function pick() {
+        M.value = tr.getAttribute("data-re"); calc();
+        qa(".mat-table tr").forEach(function (x) { x.classList.toggle("sel", x === tr); });
+        q("#simu").scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+      tr.addEventListener("click", pick);
+      tr.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
+    });
+    calc();
+    // 4. quiz
+    var qs = qa(".quiz-q");
+    function score() {
+      var n = qs.filter(function (f) { return f.classList.contains("is-ok"); }).length;
+      var done = qs.filter(function (f) { return f.classList.contains("done"); }).length;
+      q("#qz-score").textContent = n + " / " + qs.length;
+      q("#qz-stars").textContent = done === qs.length ? "★★★".slice(0, n === qs.length ? 3 : n >= qs.length - 2 ? 2 : n >= 2 ? 1 : 0) +
+        "☆☆☆".slice(0, 3 - (n === qs.length ? 3 : n >= qs.length - 2 ? 2 : n >= 2 ? 1 : 0)) : "";
+    }
+    qs.forEach(function (fs) {
+      fs.addEventListener("change", function (e) {
+        if (fs.classList.contains("done")) return;
+        var ok = e.target.value === fs.getAttribute("data-ok");
+        fs.classList.add("done", ok ? "is-ok" : "is-ko");
+        fs.querySelector(".quiz-fb").textContent = ok ? "✔ Bonne réponse !" : "✘ Pas tout à fait.";
+        fs.querySelector(".quiz-why").hidden = false;
+        Array.prototype.forEach.call(fs.querySelectorAll("input"), function (i) {
+          i.disabled = true;
+          if (i.value === fs.getAttribute("data-ok")) i.parentNode.classList.add("good");
+        });
+        score();
+      });
+    });
+    q("#qz-reset").addEventListener("click", function () {
+      qs.forEach(function (fs) {
+        fs.classList.remove("done", "is-ok", "is-ko");
+        fs.querySelector(".quiz-fb").textContent = "";
+        fs.querySelector(".quiz-why").hidden = true;
+        Array.prototype.forEach.call(fs.querySelectorAll("input"), function (i) { i.disabled = false; i.checked = false; i.parentNode.classList.remove("good"); });
+      });
+      score();
+    });
+    score();
+    q("#cours-print").addEventListener("click", function () { window.print(); });
+  }
+"""
+
+COURS_CSS = """
+/* ---------- pastille de niveau et cartes des cours ---------- */
+.pastille{display:inline-block; font:700 .72rem var(--f-titre); letter-spacing:.03em; background:var(--vert); color:#fff; padding:2px 8px; margin-left:6px; vertical-align:middle}
+.mc-tag .pastille{margin-left:8px; font-size:.68rem; padding:1px 6px}
+.ex-grid .en-edition{border-style:dashed; border-color:var(--trait)}
+.ex-grid .en-edition h3,.ex-grid .en-edition p{color:var(--encre-2)}
+.ex-grid .etat{font-weight:700; color:var(--orange)}
+#home .home-choose{margin-top:18px}
+.cours-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+
+/* ---------- cours interactif ---------- */
+.cours .part{margin-bottom:22px}
+.cours-nav{display:flex; flex-wrap:wrap; gap:6px; margin:0 0 16px}
+.cours-nav a{font:600 .92rem var(--f-titre); color:var(--encre); background:var(--papier); border:1.5px solid var(--encre); padding:5px 12px; text-decoration:none}
+.cours-nav a:hover{background:var(--jaune-pale)}
+.cours-split{display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap}
+.cours-split>div{flex:1 1 300px}
+.cours-defi{font-weight:700; color:var(--bleu)}
+.etapes{display:flex; flex-wrap:wrap; gap:6px}
+.etape{border:1.5px solid var(--encre); background:#fff; padding:6px 10px; cursor:pointer; font:600 .9rem var(--f-titre)}
+.etape b{display:inline-block; background:var(--encre); color:var(--jaune); padding:0 6px; margin-right:4px}
+.etape[aria-pressed="true"]{background:var(--jaune)}
+.essai{display:grid; grid-template-columns:minmax(0,1.5fr) minmax(0,1fr); gap:14px; align-items:center; margin:12px 0 6px}
+@media (max-width:760px){ .essai{grid-template-columns:1fr} }
+.essai-svg{width:100%; height:auto; background:#fff; border:1px solid var(--trait-fin)}
+.essai-svg .z{fill:none; stroke:var(--encre); stroke-width:3.5; cursor:pointer; transition:stroke .15s, stroke-width .15s}
+.essai-svg g.z{stroke:none}
+.essai-svg .z.on{stroke:var(--jaune); stroke-width:8}
+.essai-svg g.z-secu{opacity:.45}
+.essai-svg g.z-secu.on{opacity:1}
+.essai-svg .guide{stroke:#9AA2A8; stroke-width:1; stroke-dasharray:4 4}
+.essai-svg .lab,.essai-svg .ax{font:600 13px var(--f-texte); fill:var(--encre-2)}
+.essai-svg .pt{cursor:pointer}
+.essai-svg .pt circle{fill:#fff; stroke:var(--encre); stroke-width:2.5}
+.essai-svg .pt circle.hit{fill:transparent; stroke:none}
+.essai-svg .pt text{font:700 14px var(--f-titre); fill:var(--encre)}
+.essai-svg .pt.on circle:not(.hit){fill:var(--jaune)}
+.essai-txt{background:var(--jaune-pale); border-left:5px solid var(--jaune); padding:10px 14px; min-height:110px}
+.essai-txt p{margin:0}
+.formule{display:flex; flex-wrap:wrap; gap:14px 28px; align-items:center; border:2px solid var(--rouge); background:#fff; padding:10px 18px; margin:12px 0; max-width:620px}
+.formule .f-main{font:700 1.5rem var(--f-titre); line-height:2}
+.formule .f-units{font-size:.9rem; color:var(--encre-2)}
+.simu{border:2px solid var(--bleu); background:var(--bleu-pale); padding:12px 16px; margin:14px 0}
+.simu h3{margin:0 0 8px; font:700 1.15rem var(--f-titre); color:var(--bleu)}
+.simu-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px 18px}
+@media (max-width:640px){ .simu-grid{grid-template-columns:1fr} }
+.simu-grid label{display:flex; flex-direction:column; gap:4px; font-weight:600; font-size:.92rem}
+.simu-grid output{font:700 1rem var(--f-titre); color:var(--bleu)}
+.simu-grid input[type=range]{width:100%; accent-color:var(--bleu)}
+.simu-grid select{padding:5px; border:1.5px solid var(--encre-2); background:#fff}
+.simu-out{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin:12px 0 8px}
+.simu-out div{background:var(--encre); color:#fff; padding:6px 10px}
+.simu-out span{display:block; font-size:.78rem; color:#D7DDE2}
+.simu-out b{font:700 1.1rem var(--f-titre); color:var(--jaune)}
+@media (max-width:640px){ .simu-out{grid-template-columns:1fr} }
+.jauge{position:relative; height:16px; background:#fff; border:1px solid var(--trait)}
+.jauge-bar{height:100%; background:var(--vert); transition:width .2s}
+.jauge-bar.ko{background:var(--rouge)}
+.jauge-lim{position:absolute; left:50%; top:-4px; bottom:-4px; border-left:3px solid var(--encre)}
+.jauge-lim::after{content:"Rpe"; position:absolute; top:-18px; left:-12px; font:700 .75rem var(--f-titre)}
+.simu-verdict{font-weight:700; margin:8px 0 4px}
+.simu-verdict.ok{color:var(--vert)} .simu-verdict.ko{color:var(--rouge)}
+.simu-defi{margin-top:8px; background:#fff; border:1px dashed var(--bleu); padding:6px 10px}
+.simu-defi summary{cursor:pointer; font-weight:600}
+.cours-tables{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.3fr); gap:18px}
+@media (max-width:820px){ .cours-tables{grid-template-columns:1fr} }
+.cours-tables h3,.exemple h3{font:700 1.05rem var(--f-titre); margin:10px 0 4px}
+.mat-table tbody tr{cursor:pointer}
+.mat-table tbody tr:hover,.mat-table tbody tr.sel{background:var(--jaune-pale)}
+.exemple{background:#F6F7F4; border:1px solid var(--trait-fin); padding:6px 16px; margin-top:12px}
+.quiz{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:12px}
+.quiz-q{border:1.5px solid var(--encre); background:#fff; padding:8px 14px 10px; margin:0}
+.quiz-q legend{font-weight:700; padding:0 4px}
+.quiz-q label{display:block; padding:3px 0; cursor:pointer}
+.quiz-q.is-ok{border-color:var(--vert); background:var(--vert-pale)}
+.quiz-q.is-ko{border-color:var(--rouge); background:var(--rouge-pale)}
+.quiz-q label.good{font-weight:700; color:var(--vert)}
+.quiz-fb{margin:4px 0 0; font-weight:700}
+.quiz-q.is-ok .quiz-fb{color:var(--vert)} .quiz-q.is-ko .quiz-fb{color:var(--rouge)}
+.quiz-why{margin:2px 0 0; font-size:.9rem}
+.quiz-score{display:flex; align-items:center; gap:14px; margin:14px 0 0; font:700 1.3rem var(--f-titre)}
+#qz-stars{color:var(--jaune); font-size:1.6rem; letter-spacing:2px}
+.cours-foot{display:flex; flex-wrap:wrap; gap:10px; margin:6px 0 0}
+@media print{
+  body.cours-page #home{display:block!important; padding:0}
+  .no-print,.cours-nav,.cours-foot,.simu-defi summary~*{display:none!important}
+  .essai-txt p[hidden],.quiz-why[hidden]{display:block!important}
+  .etape-vide{display:none!important}
+}
+"""
+
+
 ROUTER_JS = r"""<script>/* Aiguillage : accueil, cours ou exercice selon ?ex=… — s'exécute avant les moteurs du gabarit */
 (function () {
   "use strict";
   var EXOS = window.__EXOS__, ex = new URLSearchParams(location.search).get("ex") || "";
   function $(s) { return document.querySelector(s); }
-  function tpl(id) { return document.getElementById(id).innerHTML; }
+  function tpl(id) { return document.getElementById(id).innerHTML; }__COURS_JS__
   var home = $("#home .home-inner");
   window.__PARTS__ = []; window.__QCFG__ = {}; window.__SKCFG__ = {}; window.__CONSEIL_MIN__ = 0;
   if (Object.prototype.hasOwnProperty.call(EXOS, ex)) {
@@ -1319,6 +2062,8 @@ ROUTER_JS = r"""<script>/* Aiguillage : accueil, cours ou exercice selon ?ex=…
     document.body.classList.add("hub");
     var page = document.getElementById("tpl-" + ex) && /^cours-/.test(ex) ? "tpl-" + ex : "tpl-hub";
     home.innerHTML = tpl(page);
+    if (page !== "tpl-hub") document.body.classList.add("cours-page");
+    if (ex === "cours-traction-bp") initCoursBp(home);
     if (page !== "tpl-hub") document.title = home.querySelector("h1").textContent + " — cours — __TITRE__";
     else document.title = "__TITRE__ — cours et exercices interactifs";
   }
@@ -1387,6 +2132,7 @@ body.hub .home-top .home-hero img{max-height:200px}
 .ex-grid .mc-head{flex-direction:column; align-items:flex-start; gap:6px}
 .ex-grid .mode-card .btn{margin-top:auto; align-self:flex-start}
 
+__COURS_CSS__
 @media print{
   .c-top,.home-back{display:none!important}
   /* correctif : dans le gabarit, « .sketch .q-expl[hidden] » l'emporte sur « body:not(.corrections-open) .q-expl »
@@ -1434,11 +2180,12 @@ def build():
         exos_cfg[k] = e["cfg"]
     templates.append(f'<template id="tpl-modes">{MODES_HTML}</template>')
     templates.append(f'<template id="tpl-hub">{render_hub()}</template>')
-    for k, tag, t in COURS:
-        templates.append(f'<template id="tpl-{k}">{render_cours(tag, t)}</template>')
+    for c in COURS:
+        body = render_cours_bp() if c["key"] == "cours-traction-bp" else render_cours(c)
+        templates.append(f'<template id="tpl-{c["key"]}">{body}</template>')
 
     config = f"<script>window.__EXOS__ = {json.dumps(exos_cfg, ensure_ascii=False)};</script>"
-    router = ROUTER_JS.replace("__TITRE__", TITRE).replace("__HOUSE__", HOUSE.replace("'", "\\'"))
+    router = ROUTER_JS.replace("__COURS_JS__", COURS_JS).replace("__TITRE__", TITRE).replace("__HOUSE__", HOUSE.replace("'", "\\'"))
 
     page = f"""<!DOCTYPE html>
 <html lang="fr">
@@ -1448,7 +2195,7 @@ def build():
 <title>{TITRE} — cours et exercices interactifs</title>
 <meta name="description" content="Traction, compression et cisaillement : effort normal, contrainte, loi de Hooke, allongement ; effort tranchant, simple et double cisaillement, dimensionnement d'axes, de goupilles et de boulons.">
 {style}
-{CONTENT_CSS}
+{CONTENT_CSS.replace("__COURS_CSS__", COURS_CSS)}
 </head>
 <body class="no-mode">
 

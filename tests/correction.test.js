@@ -1,4 +1,4 @@
-// Tests unitaires du moteur de correction appliqué aux 53 questions des deux exercices.
+// Tests unitaires du moteur de correction appliqué aux 83 questions des trois exercices.
 //   node --test tests/
 // Le moteur (Grading) et la configuration (__QCFG__) sont lus dans la page générée :
 // on teste exactement ce que l'élève utilisera.
@@ -24,6 +24,36 @@ function score(id, ans) {
 
 // [saisie, score attendu] : 1 juste, 0.5 demi-point d'unité, 0 faux, "invalid" refusée sans être notée
 const CASES = {
+  b1_1: [["295 MPa", 1], ["295", 0.5], ["295 N", 0.5], ["470 MPa", 0], ["235 MPa", 0]],
+  b1_2: [["oui", 1], ["Oui, 40 < 295", 1], ["non", 0]],
+  b1_3: [["7,38", 1], ["7,375", 1], ["7,37", 1], ["7.4", 0], ["0,14", 0]],
+  b2_1: [["28,27 mm²", 1], ["28,26 mm2", 1], ["28,27", 0.5], ["113,1 mm²", 0], ["0,2827 cm²", 1]],
+  b2_2: [["1746,18 N", 1], ["1 746 N", 1], ["1,746 kN", 1], ["1746,18", 0.5], ["1780 N", 0], ["178 N", 0]],
+  b2_3: [["2530,98 N", 1], ["2531 N", 1], ["2530,98", 0.5], ["1746,18 N", 0], ["2580 N", 0]],
+  b2_4: [["89,52 MPa", 1], ["89,53 MPa", 1], ["89,52", 0.5], ["61,77 MPa", 0], ["22,4 MPa", 0]],
+  b2_5: [["45 MPa", 1], ["45,00 MPa", 1], ["45", 0.5], ["36 MPa", 0], ["2880 MPa", 0]],
+  b2_6: [["non", 1], ["Non, 89,52 > 45", 1], ["oui", 0]],
+  b3_1: [["24 mm²", 1], ["24", 0.5], ["12 mm²", 0], ["36 mm²", 0]],
+  b3_2: [["24 mm²", 1], ["24 mm2", 1], ["36 mm²", 0], ["12 mm²", 0]],
+  b3_3: [["83,33 MPa", 1], ["83,333 MPa", 1], ["83,33", 0.5], ["166,67 MPa", 0]],
+  b3_4: [["83,33 MPa", 1], ["83,33 N/mm²", 1], ["55,56 MPa", 0]],
+  b3_5: [["7,2", 1], ["7,20", 1], ["3,6", 0], ["0,14", 0]],
+  b4_2: [["360 mm²", 1], ["360", 0.5], ["240 mm²", 0]],
+  b4_3: [["240 mm²", 1], ["240", 0.5], ["300 mm²", 0], ["120 mm²", 0]],
+  b4_4: [["210 mm²", 1], ["210 mm2", 1], ["150 mm²", 0], ["281,46 mm²", 0]],
+  b4_5: [["13,89 MPa", 1], ["13,9 MPa", 0], ["13,89", 0.5], ["20,83 MPa", 0]],
+  b4_6: [["20,83 MPa", 1], ["20,83", 0.5], ["23,81 MPa", 0]],
+  b4_7: [["23,81 MPa", 1], ["23,81", 0.5], ["33,33 MPa", 0]],
+  b4_8: [["S3", 1], ["s3", 1], ["la section 3", 1], ["S1", 0], ["S2", 0], ["S2 et S3", 0]],
+  b4_9: [["49,17 MPa", 1], ["49,167 MPa", 1], ["49,17", 0.5], ["78,33 MPa", 0], ["1770 MPa", 0]],
+  b4_10: [["oui", 1], ["Oui : 23,81 < 49,17", 1], ["non", 0]],
+  b5_1: [["333,33 N", 1], ["333,333 N", 1], ["333,33", 0.5], ["2000 N", 0], ["333 N", 0]],
+  b5_2: [["86,67 MPa", 1], ["86,667 MPa", 1], ["86,67", 0.5], ["780 MPa", 0]],
+  b5_3: [["3,85 mm²", 1], ["3,846 mm²", 1], ["3,85", 0.5], ["23,08 mm²", 0], ["4,47 mm²", 0]],
+  b5_4: [["3 mm", 1], ["3", 0.5], ["2,5 mm", 0], ["4 mm", 0]],
+  b5_5: [["186,43 MPa", 1], ["186,4 MPa", 1], ["186,43", 0.5], ["74,57 MPa", 0], ["156,25 MPa", 0]],
+  b5_6: [["non", 1], ["Non, 186 > 86,67", 1], ["oui", 0]],
+  b5_7: [["5 mm", 1], ["5", 0.5], ["4 mm", 0], ["6 mm", 0]],
   t1_1: [["833,85 N", 1], ["833.85 N", 1], ["P = 833,85 N", 1], ["833,85", 0.5], ["833,85 kg", 0.5],
          ["833,85 kN", 0.5], ["0,83385 kN", 1], ["833 N", 0], ["850 N", 0], ["environ", "invalid"]],
   t1_2: [["1200 mm", 1], ["1 200 mm", 1], ["1,2 m", 1], ["120 cm", 1], ["1200", 0.5], ["1,2", 0], ["700 mm", 0]],
@@ -114,7 +144,9 @@ test("questions vides et saisies non numériques refusées sans être notées", 
 });
 
 test("barème : points des parties cohérents, durées 65 et 80 min, tracés et dépendances", () => {
-  assert.deepEqual(Object.keys(EXOS), ["traction", "cisaillement"]);
+  assert.deepEqual(Object.keys(EXOS), ["traction-bp", "traction", "cisaillement"]);
+  assert.equal(EXOS["traction-bp"].minutes, 90);
+  assert.equal(Object.keys(EXOS["traction-bp"].qcfg).length, 30);
   assert.equal(EXOS.traction.minutes, 65);
   assert.equal(EXOS.cisaillement.minutes, 80);
   assert.equal(Object.keys(EXOS.traction.qcfg).length, 23);
