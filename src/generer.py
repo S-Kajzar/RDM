@@ -3375,6 +3375,7 @@ COURS = [
 
 
 OUVRIR = ("Ouvrir l'exercice", "Ouvrir l'étude")
+NBSP = "\u00a0"
 
 
 def _exo_card(e):
@@ -3382,7 +3383,7 @@ def _exo_card(e):
     return (f'<article class="mode-card"><div class="mc-head"><span class="mc-tag">{e["tag"]}{pastille(e.get("level"))}'
             f'</span><h3>{e["title"]}</h3></div>'
             f'<p>{e["card"]}</p><p class="small ex-meta">{len(e["P"])} partie{"s" if len(e["P"]) > 1 else ""} · '
-            f'{e["n_q"]} questions{sk} · {hm(e["minutes"])}</p>'
+            f'{e["n_q"]} questions{sk} · {hm(e["minutes"]).replace(" ", NBSP)}</p>'
             f'<a class="btn" href="?ex={e["key"]}">{OUVRIR[bool(e.get("etude"))]}</a></article>')
 
 
@@ -4071,6 +4072,19 @@ body.hub .home-top .home-hero img{max-height:200px}
 .ex-grid .mode-card .btn{margin-top:auto; align-self:flex-start}
 
 __COURS_CSS__
+/* ---------- centrage du contenu : colonne centrée dans les cours, blocs centrés partout ---------- */
+.cours .part-body{padding-left:max(22px, calc((100% - 880px) / 2)); padding-right:max(22px, calc((100% - 880px) / 2))}
+.cours .part-body>p,.cours .part-body>ul{max-width:none}
+.part-body>p,.part-body>ul,.part-body>ol,.part-body>.data,.part-body>.formule,.part-body>.exemple,.part-body>.q,
+.part-body>.fig,.part-body>figure,.part-body>.selfeval{margin-left:auto; margin-right:auto}
+.part-body>.q{max-width:80ch}
+.fig figcaption{text-align:center}
+.cours-split,.n2-split,.n2-courbes,.cours-nav,.cours-foot,.k2-tabs,.etapes,.quiz-score,.k2-syn-foot{justify-content:center}
+.cours-split>div{flex:1 1 320px}
+.k2-cartes{grid-template-columns:repeat(auto-fit,minmax(220px,300px)); justify-content:center}
+.ex-grid{display:flex; flex-wrap:wrap; justify-content:center}
+.ex-grid>.mode-card{flex:0 1 320px; min-width:0}
+#home .home-choose,#home .home-note{text-align:center}
 @media print{
   .c-top,.home-back{display:none!important}
   /* correctif : dans le gabarit, « .sketch .q-expl[hidden] » l'emporte sur « body:not(.corrections-open) .q-expl »
