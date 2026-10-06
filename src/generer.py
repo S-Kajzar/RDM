@@ -74,6 +74,7 @@ def unit(label, *accept):
 
 U = {
     "N": unit("N", "n", "newton", "newtons"),
+    "daN": unit("daN", "dan", "decanewton", "decanewtons"),
     "kN": unit("kN", "kn", "kilonewton", "kilonewtons"),
     "mm": unit("mm", "mm", "millimetre", "millimetres"),
     "cm": unit("cm", "cm", "centimetre", "centimetres"),
@@ -1098,12 +1099,218 @@ PARTS_BP.append({
 })
 
 
+# ============================================================ PARTIES — EXERCICE 2.1 (cisaillement, niveau 1)
+REG = "<i>R</i><sub>eg</sub>"
+RPG = "<i>R</i><sub>pg</sub>"
+TAU1 = "<i>τ</i>"
+H_LIRE_C = "Lis la valeur dans les données. " + UNITE
+PARTS_N1C = []
+
+PARTS_N1C.append({
+    "num": "1", "minutes": 25, "title": "Articulation : quelle solution choisir ?",
+    "intro": [
+        "<p>Vous devez effectuer la maintenance corrective d'une articulation. Pour réaliser cette liaison, vous avez le "
+        "choix entre deux solutions : un axe qui relie deux pièces (solution 1) ou un axe qui traverse une chape "
+        "(solution 2).</p>",
+        data_box([
+            "Axe de diamètre <i>d</i> = 12 mm, en acier 9SMn36 : <i>R</i><sub>e</sub> = 420 MPa",
+            "Intensité des forces : <i>F</i> = 15 000 N",
+            "Coefficient de sécurité : <i>s</i> = 3",
+        ]),
+    ],
+    "blocks": [
+        QBAR("Q1.1", ["DP1"], ans="sur la figure"),
+        SK("sk_q1_1", "Q1.1", "ARTIC",
+           "Repasser en rouge les sections cisaillées des axes, sur les deux solutions.",
+           ["Solution 1 : une seule section est tracée.",
+            "Solution 2 : deux sections sont tracées.",
+            "Chaque section est placée à la limite entre deux pièces qui tirent en sens contraires.",
+            "Chaque section coupe l'axe en travers (trait vertical sur toute la hauteur de l'axe)."],
+           [],
+           "<p>Outils : <b>Ligne</b>, couleur au choix. Cherche les endroits où deux pièces voisines tirent l'axe "
+           "dans des sens opposés.</p>",
+           "<p><b>Solution 1</b> : la pièce de gauche tire vers le haut, la pièce de droite vers le bas. L'axe risque "
+           "d'être coupé à un seul endroit, à la limite entre les deux pièces : <b>une section</b>.</p>"
+           "<p><b>Solution 2</b> : la pièce du milieu tire vers le bas, la chape (de part et d'autre) vers le haut. "
+           "L'axe peut être coupé de chaque côté de la pièce du milieu : <b>deux sections</b>.</p>"),
+        QBAR("Q1.2 – Q1.14", ["DT1", "DT2"]),
+        Q("q1_2", f"Quelle est la résistance élastique {RE} du matériau de l'axe ?", H_LIRE_C,
+          num(420, "MPa", absTol=0.5), f"{RE} = 420 MPa",
+          "<p>Elle est donnée : acier 9SMn36, <b>R<sub>e</sub> = 420 MPa</b>.</p>"),
+        Q("q1_3", f"Calculer la résistance élastique au glissement {REG}.", H_C,
+          num(210, "MPa", absTol=0.006), f"{REG} = 210 MPa",
+          "<p>En cisaillement, un acier résiste environ deux fois moins bien qu'en traction :</p>" +
+          eq(f"{REG} = " + frac(RE, "2") + " = " + frac("420", "2") + " = <b>210 MPa</b>")),
+        Q("q1_4", f"Calculer la résistance pratique au glissement {RPG}.", H_C,
+          num(70, "MPa", absTol=0.006), f"{RPG} = 70 MPa",
+          eq(f"{RPG} = " + frac(REG, "<i>s</i>") + " = " + frac("210", "3") + " = <b>70 MPa</b>")),
+        Q("q1_5", "Quelle est l'intensité de la force <i>F</i> appliquée ?", H_LIRE_C,
+          num(15000, "N", absTol=0.5, variants=[var(15, "kN", absTol=0.0005)]), "<i>F</i> = 15 000 N",
+          "<p>Elle est donnée : <b>F = 15 000 N</b>, la même pour les deux solutions.</p>"),
+        Q("q1_6", "Solution 1 : combien de sections de l'axe sont cisaillées ?", H_ENTIER,
+          num(1, absTol=0), "1",
+          "<p>Deux pièces seulement, tirées en sens contraires : l'axe est cisaillé à <b>un</b> endroit.</p>"),
+        Q("q1_7", "Solution 2 : combien de sections de l'axe sont cisaillées ?", H_ENTIER,
+          num(2, absTol=0), "2",
+          "<p>La pièce du milieu est prise entre les deux branches de la chape : l'axe est cisaillé à <b>deux</b> "
+          "endroits.</p>"),
+        Q("q1_8", "Solution 1 : calculer l'effort tranchant <i>T</i> dans la section cisaillée.", H_C,
+          num(15000, "N", absTol=0.5, variants=[var(15, "kN", absTol=0.0005)]), "<i>T</i> = 15 000 N",
+          "<p>Une seule section reprend tout l'effort : <i>T</i> = <i>F</i> = <b>15 000 N</b>.</p>"),
+        Q("q1_9", "Solution 2 : calculer l'effort tranchant <i>T</i> dans une section cisaillée.", H_C,
+          num(7500, "N", absTol=0.5, variants=[var(7.5, "kN", absTol=0.0005)]), "<i>T</i> = 7 500 N",
+          "<p>L'effort se partage entre les deux sections :</p>" +
+          eq("<i>T</i> = " + frac("<i>F</i>", "2") + " = " + frac("15 000", "2") + " = <b>7 500 N</b>")),
+        Q("q1_10", "Calculer l'aire <i>S</i> d'une section cisaillée de l'axe.", H_C,
+          num(113.0973, "mm2", relTol=0.001, variants=[var(1.130973, "cm2", relTol=0.001)]), "<i>S</i> ≈ 113,10 mm²",
+          "<p>La section de l'axe est un disque, la même pour les deux solutions :</p>" +
+          eq("<i>S</i> = " + frac("π × <i>d</i>²", "4") + " = " + frac("π × 12²", "4") + " ≈ <b>113,10 mm²</b>")),
+        Q("q1_11", f"Solution 1 : calculer la contrainte {TAU1} dans la section.", H_C,
+          num(132.6291, "MPa", relTol=0.001), f"{TAU1} ≈ 132,63 MPa",
+          eq(f"{TAU1} = " + frac("<i>T</i>", "<i>S</i>") + " = " + frac("15 000", "113,10") + " ≈ <b>132,63 MPa</b>")),
+        Q("q1_12", f"Solution 2 : calculer la contrainte {TAU1} dans une section.", H_C,
+          num(66.3146, "MPa", relTol=0.001), f"{TAU1} ≈ 66,31 MPa",
+          eq(f"{TAU1} = " + frac("7 500", "113,10") + " ≈ <b>66,31 MPa</b>") +
+          "<p>Deux fois moins que pour la solution 1 : l'effort est partagé entre deux sections.</p>"),
+        Q("q1_13", "Solution 1 : la condition de résistance est-elle vérifiée ?", H_OUINON,
+          {"type": "yesno", "value": False}, "Non",
+          f"<p>{TAU1} ≈ 132,63 MPa est plus grande que {RPG} = 70 MPa : la solution 1 <b>ne convient pas</b>.</p>"),
+        Q("q1_14", "Solution 2 : la condition de résistance est-elle vérifiée ?", H_OUINON, YES, "Oui",
+          f"<p>{TAU1} ≈ 66,31 MPa ≤ {RPG} = 70 MPa : la solution 2 <b>convient</b>. C'est le montage à choisir : "
+          "avec deux sections cisaillées, le même axe supporte un effort deux fois plus grand.</p>"),
+    ],
+})
+
+CLAVETTES = [("6 à 8", 2, 2), ("8 à 10", 3, 3), ("10 à 12", 4, 4), ("12 à 17", 5, 5), ("17 à 22", 6, 6),
+             ("22 à 30", 8, 7), ("30 à 38", 10, 8), ("38 à 44", 12, 8), ("44 à 50", 14, 9), ("50 à 58", 16, 10),
+             ("58 à 65", 18, 11), ("65 à 75", 20, 12), ("75 à 85", 22, 14), ("85 à 95", 25, 14),
+             ("95 à 110", 28, 16), ("110 à 130", 32, 18), ("130 à 150", 36, 20), ("150 à 170", 40, 22)]
+_DESIGN = [p + c for p in ("clavetteformeb", "clavetteb", "formeb", "b") for c in ("8x7x51", "8751")]
+
+PARTS_N1C.append({
+    "num": "2", "minutes": 25, "title": "Clavette : désigner la clavette d'un arbre",
+    "intro": [
+        "<p>Une clavette relie un arbre et un moyeu : elle transmet le couple. Vous devez déterminer la désignation "
+        "de cette clavette pour un couple de 180 N·m.</p>",
+        data_box([
+            "Arbre de diamètre <i>d</i> = 30 mm ; couple maximal à transmettre : <i>C</i> = 180 N·m",
+            "Clavette forme B, en acier <b>E295</b> ; coefficient de sécurité <i>s</i> = 5",
+            "Dimensions des clavettes : DT3",
+        ]),
+    ],
+    "blocks": [
+        QBAR("Q2.1", ["DP1"], ans="sur la figure"),
+        SK("sk_q2_1", "Q2.1", "CLAVETTE",
+           "Sur la figure : tracer la force qui cisaille la clavette (sur le dessin de l'arbre), puis la section "
+           "cisaillée (sur la perspective de la clavette).",
+           ["Sur l'arbre, la force est horizontale, appliquée sur la clavette (perpendiculaire au rayon).",
+            "La force est orientée dans le sens de rotation indiqué par la flèche courbe (vers la gauche en haut).",
+            "Sur la perspective, la section cisaillée est un plan horizontal à mi-hauteur de la clavette.",
+            "Cette section s'étend sur toute la longueur L et toute la largeur a."],
+           [],
+           "<p>Outils : <b>Flèche</b> pour la force, <b>Ligne</b> pour le contour de la section.</p>"
+           "<p>La clavette est à moitié dans l'arbre, à moitié dans le moyeu : c'est entre les deux qu'elle risque "
+           "d'être coupée.</p>",
+           "<p>L'arbre tourne dans le sens de la flèche courbe et pousse la partie basse de la clavette, logée dans "
+           "l'arbre ; le moyeu retient sa partie haute. La force est <b>tangente</b> à l'arbre, donc horizontale au "
+           "sommet.</p><p>La clavette est coupée dans le plan de contact arbre / moyeu : une section <b>horizontale "
+           "à mi-hauteur</b>, de dimensions <i>a</i> × <i>L</i>.</p>"),
+        QBAR("Q2.2 – Q2.9", ["DT1", "DT2", "DT3"]),
+        Q("q2_2", "Calculer l'effort tranchant <i>T</i> pour un arbre de diamètre 30 mm.", H_C,
+          num(12000, "N", absTol=0.5, variants=[var(12, "kN", absTol=0.0005)]), "<i>T</i> = 12 000 N",
+          "<p>Le couple est l'effort multiplié par le bras de levier, ici le rayon de l'arbre (15 mm = 0,015 m) :</p>" +
+          eq("<i>T</i> = " + frac("<i>C</i>", "<i>d</i> / 2") + " = " + frac("180", "0,015") + " = <b>12 000 N</b>") +
+          "<p>Attention aux unités : le couple est en N·m, le rayon doit donc être en mètres.</p>"),
+        Q("q2_3", f"Déterminer {RE} pour le matériau de la clavette.", "Lis la valeur dans le DT2. " + UNITE,
+          num(295, "MPa", absTol=0.5), f"{RE} = 295 MPa",
+          "<p>Acier E295 : <b>R<sub>e</sub> = 295 MPa</b> (DT2).</p>"),
+        Q("q2_4", f"Calculer {REG}.", H_C,
+          num(147.5, "MPa", absTol=0.006), f"{REG} = 147,5 MPa",
+          eq(f"{REG} = " + frac(RE, "2") + " = " + frac("295", "2") + " = <b>147,5 MPa</b>")),
+        Q("q2_5", f"Calculer {RPG}.", H_C,
+          num(29.5, "MPa", absTol=0.006), f"{RPG} = 29,5 MPa",
+          eq(f"{RPG} = " + frac(REG, "<i>s</i>") + " = " + frac("147,5", "5") + " = <b>29,5 MPa</b>")),
+        Q("q2_6", "Calculer l'aire minimale <i>S</i> de la section cisaillée.", H_C,
+          num(406.7797, "mm2", absTol=0.006), "<i>S</i> ≈ 406,78 mm²",
+          f"<p>Condition de résistance : {TAU1} = <i>T</i> / <i>S</i> ≤ {RPG}, donc <i>S</i> ≥ <i>T</i> / {RPG} :</p>" +
+          eq("<i>S</i> = " + frac("12 000", "29,5") + " ≈ <b>406,78 mm²</b>")),
+        Q("q2_7", "À l'aide du DT3, déterminer la largeur <i>a</i> de la clavette.", "Valeur du tableau. " + UNITE,
+          num(8, "mm", absTol=0.01), "<i>a</i> = 8 mm",
+          "<p>Dans le DT3, un arbre de 30 mm se trouve dans la ligne « 22 à 30 » : <b>a = 8 mm</b> et b = 7 mm.</p>"),
+        Q("q2_8", "Calculer la longueur minimale <i>L</i> de la clavette, arrondie au millimètre supérieur.",
+          "Arrondir au millimètre supérieur. " + UNITE,
+          num(51, "mm", absTol=0.01), "<i>L</i> = 51 mm (50,85 mm)",
+          "<p>La section cisaillée est un rectangle <i>a</i> × <i>L</i> :</p>" +
+          eq("<i>L</i> = " + frac("<i>S</i>", "<i>a</i>") + " = " + frac("406,78", "8") + " ≈ 50,85 mm, soit "
+             "<b>51 mm</b>") +
+          "<p>On arrondit toujours au-dessus : une clavette plus courte ne résisterait pas.</p>"),
+        Q("q2_9", "Désigner la clavette.", "Sous la forme : clavette forme X, a x b x L.",
+          {"type": "code", "equals": _DESIGN}, "Clavette forme B, 8 × 7 × 51",
+          "<p>La désignation donne la forme, puis largeur × hauteur × longueur : <b>clavette forme B, 8 × 7 × 51</b>. "
+          "En pratique, on choisit ensuite la longueur normalisée immédiatement supérieure.</p>"),
+    ],
+})
+
+PARTS_N1C.append({
+    "num": "3", "minutes": 20, "title": "Grue d'atelier : axe du vérin",
+    "intro": [
+        "<p>Le vérin d'une grue d'atelier exerce une poussée de 3 150 daN lors du soulèvement d'une charge "
+        "importante. On veut vérifier la condition de résistance de l'axe qui relie le vérin au bras.</p>",
+        figure("n1-grue", "Axe monté dans une chape et grue d'atelier : bâti 1, bras 2, vérin 3, jambe 4, roues 5 et "
+               "6, crochet 7", "Figure 1 — Axe d'articulation et grue d'atelier", 620),
+        data_box([
+            "Poussée du vérin : <i>F</i> = 3 150 daN (1 daN = 10 N)",
+            "Diamètre cisaillé : 40 mm ; matière S235",
+            f"{REG} = 0,5 × {RE} ; coefficient de sécurité <i>s</i> = 8",
+        ]),
+    ],
+    "blocks": [
+        QBAR("Q3.1", ["DP1"], ans="sur la figure"),
+        SK("sk_q3_1", "Q3.1", "GRUE",
+           "Représenter les sections cisaillées sur l'axe.",
+           ["Deux sections sont tracées.",
+            "Elles sont placées aux limites entre la pièce du milieu et les deux branches de la chape.",
+            "Chaque section coupe l'axe en travers (trait vertical sur toute la hauteur de l'axe)."],
+           [],
+           "<p>Outil : <b>Ligne</b>. L'axe traverse la chape (à gauche et à droite) et l'œil du vérin (au milieu).</p>",
+           "<p>L'œil du vérin pousse le milieu de l'axe, les deux branches de la chape retiennent ses extrémités : "
+           "l'axe est cisaillé de chaque côté de l'œil, soit <b>deux sections</b> (double cisaillement).</p>"),
+        QBAR("Q3.2 – Q3.7", ["DT1", "DT2"]),
+        Q("q3_2", "Calculer l'effort tranchant <i>T</i> dans une section.", H_C,
+          num(15750, "N", absTol=0.5, variants=[var(15.75, "kN", absTol=0.0005), var(1575, "daN", absTol=0.05)]),
+          "<i>T</i> = 15 750 N",
+          "<p>On convertit d'abord : 3 150 daN = 31 500 N. L'axe est cisaillé en deux sections, qui se partagent "
+          "l'effort :</p>" + eq("<i>T</i> = " + frac("31 500", "2") + " = <b>15 750 N</b>")),
+        Q("q3_3", "Calculer l'aire <i>S</i> d'une section cisaillée.", H_C,
+          num(1256.637, "mm2", relTol=0.001, variants=[var(12.56637, "cm2", relTol=0.001)]),
+          "<i>S</i> ≈ 1 256,64 mm²",
+          eq("<i>S</i> = " + frac("π × 40²", "4") + " ≈ <b>1 256,64 mm²</b>")),
+        Q("q3_4", f"Calculer {REG}.", H_C,
+          num(117.5, "MPa", absTol=0.006), f"{REG} = 117,5 MPa",
+          f"<p>Acier S235 : {RE} = 235 MPa (DT2).</p>" +
+          eq(f"{REG} = 0,5 × 235 = <b>117,5 MPa</b>")),
+        Q("q3_5", f"Calculer {RPG}.", H_C,
+          num(14.6875, "MPa", absTol=0.006), f"{RPG} ≈ 14,69 MPa",
+          eq(f"{RPG} = " + frac(REG, "<i>s</i>") + " = " + frac("117,5", "8") + " ≈ <b>14,69 MPa</b>")),
+        Q("q3_6", f"Calculer la contrainte {TAU1} dans une section.", H_C,
+          num(12.5334, "MPa", relTol=0.001), f"{TAU1} ≈ 12,53 MPa",
+          eq(f"{TAU1} = " + frac("<i>T</i>", "<i>S</i>") + " = " + frac("15 750", "1 256,64") + " ≈ <b>12,53 MPa</b>")),
+        Q("q3_7", "L'axe résiste-t-il ? Conclure.", H_OUINON, YES, "Oui",
+          f"<p>{TAU1} ≈ 12,53 MPa ≤ {RPG} ≈ 14,69 MPa : la condition de résistance est <b>vérifiée</b>, l'axe "
+          "résiste avec le coefficient de sécurité demandé.</p>"),
+    ],
+})
+
+
 # ============================================================ TRACÉS (fonds et décor)
 SK_BG = {
     # clé : (image, largeur déclarée, hauteur déclarée)
     "POUTRE": ("t1-siege-fil", 810, 460),
     "AXE": ("c7-axe-chape", 860, 373),
     "SECTIONS": ("svg:DR_SECTIONS_SVG", 900, 400),
+    "ARTIC": ("n1-articulation", 650, 470),
+    "CLAVETTE": ("n1-clavette", 783, 439),
+    "GRUE": ("n1-grue-axe", 500, 235),
 }
 
 
@@ -1113,6 +1320,39 @@ def bg_src(name):
     return png(name)[0]
 
 DECOR_JS = r"""  var DECOR = {
+    // Activité « articulation » : axe de la solution 1 (x 72 → 250, y 168 → 257), solution 2 (x 370 → 610)
+    ARTIC: {
+      pad: { t: 10, r: 10, b: 10, l: 10 }, rs: 2.4,
+      decorate: function () {},
+      correction: function (c) {
+        [140, 435, 503].forEach(function (x) { line(c, x, 158, x, 268, CORR, 5); });
+        text(c, "1 section", 140, 145, CORR, 18, "center", "800");
+        text(c, "2 sections", 469, 145, CORR, 18, "center", "800");
+      }
+    },
+    // Clavette : arbre (centre 180 ; 238), clavette x 152 → 208, y 60 → 125, contact arbre / moyeu y ≈ 100 ;
+    // perspective : face avant x 440 → 522, y 288 → 372, fuyante (+220 ; −112)
+    CLAVETTE: {
+      pad: { t: 10, r: 10, b: 10, l: 10 }, rs: 2.4,
+      decorate: function () {},
+      correction: function (c) {
+        arrow(c, 270, 113, 162, 113, CORR, 4); vlabel(c, 236, 136, "T", "", CORR, 22, "center");
+        line(c, 140, 100, 220, 100, CORR, 3, [8, 5]);
+        c.save(); c.fillStyle = "rgba(198,40,40,.35)"; c.strokeStyle = CORR; c.lineWidth = 3;
+        c.beginPath(); c.moveTo(440, 330); c.lineTo(522, 330); c.lineTo(742, 218); c.lineTo(660, 218); c.closePath();
+        c.fill(); c.stroke(); c.restore();
+        text(c, "section cisaillée a × L", 610, 410, CORR, 18, "center", "800");
+      }
+    },
+    // Grue : axe y 72 → 145, branches de la chape x 88 → 150 et 393 → 455
+    GRUE: {
+      pad: { t: 10, r: 10, b: 10, l: 10 }, rs: 3,
+      decorate: function () {},
+      correction: function (c) {
+        [150, 393].forEach(function (x) { line(c, x, 62, x, 155, CORR, 5); });
+        text(c, "2 sections cisaillées", 271, 215, CORR, 18, "center", "800");
+      }
+    },
     // Document réponse de la barre percée : 5 px = 1 mm ; section 15 × 24 mm dessinée à 55 px du bord gauche
     // de chaque cadre et à 65 px de son bord haut
     SECTIONS: {
@@ -1182,6 +1422,9 @@ DECOR_JS = r"""  var DECOR = {
 """
 
 DR_NAMES_JS = """  var DR_NAMES = {
+    ARTIC: { doc: "DR1", q: "Q1.1", t: "Articulation : sections cisaillées des axes", scale: false },
+    CLAVETTE: { doc: "DR2", q: "Q2.1", t: "Clavette : force et section cisaillée", scale: false },
+    GRUE: { doc: "DR3", q: "Q3.1", t: "Grue d'atelier : sections cisaillées de l'axe", scale: false },
     SECTIONS: { doc: "DR1", q: "Q4.1", t: "Barre percée : sections S1, S2 et S3 à l'échelle 1:1", scale: false },
     POUTRE: { doc: "DR1", q: "Q1.5", t: "Poutre AC isolée : actions mécaniques extérieures", scale: false },
     AXE: { doc: "DR1", q: "Q7.2", t: "Axe de chape : sections cisaillées", scale: false }
@@ -1356,6 +1599,43 @@ si <i>σ</i> ≤ <i>R</i><sub>pe</sub>, la pièce résiste en toute sécurité.<
 ]
 
 
+DOCS += [
+    ("CDP1", "Méthode — vérifier une pièce cisaillée", "Dossier présentation", False, """
+<div class="doc-text"><h3>Vérifier une pièce cisaillée : 5 étapes</h3>
+<ol>
+<li><strong>Repérer les sections cisaillées</strong> : là où deux pièces voisines tirent la pièce (axe, goupille,
+clavette) dans des sens opposés. Un axe qui relie deux pièces : 1 section ; un axe dans une chape : 2 sections.</li>
+<li><strong>L'effort tranchant</strong> <i>T</i> dans une section : l'effort total divisé par le nombre de sections.</li>
+<li><strong>L'aire</strong> <i>S</i> d'une section, en mm² (disque : π × d² / 4 ; rectangle : a × L).</li>
+<li><strong>La contrainte</strong> <i>τ</i> = <i>T</i> / <i>S</i>, en MPa.</li>
+<li><strong>La comparaison</strong> avec <i>R</i><sub>pg</sub> = <i>R</i><sub>eg</sub> / <i>s</i>, avec
+<i>R</i><sub>eg</sub> = <i>R</i><sub>e</sub> / 2 : si <i>τ</i> ≤ <i>R</i><sub>pg</sub>, la pièce résiste.</li>
+</ol>
+<h3>Conseils</h3>
+<ul><li>Force en N et aire en mm² : la contrainte sort en MPa. 1 daN = 10 N.</li>
+<li>Un couple <i>C</i> (N·m) transmis par une clavette : <i>T</i> = <i>C</i> / rayon, rayon en mètres.</li>
+<li>Toujours écrire l'unité : elle compte pour la moitié des points.</li></ul></div>"""),
+    ("CDT1", "Formulaire — cisaillement", "Dossier technique", True, """
+<div class="doc-text"><h3>Les relations à connaître</h3>
+<table class="t"><thead><tr><th>Grandeur</th><th>Relation</th><th>Unités</th></tr></thead><tbody>
+<tr><td>Contrainte tangentielle</td><td><i>τ</i> = <i>T</i> / <i>S</i></td><td>MPa ; N ; mm²</td></tr>
+<tr><td>Résistance élastique au glissement</td><td><i>R</i><sub>eg</sub> = <i>R</i><sub>e</sub> / 2</td><td>MPa</td></tr>
+<tr><td>Résistance pratique au glissement</td><td><i>R</i><sub>pg</sub> = <i>R</i><sub>eg</sub> / <i>s</i></td><td>MPa</td></tr>
+<tr><td>Condition de résistance</td><td><i>τ</i> ≤ <i>R</i><sub>pg</sub></td><td>MPa</td></tr>
+<tr><td>Effort tranchant par section</td><td><i>T</i> = <i>F</i> / nombre de sections</td><td>N</td></tr>
+</tbody></table>
+<h3>Aire des sections</h3>
+<table class="t"><tbody><tr><th>Disque de diamètre <i>d</i></th><td><i>S</i> = π × <i>d</i>² / 4</td></tr>
+<tr><th>Rectangle <i>a</i> × <i>L</i></th><td><i>S</i> = <i>a</i> × <i>L</i></td></tr></tbody></table></div>"""),
+    ("CDT3", "Clavettes parallèles : dimensions", "Dossier technique", True,
+     '<div class="doc-text"><h3>Clavettes parallèles : largeur a et hauteur b selon le diamètre d de l\'arbre</h3>'
+     '<table class="t"><thead><tr><th>d (mm)</th><th>a (mm)</th><th>b (mm)</th></tr></thead><tbody>' +
+     "".join(f"<tr><td>{d}</td><td>{a}</td><td>{b}</td></tr>" for d, a, b in CLAVETTES) +
+     '</tbody></table><p>Chaque ligne va jusqu\'à la borne supérieure incluse (« 22 à 30 » : de plus de 22 mm '
+     'jusqu\'à 30 mm). Désignation : clavette forme A, B ou C, <i>a</i> × <i>b</i> × <i>L</i>.</p></div>'),
+]
+
+
 # ============================================================ rendu HTML
 def render_q(q, part):
     qid, label = q["id"], q["label"]
@@ -1469,7 +1749,7 @@ def hm(minutes):
 # Chaque exercice reprend une partie des PARTIES ci-dessus, renumérotées à partir de 1.
 # Les documents sont renommés exercice par exercice (DP1, DT1, DT2…) ; « docs » donne la correspondance.
 EXO_DEFS = [
-    {"key": "traction-bp", "prefix": "b", "tag": "Exercice 1.1", "level": "Bac pro", "title": "Traction",
+    {"key": "traction-n1", "prefix": "b", "tag": "Exercice 1.1", "level": "Niveau 1", "title": "Traction",
      "parts": PARTS_BP, "docs": {"BDP1": "DP1", "BDT1": "DT1", "BDT2": "DT2", "BDT3": "DT3"}, "fig_shift": 0,
      "hero": ("bp-treuil", "Treuil électrique de levage suspendu à une poutre, câble et crochet",
               "Un treuil de levage : son câble travaille en traction."),
@@ -1477,7 +1757,7 @@ EXO_DEFS = [
              "contrainte, résistance pratique et coefficient de sécurité.",
      "sub": "Cinq situations de maintenance pour vérifier une pièce tendue : lire une résistance dans un tableau, "
             "calculer une section et une contrainte, comparer à la résistance pratique, choisir une vis."},
-    {"key": "traction", "prefix": "t", "tag": "Exercice 1.2", "title": "Traction et compression",
+    {"key": "traction", "prefix": "t", "tag": "Exercice 1.2", "level": "Niveau 2", "title": "Traction et compression",
      "parts": PARTS[0:4], "docs": {"DP1": "DP1", "DT1": "DT1", "DT3": "DT2"}, "fig_shift": 0,
      "hero": ("t1-siege-fil", "Siège suspendu : poutre AC articulée sur un mur, maintenue par le fil DE",
               "Le fil d'acier DE porte le siège : on calcule sa tension, sa contrainte et son allongement."),
@@ -1485,7 +1765,15 @@ EXO_DEFS = [
              "normal, contrainte, loi de Hooke, allongement.",
      "sub": "Quatre pièces sollicitées en traction ou en compression : calculer l'effort normal et la contrainte, "
             "vérifier la condition de résistance, appliquer la loi de Hooke et dimensionner une section."},
-    {"key": "cisaillement", "prefix": "c", "tag": "Exercice 2", "title": "Cisaillement",
+    {"key": "cisaillement-n1", "prefix": "d", "tag": "Exercice 2.1", "level": "Niveau 1", "title": "Cisaillement",
+     "parts": PARTS_N1C, "docs": {"CDP1": "DP1", "CDT1": "DT1", "BDT2": "DT2", "CDT3": "DT3"}, "fig_shift": 0,
+     "hero": ("n1-clavette", "Arbre et clavette : couple de 180 N·m, clavette forme B",
+              "Une clavette transmet le couple de l'arbre au moyeu : elle travaille au cisaillement."),
+     "card": "Une articulation à choisir, une clavette à désigner et l'axe d'une grue d'atelier : sections "
+             "cisaillées, effort tranchant, contrainte et résistance pratique au glissement.",
+     "sub": "Trois situations de maintenance : repérer les sections cisaillées, calculer l'effort tranchant et la "
+            "contrainte, comparer à la résistance pratique au glissement, choisir une solution ou une clavette."},
+    {"key": "cisaillement", "prefix": "c", "tag": "Exercice 2.2", "level": "Niveau 2", "title": "Cisaillement",
      "parts": PARTS[4:11], "docs": {"DP1": "DP1", "DT2": "DT1", "DT3": "DT2"}, "fig_shift": 4,
      "hero": ("c2-pince", "Pince à goupille : charges P sur les poignées, force de serrage dans les mâchoires",
               "La goupille de la pince transmet tout l'effort entre les deux branches."),
@@ -1603,9 +1891,8 @@ def prepare_exo(e):
 def render_docs(e):
     rail, tabs, secs = [], [], []
     first_dt = True
-    for key, title, kind, is_dt, content in DOCS:
-        if key not in e["docs"]:
-            continue
+    chosen = sorted((d for d in DOCS if d[0] in e["docs"]), key=lambda d: (not e["docs"][d[0]].startswith("DP"), e["docs"][d[0]]))
+    for key, title, kind, is_dt, content in chosen:
         k = e["docs"][key]
         if is_dt and first_dt:
             rail.append('<div class="grp" aria-hidden="true"></div>')
@@ -1619,7 +1906,9 @@ def render_docs(e):
 
 
 def pastille(level):
-    return f' <span class="pastille">{level}</span>' if level else ""
+    if not level:
+        return ""
+    return f' <span class="pastille n{level.split()[-1]}">{level}</span>'
 
 
 def render_exo_home(e):
@@ -1630,7 +1919,7 @@ def render_exo_home(e):
              f'<div><b>{len(e["P"])} parties</b><span>{e["n_q"]} questions</span></div>'
              f'<div><b>{hm(e["minutes"])}</b><span>durée conseillée</span></div>'
              f'<div><b>{len(docs)} documents</b><span>{docs_txt}</span></div>'
-             f'<div><b>{e["n_sk"]} tracé</b><span>auto-évalué</span></div></div>')
+             f'<div><b>{e["n_sk"]} tracé{"s" if e["n_sk"] > 1 else ""}</b><span>auto-évalué{"s" if e["n_sk"] > 1 else ""}</span></div></div>')
     return (f'<div class="home-top"><div class="home-top-l"><header class="home-head"><span class="mc-tag">{e["tag"]}</span>{pastille(e.get("level"))}'
             f'<h1 id="home-title">{e["title"]}</h1><p class="home-sub">{e["sub"]}</p></header>{facts}</div>'
             f'<figure class="home-hero"><img src="{src}" alt="{esc(e["hero"][1])}" width="{w}" height="{h}">'
@@ -1661,13 +1950,14 @@ MODES_HTML = """<h2 class="home-choose">Choisis ton mode de travail</h2>
 
 
 COURS = [
-    {"key": "cours-traction-bp", "tag": "Cours 1.1", "level": "Bac pro", "title": "Traction", "ready": True,
+    {"key": "cours-traction-n1", "tag": "Cours 1.1", "level": "Niveau 1", "title": "Traction", "ready": True,
      "desc": "L'essai de traction, la contrainte, la condition de résistance ; avec un simulateur et un quiz."},
-    {"key": "cours-traction", "tag": "Cours 1.2", "title": "Traction et compression", "ready": False,
+    {"key": "cours-traction", "tag": "Cours 1.2", "level": "Niveau 2", "title": "Traction et compression", "ready": False,
      "desc": "Effort normal, loi de Hooke, allongement et dimensionnement."},
-    {"key": "cours-cisaillement-bp", "tag": "Cours 2.1", "level": "Bac pro", "title": "Cisaillement", "ready": False,
-     "desc": "Simple et double cisaillement, contrainte de cisaillement, condition de résistance."},
-    {"key": "cours-cisaillement", "tag": "Cours 2.2", "title": "Cisaillement", "ready": False,
+    {"key": "cours-cisaillement-n1", "tag": "Cours 2.1", "level": "Niveau 1", "title": "Cisaillement", "ready": True,
+     "desc": "Simple et double cisaillement, contrainte tangentielle, condition de résistance ; avec une animation, "
+             "un simulateur et un quiz."},
+    {"key": "cours-cisaillement", "tag": "Cours 2.2", "level": "Niveau 2", "title": "Cisaillement", "ready": False,
      "desc": "Effort tranchant, dimensionnement des goupilles, boulons et axes, glissement."},
 ]
 
@@ -1678,7 +1968,7 @@ def render_hub():
         f'<article class="mode-card"><div class="mc-head"><span class="mc-tag">{e["tag"]}{pastille(e.get("level"))}'
         f'</span><h3>{e["title"]}</h3></div>'
         f'<p>{e["card"]}</p><p class="small ex-meta">{len(e["P"])} parties · {e["n_q"]} questions · '
-        f'{e["n_sk"]} tracé · {hm(e["minutes"])}</p>'
+        f'{e["n_sk"]} tracé{"s" if e["n_sk"] > 1 else ""} · {hm(e["minutes"])}</p>'
         f'<a class="btn" href="?ex={e["key"]}">Ouvrir l\'exercice</a></article>' for e in EXO_DEFS)
     cours = "".join(
         f'<article class="mode-card cours-card{"" if c["ready"] else " en-edition"}"><div class="mc-head">'
@@ -1696,8 +1986,8 @@ def render_hub():
             '<figcaption class="small">Quelques-unes des pièces étudiées dans les exercices.</figcaption></figure></div>'
             f'<h2 class="home-choose">Les cours</h2><div class="ex-grid cours-grid">{cours}</div>'
             f'<h2 class="home-choose">Les exercices</h2><div class="ex-grid">{cards}</div>'
-            '<p class="home-note small">La pastille <span class="pastille">Bac pro</span> signale les cours et '
-            'exercices de premier niveau. Chaque exercice propose le mode entraînement (correction question par '
+            f'<p class="home-note small">Pastilles : {pastille("Niveau 1").strip()} premier niveau, '
+            f'{pastille("Niveau 2").strip()} niveau approfondi. Chaque exercice propose le mode entraînement (correction question par '
             'question) ou le mode examen (correction à la remise de la copie). Rien n\'est enregistré sur '
             'l\'ordinateur.</p>')
 
@@ -1788,7 +2078,7 @@ def render_cours_bp():
         [("c-essai", "L'essai"), ("c-sigma", "La contrainte"), ("c-cond", "La condition de résistance"),
          ("c-quiz", "Quiz")], 1))
     return f"""<div class="cours" id="cours-bp">
-<div class="home-top home-top-single"><div class="home-top-l"><header class="home-head"><span class="mc-tag">Cours 1.1</span>{pastille("Bac pro")}
+<div class="home-top home-top-single"><div class="home-top-l"><header class="home-head"><span class="mc-tag">Cours 1.1</span>{pastille("Niveau 1")}
 <h1 id="home-title">Traction</h1><p class="home-sub">Comprendre l'essai de traction, calculer une contrainte et vérifier
 qu'une pièce résiste. Environ 20 minutes : explore la courbe, joue avec le simulateur, puis teste-toi avec le quiz.</p>
 </header></div></div>
@@ -1853,13 +2143,49 @@ plus la pièce a de la marge.</p>
 <button type="button" class="btn ghost" id="qz-reset">Recommencer</button></div>
 </div></section>
 
-<div class="cours-foot no-print"><a class="btn" href="?ex=traction-bp">S'entraîner : Exercice 1.1</a>
+<div class="cours-foot no-print"><a class="btn" href="?ex=traction-n1">S'entraîner : Exercice 1.1</a>
 <button type="button" class="btn ghost" id="cours-print">Imprimer le cours</button>
 <a class="btn ghost" href="?">{HOUSE} Retour à l'accueil</a></div>
 </div>"""
 
 
 COURS_JS = r"""
+  function initQuiz(root) {
+    function q(s) { return root.querySelector(s); }
+    function qa(s) { return Array.prototype.slice.call(root.querySelectorAll(s)); }
+    var qs = qa(".quiz-q");
+    function score() {
+      var n = qs.filter(function (f) { return f.classList.contains("is-ok"); }).length;
+      var done = qs.filter(function (f) { return f.classList.contains("done"); }).length;
+      q("#qz-score").textContent = n + " / " + qs.length;
+      q("#qz-stars").textContent = done === qs.length ? "★★★".slice(0, n === qs.length ? 3 : n >= qs.length - 2 ? 2 : n >= 2 ? 1 : 0) +
+        "☆☆☆".slice(0, 3 - (n === qs.length ? 3 : n >= qs.length - 2 ? 2 : n >= 2 ? 1 : 0)) : "";
+    }
+    qs.forEach(function (fs) {
+      fs.addEventListener("change", function (e) {
+        if (fs.classList.contains("done")) return;
+        var ok = e.target.value === fs.getAttribute("data-ok");
+        fs.classList.add("done", ok ? "is-ok" : "is-ko");
+        fs.querySelector(".quiz-fb").textContent = ok ? "✔ Bonne réponse !" : "✘ Pas tout à fait.";
+        fs.querySelector(".quiz-why").hidden = false;
+        Array.prototype.forEach.call(fs.querySelectorAll("input"), function (i) {
+          i.disabled = true;
+          if (i.value === fs.getAttribute("data-ok")) i.parentNode.classList.add("good");
+        });
+        score();
+      });
+    });
+    q("#qz-reset").addEventListener("click", function () {
+      qs.forEach(function (fs) {
+        fs.classList.remove("done", "is-ok", "is-ko");
+        fs.querySelector(".quiz-fb").textContent = "";
+        fs.querySelector(".quiz-why").hidden = true;
+        Array.prototype.forEach.call(fs.querySelectorAll("input"), function (i) { i.disabled = false; i.checked = false; i.parentNode.classList.remove("good"); });
+      });
+      score();
+    });
+    score();
+  }
   function initCoursBp(root) {
     function q(s) { return root.querySelector(s); }
     function qa(s) { return Array.prototype.slice.call(root.querySelectorAll(s)); }
@@ -1906,39 +2232,7 @@ COURS_JS = r"""
       tr.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
     });
     calc();
-    // 4. quiz
-    var qs = qa(".quiz-q");
-    function score() {
-      var n = qs.filter(function (f) { return f.classList.contains("is-ok"); }).length;
-      var done = qs.filter(function (f) { return f.classList.contains("done"); }).length;
-      q("#qz-score").textContent = n + " / " + qs.length;
-      q("#qz-stars").textContent = done === qs.length ? "★★★".slice(0, n === qs.length ? 3 : n >= qs.length - 2 ? 2 : n >= 2 ? 1 : 0) +
-        "☆☆☆".slice(0, 3 - (n === qs.length ? 3 : n >= qs.length - 2 ? 2 : n >= 2 ? 1 : 0)) : "";
-    }
-    qs.forEach(function (fs) {
-      fs.addEventListener("change", function (e) {
-        if (fs.classList.contains("done")) return;
-        var ok = e.target.value === fs.getAttribute("data-ok");
-        fs.classList.add("done", ok ? "is-ok" : "is-ko");
-        fs.querySelector(".quiz-fb").textContent = ok ? "✔ Bonne réponse !" : "✘ Pas tout à fait.";
-        fs.querySelector(".quiz-why").hidden = false;
-        Array.prototype.forEach.call(fs.querySelectorAll("input"), function (i) {
-          i.disabled = true;
-          if (i.value === fs.getAttribute("data-ok")) i.parentNode.classList.add("good");
-        });
-        score();
-      });
-    });
-    q("#qz-reset").addEventListener("click", function () {
-      qs.forEach(function (fs) {
-        fs.classList.remove("done", "is-ok", "is-ko");
-        fs.querySelector(".quiz-fb").textContent = "";
-        fs.querySelector(".quiz-why").hidden = true;
-        Array.prototype.forEach.call(fs.querySelectorAll("input"), function (i) { i.disabled = false; i.checked = false; i.parentNode.classList.remove("good"); });
-      });
-      score();
-    });
-    score();
+    initQuiz(root);
     q("#cours-print").addEventListener("click", function () { window.print(); });
   }
 """
@@ -2035,6 +2329,226 @@ COURS_CSS = """
 """
 
 
+# ============================================================ COURS 2.1 — CISAILLEMENT (niveau 1), interactif
+MATERIAUX_C = MATERIAUX + [("9SMn36", 0, 420)]
+
+QUIZ_C = [
+    ("La contrainte tangentielle τ s'exprime en…", ["MPa (ou N/mm²)", "N", "mm²", "N·m"], 0,
+     "τ = T / S : des newtons divisés par des mm², soit des MPa."),
+    ("Un axe est cisaillé en deux sections. Chaque section reprend…",
+     ["la moitié de l'effort", "tout l'effort", "le double de l'effort"], 0,
+     "Les deux sections se partagent l'effort : T = F / 2."),
+    ("Acier de Re = 420 MPa : que vaut Reg ?", ["210 MPa", "840 MPa", "420 MPa"], 0,
+     "En cisaillement, Reg = Re / 2 = 420 / 2 = 210 MPa."),
+    ("Reg = 210 MPa et s = 3 : que vaut Rpg ?", ["70 MPa", "630 MPa", "207 MPa"], 0,
+     "Rpg = Reg / s = 210 / 3 = 70 MPa."),
+    ("τ = 80 MPa et Rpg = 70 MPa : la pièce résiste-t-elle en toute sécurité ?", ["Non", "Oui"], 0,
+     "La condition τ ≤ Rpg n'est pas respectée : 80 MPa > 70 MPa."),
+    ("Même axe, même effort : quel montage est le plus résistant ?",
+     ["l'axe dans une chape (2 sections)", "l'axe qui relie deux pièces (1 section)", "les deux se valent"], 0,
+     "Avec deux sections, chacune ne reprend que la moitié de l'effort : la contrainte est deux fois plus faible."),
+]
+
+JEU_SECTIONS = [
+    ("Figure 1 du cours : l'axe relie deux pièces", 1),
+    ("Figure 2 du cours : l'axe traverse une chape", 2),
+    ("Une clavette entre un arbre et un moyeu", 1),
+    ("L'axe d'un vérin monté dans une chape (grue d'atelier)", 2),
+    ("Un boulon qui assemble deux tôles", 1),
+]
+
+GLISSE_SVG = """<svg class="glisse-svg" viewBox="0 0 520 230" role="img" aria-labelledby="gl-t">
+<title id="gl-t">Une pièce cisaillée par deux forces T opposées : la partie droite glisse vers le bas</title>
+<defs><marker id="fl2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+<path d="M0 0 10 5 0 10z" fill="#1C2530"/></marker></defs>
+<line x1="40" y1="115" x2="480" y2="115" stroke="#9AA2A8" stroke-dasharray="10 4 2 4"/>
+<rect x="60" y="80" width="200" height="70" fill="#DDE3EA" stroke="#1C2530" stroke-width="2.5"/>
+<g id="gl-droite"><rect x="260" y="80" width="200" height="70" fill="#DDE3EA" stroke="#1C2530" stroke-width="2.5"/>
+<line x1="270" y1="230" x2="270" y2="158" stroke="#1C2530" stroke-width="3" marker-end="url(#fl2)"/>
+<text x="282" y="210" class="gl-lab">T</text></g>
+<line x1="250" y1="0" x2="250" y2="72" stroke="#1C2530" stroke-width="3" marker-end="url(#fl2)"/>
+<text x="222" y="30" class="gl-lab">T</text>
+<line id="gl-plan" x1="260" y1="68" x2="260" y2="162" stroke="#B42318" stroke-width="3" stroke-dasharray="6 4"/>
+</svg>"""
+
+
+def render_cours_cis():
+    sec_src, sw, sh = png("n1-sections")
+    mats = "".join(f'<option value="{e}"{" selected" if n.startswith("9SMn36") else ""}>{n} — Re = {e} MPa</option>'
+                   for n, r, e in MATERIAUX_C)
+    quiz = "".join(
+        f'<fieldset class="quiz-q" data-ok="{ok}"><legend><span class="q-num">{i + 1}</span> {q}</legend>' +
+        "".join(f'<label><input type="radio" name="qc{i}" value="{j}"> {o}</label>' for j, o in enumerate(opts)) +
+        f'<p class="quiz-fb" aria-live="polite"></p><p class="quiz-why" hidden>{why}</p></fieldset>'
+        for i, (q, opts, ok, why) in enumerate(QUIZ_C))
+    jeu = "".join(
+        f'<div class="jeu-l" data-ok="{n}"><span>{t}</span><button type="button" class="btn ghost" data-n="1">1 section'
+        f'</button><button type="button" class="btn ghost" data-n="2">2 sections</button><b class="jeu-fb" aria-live="polite">'
+        f'</b></div>' for t, n in JEU_SECTIONS)
+    nav = "".join(f'<a href="#{a}">{n}. {t}</a>' for n, (a, t) in enumerate(
+        [("cc-intro", "Le cisaillement"), ("cc-tau", "La contrainte"), ("cc-cond", "La condition de résistance"),
+         ("cc-sec", "Le nombre de sections"), ("cc-quiz", "Quiz")], 1))
+    s_opts = "".join(f'<option{" selected" if v == 3 else ""}>{v}</option>' for v in (2, 3, 4, 5, 6, 8, 10))
+    return f"""<div class="cours" id="cours-cis">
+<div class="home-top home-top-single"><div class="home-top-l"><header class="home-head"><span class="mc-tag">Cours 2.1</span>{pastille("Niveau 1")}
+<h1 id="home-title">Cisaillement</h1><p class="home-sub">Reconnaître une pièce cisaillée, compter ses sections cisaillées,
+calculer la contrainte tangentielle et vérifier la résistance. Environ 20 minutes, avec une animation, un simulateur, un
+petit jeu et un quiz.</p></header></div></div>
+<nav class="cours-nav no-print" aria-label="Étapes du cours">{nav}</nav>
+
+<section class="part cours-sec" id="cc-intro" aria-labelledby="cc-intro-t"><header class="part-head"><div class="part-num" aria-hidden="true">1</div>
+<div><h2 id="cc-intro-t" style="padding:14px 16px">Qu'est-ce que le cisaillement ?</h2></div></header><div class="part-body">
+<p>Une pièce est <strong>cisaillée</strong> quand deux forces égales et opposées, perpendiculaires à sa ligne moyenne,
+tendent à faire glisser une partie de la pièce par rapport à l'autre — comme une paire de ciseaux.</p>
+<p class="cours-defi">À toi : augmente l'effort T et regarde ce qui arrive à la pièce.</p>
+<div class="glisse">{GLISSE_SVG}<div class="glisse-ctl"><label><span>Effort T : <output id="gl-o">0 %</output> de l'effort de rupture</span>
+<input type="range" id="gl-s" min="0" max="100" step="1" value="0"></label><p class="glisse-txt" id="gl-txt" aria-live="polite"></p></div></div>
+</div></section>
+
+<section class="part cours-sec" id="cc-tau" aria-labelledby="cc-tau-t"><header class="part-head"><div class="part-num" aria-hidden="true">2</div>
+<div><h2 id="cc-tau-t" style="padding:14px 16px">La contrainte tangentielle τ (tau)</h2></div></header><div class="part-body">
+<p>L'effort tranchant <i>T</i> se répartit sur la section cisaillée <i>S</i>. La contrainte qui en résulte, contenue dans le
+plan de la section, s'appelle la <strong>contrainte tangentielle</strong> :</p>
+<div class="formule"><span class="f-main"><i>τ</i> = {frac("<i>T</i>", "<i>S</i>")}</span>
+<span class="f-units"><i>τ</i> en MPa (N/mm²)<br><i>T</i> : effort tranchant en newtons (N)<br><i>S</i> : aire de la section en mm²</span></div>
+<p><strong>À ne pas confondre :</strong> en traction, la section est perpendiculaire à la force ; en cisaillement, la force est
+<em>dans</em> le plan de la section.</p>
+</div></section>
+
+<section class="part cours-sec" id="cc-cond" aria-labelledby="cc-cond-t"><header class="part-head"><div class="part-num" aria-hidden="true">3</div>
+<div><h2 id="cc-cond-t" style="padding:14px 16px">La condition de résistance</h2></div></header><div class="part-body">
+<p>La contrainte tangentielle doit rester inférieure à la <strong>résistance pratique au glissement</strong>
+<i>R</i><sub>pg</sub> :</p>
+<div class="formule"><span class="f-main"><i>τ</i> = {frac("<i>T</i>", "<i>S</i>")} ≤ <i>R</i><sub>pg</sub> = {frac("<i>R</i><sub>eg</sub>", "<i>s</i>")}</span>
+<span class="f-units">avec <b><i>R</i><sub>eg</sub> = <i>R</i><sub>e</sub> / 2</b><br><i>R</i><sub>eg</sub> : résistance élastique au glissement<br><i>s</i> : coefficient de sécurité</span></div>
+<p>Un acier résiste environ <strong>deux fois moins bien</strong> au cisaillement qu'à la traction : c'est pourquoi
+<i>R</i><sub>eg</sub> vaut la moitié de <i>R</i><sub>e</sub>.</p>
+<div class="simu" id="simu-c"><h3>Simulateur : un axe cisaillé</h3>
+<div class="simu-grid">
+<label><span>Effort <i>F</i> : <output id="c-of">15 000 N</output></span><input type="range" id="c-f" min="500" max="40000" step="500" value="15000"></label>
+<label><span>Diamètre de l'axe <i>d</i> : <output id="c-od">12 mm</output></span><input type="range" id="c-d" min="4" max="40" step="1" value="12"></label>
+<label><span>Matériau</span><select id="c-m">{mats}</select></label>
+<label><span>Coefficient de sécurité <i>s</i></span><select id="c-s">{s_opts}</select></label>
+</div>
+<div class="simu-sec" role="radiogroup" aria-label="Nombre de sections cisaillées"><span>Montage :</span>
+<label><input type="radio" name="c-n" value="1" checked> 1 section (axe reliant deux pièces)</label>
+<label><input type="radio" name="c-n" value="2"> 2 sections (axe dans une chape)</label></div>
+<div class="simu-out simu-out4"><div><span>Effort tranchant T</span><b id="c-rt"></b></div><div><span>Aire S</span><b id="c-rs"></b></div>
+<div><span>Contrainte τ</span><b id="c-rtau"></b></div><div><span>Rpg</span><b id="c-rpg"></b></div></div>
+<div class="jauge" aria-hidden="true"><div class="jauge-bar" id="c-bar"></div><div class="jauge-lim jauge-lim-g"></div></div>
+<p class="simu-verdict" id="c-v" aria-live="polite"></p>
+<details class="simu-defi"><summary>Défi : avec les réglages de départ (15 000 N, Ø12, 9SMn36, s = 3), quel montage faut-il choisir ?</summary>
+<p>Avec 1 section, τ ≈ 132,6 MPa &gt; Rpg = 70 MPa : ça ne tient pas. Avec 2 sections, τ ≈ 66,3 MPa ≤ 70 MPa : il faut
+le <b>montage en chape</b>. C'est la question de l'exercice 2.1 !</p></details>
+</div></div></section>
+
+<section class="part cours-sec" id="cc-sec" aria-labelledby="cc-sec-t"><header class="part-head"><div class="part-num" aria-hidden="true">4</div>
+<div><h2 id="cc-sec-t" style="padding:14px 16px">Le nombre de sections cisaillées</h2></div></header><div class="part-body">
+<figure class="fig" style="max-width:560px"><img src="{sec_src}" width="{sw}" height="{sh}" alt="Figure 1 : axe reliant deux
+pièces, une section cisaillée en pointillés rouges. Figure 2 : axe dans une chape, deux sections cisaillées"><figcaption>En
+pointillés rouges : les sections cisaillées.</figcaption></figure>
+<ul><li>Figure 1 : l'axe est cisaillé en <strong>un seul endroit</strong>, il reprend tout l'effort.</li>
+<li>Figure 2 : l'axe est cisaillé en <strong>deux endroits</strong> ; l'effort se répartit sur les deux sections. Ce montage
+est préférable : le même axe supporte un effort deux fois plus grand.</li></ul>
+<div class="jeu"><h3>Jeu : 1 ou 2 sections ?</h3>{jeu}<p class="jeu-score" aria-live="polite"><span id="jeu-s">0 / {len(JEU_SECTIONS)}</span></p></div>
+</div></section>
+
+<section class="part cours-sec" id="cc-quiz" aria-labelledby="cc-quiz-t"><header class="part-head"><div class="part-num" aria-hidden="true">5</div>
+<div><h2 id="cc-quiz-t" style="padding:14px 16px">Quiz : vérifie tes connaissances</h2></div></header><div class="part-body">
+<p>Choisis une réponse : la correction s'affiche aussitôt.</p>
+<div class="quiz">{quiz}</div>
+<div class="quiz-score" aria-live="polite"><span id="qz-score">0 / {len(QUIZ_C)}</span><span id="qz-stars" aria-hidden="true"></span>
+<button type="button" class="btn ghost" id="qz-reset">Recommencer</button></div>
+</div></section>
+
+<div class="cours-foot no-print"><a class="btn" href="?ex=cisaillement-n1">S'entraîner : Exercice 2.1</a>
+<button type="button" class="btn ghost" id="cours-print">Imprimer le cours</button>
+<a class="btn ghost" href="?">{HOUSE} Retour à l'accueil</a></div>
+</div>"""
+
+
+COURS_C_JS = r"""
+  function initCoursCis(root) {
+    function q(s) { return root.querySelector(s); }
+    function qa(s) { return Array.prototype.slice.call(root.querySelectorAll(s)); }
+    function fr(x, d) { return x.toLocaleString("fr-FR", { minimumFractionDigits: d, maximumFractionDigits: d }); }
+    // 1. animation du glissement
+    var gs = q("#gl-s");
+    function glisse() {
+      var v = +gs.value, dy = v < 50 ? v * 0.08 : (v < 100 ? 4 + (v - 50) * 0.5 : 60);
+      q("#gl-droite").setAttribute("transform", "translate(0," + dy + ")");
+      q("#gl-o").textContent = v + " %";
+      q("#gl-plan").style.opacity = v >= 50 ? 1 : 0.25;
+      q("#gl-txt").textContent = v === 0 ? "Aucun effort : la pièce est intacte." :
+        v < 50 ? "Déformation élastique : la partie droite glisse à peine, et revient en place si l'on relâche." :
+        v < 100 ? "Au-delà de Reg, le glissement devient permanent : la pièce est déformée dans la section cisaillée." :
+        "Rupture : la pièce est coupée net dans la section cisaillée, comme par des ciseaux.";
+      q("#gl-txt").className = "glisse-txt" + (v >= 100 ? " ko" : v >= 50 ? " warn" : "");
+    }
+    gs.addEventListener("input", glisse); glisse();
+    // 3. simulateur
+    var F = q("#c-f"), D = q("#c-d"), M = q("#c-m"), SF = q("#c-s");
+    function calc() {
+      var n = +q("input[name=c-n]:checked").value, f = +F.value, d = +D.value, re = +M.value, s = +SF.value;
+      var T = f / n, S = Math.PI * d * d / 4, tau = T / S, rpg = re / 2 / s, ok = tau <= rpg;
+      q("#c-of").textContent = fr(f, 0) + " N"; q("#c-od").textContent = d + " mm";
+      q("#c-rt").textContent = fr(T, 0) + " N"; q("#c-rs").textContent = fr(S, 2) + " mm²";
+      q("#c-rtau").textContent = fr(tau, 2) + " MPa"; q("#c-rpg").textContent = fr(rpg, 2) + " MPa";
+      var bar = q("#c-bar"); bar.style.width = Math.min(100, tau / rpg * 50) + "%"; bar.classList.toggle("ko", !ok);
+      q("#c-v").className = "simu-verdict " + (ok ? "ok" : "ko");
+      q("#c-v").textContent = ok ? "✔ τ ≤ Rpg : l'axe résiste, avec la marge de sécurité choisie."
+        : "✘ τ > Rpg : l'axe ne résiste pas en toute sécurité.";
+    }
+    [F, D, M, SF].forEach(function (el) { el.addEventListener("input", calc); el.addEventListener("change", calc); });
+    qa("input[name=c-n]").forEach(function (r) { r.addEventListener("change", calc); });
+    calc();
+    // 4. jeu : 1 ou 2 sections
+    var lignes = qa(".jeu-l");
+    lignes.forEach(function (l) {
+      Array.prototype.forEach.call(l.querySelectorAll("button"), function (b) {
+        b.addEventListener("click", function () {
+          if (l.classList.contains("done")) return;
+          var ok = b.getAttribute("data-n") === l.getAttribute("data-ok");
+          l.classList.add("done", ok ? "is-ok" : "is-ko");
+          l.querySelector(".jeu-fb").textContent = ok ? "✔" : "✘ " + l.getAttribute("data-ok") + " section" + (l.getAttribute("data-ok") === "2" ? "s" : "");
+          Array.prototype.forEach.call(l.querySelectorAll("button"), function (x) { x.disabled = true; });
+          q("#jeu-s").textContent = lignes.filter(function (x) { return x.classList.contains("is-ok"); }).length + " / " + lignes.length;
+        });
+      });
+    });
+    initQuiz(root);
+    q("#cours-print").addEventListener("click", function () { window.print(); });
+  }
+"""
+
+COURS_C_CSS = """
+.pastille.n2{background:var(--bleu)}
+.glisse{display:grid; grid-template-columns:minmax(0,1.4fr) minmax(0,1fr); gap:14px; align-items:center}
+@media (max-width:760px){ .glisse{grid-template-columns:1fr} }
+.glisse-svg{width:100%; height:auto; background:#fff; border:1px solid var(--trait-fin)}
+.glisse-svg .gl-lab{font:italic 700 22px var(--f-texte); fill:var(--encre)}
+#gl-droite{transition:transform .15s}
+.glisse-ctl label{display:flex; flex-direction:column; gap:4px; font-weight:600}
+.glisse-ctl input{width:100%; accent-color:var(--rouge)}
+.glisse-txt{background:var(--vert-pale); border-left:5px solid var(--vert); padding:8px 12px; margin:10px 0 0}
+.glisse-txt.warn{background:var(--orange-pale); border-left-color:var(--orange)}
+.glisse-txt.ko{background:var(--rouge-pale); border-left-color:var(--rouge); font-weight:700}
+.simu-sec{display:flex; flex-wrap:wrap; gap:6px 18px; align-items:center; margin:10px 0 0; font-weight:600}
+.simu-sec label{font-weight:500; cursor:pointer}
+.simu-out4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:760px){ .simu-out4{grid-template-columns:repeat(2,minmax(0,1fr))} }
+.jauge-lim-g::after{content:"Rpg"; left:-13px}
+.jeu{border:2px solid var(--encre); background:#fff; padding:10px 14px; margin:12px 0 0}
+.jeu h3{margin:0 0 6px; font:700 1.1rem var(--f-titre)}
+.jeu-l{display:flex; flex-wrap:wrap; gap:6px 10px; align-items:center; padding:6px 0; border-top:1px solid var(--trait-fin)}
+.jeu-l span{flex:1 1 260px}
+.jeu-l .btn{padding:5px 10px}
+.jeu-l.is-ok{background:var(--vert-pale)} .jeu-l.is-ko{background:var(--rouge-pale)}
+.jeu-fb{min-width:5em} .jeu-l.is-ok .jeu-fb{color:var(--vert)} .jeu-l.is-ko .jeu-fb{color:var(--rouge)}
+.jeu-score{font:700 1.2rem var(--f-titre); margin:8px 0 0}
+"""
+
+
 ROUTER_JS = r"""<script>/* Aiguillage : accueil, cours ou exercice selon ?ex=… — s'exécute avant les moteurs du gabarit */
 (function () {
   "use strict";
@@ -2063,7 +2577,8 @@ ROUTER_JS = r"""<script>/* Aiguillage : accueil, cours ou exercice selon ?ex=…
     var page = document.getElementById("tpl-" + ex) && /^cours-/.test(ex) ? "tpl-" + ex : "tpl-hub";
     home.innerHTML = tpl(page);
     if (page !== "tpl-hub") document.body.classList.add("cours-page");
-    if (ex === "cours-traction-bp") initCoursBp(home);
+    if (ex === "cours-traction-n1") initCoursBp(home);
+    if (ex === "cours-cisaillement-n1") initCoursCis(home);
     if (page !== "tpl-hub") document.title = home.querySelector("h1").textContent + " — cours — __TITRE__";
     else document.title = "__TITRE__ — cours et exercices interactifs";
   }
@@ -2181,11 +2696,12 @@ def build():
     templates.append(f'<template id="tpl-modes">{MODES_HTML}</template>')
     templates.append(f'<template id="tpl-hub">{render_hub()}</template>')
     for c in COURS:
-        body = render_cours_bp() if c["key"] == "cours-traction-bp" else render_cours(c)
+        body = (render_cours_bp() if c["key"] == "cours-traction-n1" else
+                render_cours_cis() if c["key"] == "cours-cisaillement-n1" else render_cours(c))
         templates.append(f'<template id="tpl-{c["key"]}">{body}</template>')
 
     config = f"<script>window.__EXOS__ = {json.dumps(exos_cfg, ensure_ascii=False)};</script>"
-    router = ROUTER_JS.replace("__COURS_JS__", COURS_JS).replace("__TITRE__", TITRE).replace("__HOUSE__", HOUSE.replace("'", "\\'"))
+    router = ROUTER_JS.replace("__COURS_JS__", COURS_JS + COURS_C_JS).replace("__TITRE__", TITRE).replace("__HOUSE__", HOUSE.replace("'", "\\'"))
 
     page = f"""<!DOCTYPE html>
 <html lang="fr">
@@ -2195,7 +2711,7 @@ def build():
 <title>{TITRE} — cours et exercices interactifs</title>
 <meta name="description" content="Traction, compression et cisaillement : effort normal, contrainte, loi de Hooke, allongement ; effort tranchant, simple et double cisaillement, dimensionnement d'axes, de goupilles et de boulons.">
 {style}
-{CONTENT_CSS.replace("__COURS_CSS__", COURS_CSS)}
+{CONTENT_CSS.replace("__COURS_CSS__", COURS_CSS + COURS_C_CSS)}
 </head>
 <body class="no-mode">
 

@@ -10,7 +10,9 @@ const REP = require("./reponses.js");
 const FILE = path.join(__dirname, "..", "index.html");
 const URL = "file://" + FILE;
 const EXO = {
-  "traction-bp": { prefix: "b", sketch: "sk_b4_1", dr: /DR1 Q4\.1/, parts: 5, items: 31, points: 34 },
+  "cisaillement-n1": { prefix: "d", sketches: ["sk_d1_1", "sk_d2_1", "sk_d3_1"], sketch: "sk_d3_1", dr: /DR3 Q3\.1/,
+    sheets: 3, parts: 3, items: 30, points: 38 },
+  "traction-n1": { prefix: "b", sketch: "sk_b4_1", dr: /DR1 Q4\.1/, parts: 5, items: 31, points: 34 },
   traction: { prefix: "t", sketch: "sk_t1_5", dr: /DR1 Q1\.5/, parts: 4, items: 24, points: 27 },
   cisaillement: { prefix: "c", sketch: "sk_c7_2", dr: /DR1 Q7\.2/, parts: 7, items: 31, points: 34 },
 };
@@ -44,7 +46,7 @@ async function drawArrow(page, sk, x1, y1, x2, y2) {
 const nStrokes = (page, sk) => page.evaluate((id) => window.__app__.sketches[id].strokes.length, sk);
 const text = (page, sel) => page.locator(sel).first().innerText();
 
-test("accueil : quatre cartes de cours, trois cartes d'exercices, pastilles Bac pro", async () => {
+test("accueil : quatre cartes de cours, quatre cartes d'exercices, pastilles Niveau 1 et Niveau 2", async () => {
   const { context, page, errors } = await open();
   assert.ok(await page.locator("body.hub").count());
   assert.ok(await page.isVisible("#home"));
@@ -54,26 +56,24 @@ test("accueil : quatre cartes de cours, trois cartes d'exercices, pastilles Bac 
   const card = (sel) => page.locator(sel).evaluateAll((cs) => cs.map((c) => [
     c.querySelector(".mc-tag").textContent.trim(), c.querySelector("h3").textContent, c.querySelector("a").getAttribute("href")]));
   assert.deepEqual(await card(".cours-grid .mode-card"), [
-    ["Cours 1.1 Bac pro", "Traction", "?ex=cours-traction-bp"], ["Cours 1.2", "Traction et compression", "?ex=cours-traction"],
-    ["Cours 2.1 Bac pro", "Cisaillement", "?ex=cours-cisaillement-bp"], ["Cours 2.2", "Cisaillement", "?ex=cours-cisaillement"]]);
-  assert.equal(await page.locator(".cours-grid .en-edition").count(), 3);
+    ["Cours 1.1 Niveau 1", "Traction", "?ex=cours-traction-n1"], ["Cours 1.2 Niveau 2", "Traction et compression", "?ex=cours-traction"],
+    ["Cours 2.1 Niveau 1", "Cisaillement", "?ex=cours-cisaillement-n1"], ["Cours 2.2 Niveau 2", "Cisaillement", "?ex=cours-cisaillement"]]);
+  assert.equal(await page.locator(".cours-grid .en-edition").count(), 2);
   assert.deepEqual(await card(".ex-grid:not(.cours-grid) .mode-card"), [
-    ["Exercice 1.1 Bac pro", "Traction", "?ex=traction-bp"], ["Exercice 1.2", "Traction et compression", "?ex=traction"],
-    ["Exercice 2", "Cisaillement", "?ex=cisaillement"]]);
+    ["Exercice 1.1 Niveau 1", "Traction", "?ex=traction-n1"], ["Exercice 1.2 Niveau 2", "Traction et compression", "?ex=traction"],
+    ["Exercice 2.1 Niveau 1", "Cisaillement", "?ex=cisaillement-n1"], ["Exercice 2.2 Niveau 2", "Cisaillement", "?ex=cisaillement"]]);
   assert.equal(await page.locator("#home .btn-mode").count(), 0);
   // pas de débordement horizontal sur téléphone
   await page.setViewportSize({ width: 390, height: 844 });
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
   const src = fs.readFileSync(FILE, "utf8").replace(/data:[^"]+/g, "");
-  // seule mention de niveau admise : la pastille « Bac pro » demandée
-  assert.doesNotMatch(src.replace(/Bac pro/g, ""), /\b(BTS|bac(calaur[ée]at)?|session \d|[ée]preuve|acad[ée]mie|sujet z[ée]ro|brevet)\b/i);
+    assert.doesNotMatch(src, /\b(BTS|bac(calaur[ée]at)?|session \d|[ée]preuve|acad[ée]mie|sujet z[ée]ro|brevet)\b/i);
   assert.deepEqual(errors, []);
   await context.close();
 });
 
 test("cours : page « En cours d'édition » avec retour à l'accueil", async () => {
-  for (const [q, title] of [["cours-traction", "Traction et compression"], ["cours-cisaillement-bp", "Cisaillement"],
-    ["cours-cisaillement", "Cisaillement"]]) {
+  for (const [q, title] of [["cours-traction", "Traction et compression"], ["cours-cisaillement", "Cisaillement"]]) {
     const { context, page, errors } = await open("?ex=" + q);
     assert.equal((await text(page, "#home h1")).trim(), title);
     assert.match(await text(page, "#home"), /En cours d'édition/);
@@ -89,10 +89,44 @@ test("cours : page « En cours d'édition » avec retour à l'accueil", async ()
   await context.close();
 });
 
-test("cours 1.1 (bac pro) : courbe cliquable, simulateur, quiz noté", async () => {
-  const { context, page, errors } = await open("?ex=cours-traction-bp");
+test("cours 2.1 (niveau 1) : animation, simulateur à 1 ou 2 sections, jeu, quiz", async () => {
+  const { context, page, errors } = await open("?ex=cours-cisaillement-n1");
+  assert.match(await text(page, "#home .home-head"), /Cours 2\.1[\s\S]*Niveau 1[\s\S]*Cisaillement/);
+  const set = (sel, v) => page.locator(sel).evaluate((e, x) => { e.value = x; e.dispatchEvent(new Event("input")); }, v);
+  await set("#gl-s", "100");
+  assert.match(await text(page, "#gl-txt"), /Rupture/);
+  assert.match(await page.getAttribute("#gl-droite", "transform"), /translate\(0,60\)/);
+  // réglages de départ : 1 section → ne résiste pas ; 2 sections → résiste
+  assert.match(await text(page, "#c-rtau"), /132,63 MPa/);
+  assert.match(await text(page, "#c-rpg"), /70,00 MPa/);
+  assert.match(await text(page, "#c-v"), /ne résiste pas/);
+  await page.check("input[name=c-n][value='2']");
+  assert.match(await text(page, "#c-rt"), /7\s500 N/);
+  assert.match(await text(page, "#c-rtau"), /66,31 MPa/);
+  assert.match(await text(page, "#c-v"), /résiste/);
+  // jeu : toutes justes
+  const lignes = page.locator(".jeu-l");
+  for (let i = 0; i < await lignes.count(); i++) {
+    const ok = await lignes.nth(i).getAttribute("data-ok");
+    await lignes.nth(i).locator(`button[data-n="${ok}"]`).click();
+  }
+  assert.equal((await text(page, "#jeu-s")).trim(), "5 / 5");
+  // quiz : tout juste → 3 étoiles
+  const n = await page.locator(".quiz-q").count();
+  for (let i = 0; i < n; i++) {
+    const fs = page.locator(".quiz-q").nth(i);
+    await fs.locator(`input[value="${await fs.getAttribute("data-ok")}"]`).check();
+  }
+  assert.equal((await text(page, "#qz-score")).trim(), `${n} / ${n}`);
+  assert.equal((await text(page, "#qz-stars")).trim(), "★★★");
+  assert.deepEqual(errors, []);
+  await context.close();
+});
+
+test("cours 1.1 (niveau 1) : courbe cliquable, simulateur, quiz noté", async () => {
+  const { context, page, errors } = await open("?ex=cours-traction-n1");
   assert.match(await text(page, "#home h1"), /Traction/);
-  assert.match(await text(page, "#home .home-head"), /Bac pro/);
+  assert.match(await text(page, "#home .home-head"), /Niveau 1/);
   // courbe : une étape affiche son explication et met la courbe en valeur
   await page.click(".etape[data-zone=plast]");
   assert.ok(await page.isVisible(".etape-txt[data-zone=plast]"));
@@ -130,8 +164,8 @@ test("cours 1.1 (bac pro) : courbe cliquable, simulateur, quiz noté", async () 
   assert.ok(await page.isVisible("#c-quiz"));
   assert.ok(!(await page.isVisible(".cours-foot")));
   await page.emulateMedia({ media: "screen" });
-  await page.click(".cours-foot a[href='?ex=traction-bp']");
-  await page.waitForURL(/\?ex=traction-bp$/);
+  await page.click(".cours-foot a[href='?ex=traction-n1']");
+  await page.waitForURL(/\?ex=traction-n1$/);
   assert.equal(await page.locator("#home .btn-mode").count(), 2);
   assert.deepEqual(errors, []);
   await context.close();
@@ -147,17 +181,19 @@ for (const key of Object.keys(EXO)) {
     assert.ok(await page.isVisible("main.page"));
     assert.equal(await page.locator(".part").count(), X.parts);
     assert.deepEqual(await page.locator(".rail .tab:not(.tab-home)").allInnerTexts(),
-      key === "traction-bp" ? ["DP1", "DT1", "DT2", "DT3"] : ["DP1", "DT1", "DT2"]);
+      /-n1$/.test(key) ? ["DP1", "DT1", "DT2", "DT3"] : ["DP1", "DT1", "DT2"]);
     assert.ok(await page.isVisible(".rail .tab-home"));
     assert.ok(await page.isVisible(".c-top a[href='?']"));
 
-    const sk = X.sketch;
-    const deps = await page.evaluate((id) => window.__SKCFG__[id].deps, sk);
-    await drawArrow(page, sk, 0.4, 0.4, 0.6, 0.4);
-    await page.click(`#${sk} .btn-sketch`);
-    if (deps.length) {
-      assert.match(await text(page, `#${sk} .sk-wait`), /Q7\.1/);
-      assert.ok(!(await page.isVisible(`#${sk} .selfeval`)));
+    const sk = X.sketch, sks = X.sketches || [sk];
+    for (const k of sks) {
+      const deps = await page.evaluate((id) => window.__SKCFG__[id].deps, k);
+      await drawArrow(page, k, 0.4, 0.4, 0.6, 0.4);
+      await page.click(`#${k} .btn-sketch`);
+      if (deps.length) {
+        assert.match(await text(page, `#${k} .sk-wait`), /Q7\.1/);
+        assert.ok(!(await page.isVisible(`#${k} .selfeval`)));
+      }
     }
     for (const [id, ans] of answers(key)) {
       await page.fill(`#in-${id}`, ans);
@@ -166,11 +202,14 @@ for (const key of Object.keys(EXO)) {
       assert.ok(await page.isDisabled(`#in-${id}`), id + " verrouillée");
       assert.ok(await page.isVisible(`#${id} .q-expl`));
     }
-    assert.ok(await page.isVisible(`#${sk} .selfeval`));
-    assert.ok(await page.isChecked(`#${sk} .sk-corr-toggle input`));
-    for (const cb of await page.locator(`#${sk} .selfeval input[data-crit]`).all()) await cb.check();
-    await page.click(`#${sk} .btn-self`);
-    assert.match(await text(page, `#${sk} .se-score`), /4 points sur 4/);
+    for (const k of sks) {
+      assert.ok(await page.isVisible(`#${k} .selfeval`));
+      assert.ok(await page.isChecked(`#${k} .sk-corr-toggle input`));
+      const n = await page.locator(`#${k} .selfeval input[data-crit]`).count();
+      for (const cb of await page.locator(`#${k} .selfeval input[data-crit]`).all()) await cb.check();
+      await page.click(`#${k} .btn-self`);
+      assert.match(await text(page, `#${k} .se-score`), new RegExp(`${n} points sur ${n}`));
+    }
 
     assert.match(await text(page, "#score-val"), /20,0/);
     assert.equal((await text(page, "#recap .final-note")).trim(), "20,0/20");
@@ -185,7 +224,7 @@ for (const key of Object.keys(EXO)) {
     assert.ok(!(await page.isVisible(".c-top")));
     assert.ok(!(await page.isVisible(".print-nograde")));
     assert.match(await text(page, ".print-summary"), /Élève Test[\s\S]*entraînement[\s\S]*durée conseillée : 1 h [0-9]{2}[\s\S]*20,0\/20/);
-    if (key === "traction-bp") assert.ok(await page.evaluate(() => window.__app__.sketches.sk_b4_1.dec.pxPerCm === 50));
+    if (key === "traction-n1") assert.ok(await page.evaluate(() => window.__app__.sketches.sk_b4_1.dec.pxPerCm === 50));
     assert.match(await page.getAttribute(`#${sk} .sk-print-student`, "src"), /^data:image\/png/);
     assert.match(await page.getAttribute(`#${sk} .sk-print-corr`, "src"), /^data:image\/png/);
     const pdf = await page.pdf({ format: "A4" });
@@ -195,8 +234,8 @@ for (const key of Object.keys(EXO)) {
     // fenêtre des documents réponses : la feuille vierge de l'exercice
     const [popup] = await Promise.all([context.waitForEvent("page"), page.click(`#${sk} [data-act=drprint]`)]);
     await popup.waitForLoadState();
-    assert.equal(await popup.locator(".sheet").count(), 1);
-    assert.match(await popup.locator(".sheet h2").innerText(), X.dr);
+    assert.equal(await popup.locator(".sheet").count(), X.sheets || 1);
+    assert.match(await popup.locator(".sheet h2").last().innerText(), X.dr);
     assert.deepEqual(errors, []);
     await context.close();
   });

@@ -1,4 +1,4 @@
-// Tests unitaires du moteur de correction appliqué aux 83 questions des trois exercices.
+// Tests unitaires du moteur de correction appliqué aux 110 questions des quatre exercices.
 //   node --test tests/
 // Le moteur (Grading) et la configuration (__QCFG__) sont lus dans la page générée :
 // on teste exactement ce que l'élève utilisera.
@@ -24,6 +24,35 @@ function score(id, ans) {
 
 // [saisie, score attendu] : 1 juste, 0.5 demi-point d'unité, 0 faux, "invalid" refusée sans être notée
 const CASES = {
+  d1_2: [["420 MPa", 1], ["420", 0.5], ["210 MPa", 0]],
+  d1_3: [["210 MPa", 1], ["210", 0.5], ["840 MPa", 0], ["140 MPa", 0]],
+  d1_4: [["70 MPa", 1], ["70,00 MPa", 1], ["70", 0.5], ["140 MPa", 0], ["630 MPa", 0]],
+  d1_5: [["15000 N", 1], ["15 000 N", 1], ["15 kN", 1], ["15000", 0.5], ["7500 N", 0]],
+  d1_6: [["1", 1], ["1 section", 1], ["2", 0]],
+  d1_7: [["2", 1], ["2 sections", 1], ["1", 0]],
+  d1_8: [["15000 N", 1], ["15 kN", 1], ["7500 N", 0]],
+  d1_9: [["7500 N", 1], ["7,5 kN", 1], ["7500", 0.5], ["15000 N", 0], ["3750 N", 0]],
+  d1_10: [["113,1 mm²", 1], ["113,10 mm²", 1], ["113,04 mm²", 1], ["113,1", 0.5], ["452,39 mm²", 0], ["37,7 mm²", 0]],
+  d1_11: [["132,63 MPa", 1], ["132,7 MPa", 1], ["132,63", 0.5], ["66,31 MPa", 0], ["33,16 MPa", 0]],
+  d1_12: [["66,31 MPa", 1], ["66,3 MPa", 1], ["66,31", 0.5], ["132,63 MPa", 0]],
+  d1_13: [["non", 1], ["Non : 132,63 > 70", 1], ["oui", 0]],
+  d1_14: [["oui", 1], ["Oui, 66,31 < 70", 1], ["non", 0]],
+  d2_2: [["12000 N", 1], ["12 000 N", 1], ["12 kN", 1], ["12000", 0.5], ["6000 N", 0], ["12 N", 0]],
+  d2_3: [["295 MPa", 1], ["295", 0.5], ["470 MPa", 0]],
+  d2_4: [["147,5 MPa", 1], ["147,50 MPa", 1], ["147,5", 0.5], ["590 MPa", 0], ["59 MPa", 0]],
+  d2_5: [["29,5 MPa", 1], ["29,50 MPa", 1], ["29,5", 0.5], ["59 MPa", 0], ["737,5 MPa", 0]],
+  d2_6: [["406,78 mm²", 1], ["406,779 mm2", 1], ["406,78", 0.5], ["203,39 mm²", 0], ["406 mm²", 0]],
+  d2_7: [["8 mm", 1], ["8", 0.5], ["10 mm", 0], ["7 mm", 0]],
+  d2_8: [["51 mm", 1], ["51", 0.5], ["50,85 mm", 0], ["50 mm", 0], ["41 mm", 0]],
+  d2_9: [["clavette forme B 8 x 7 x 51", 1], ["Clavette forme B, 8×7×51", 1], ["forme B 8x7x51", 1], ["B 8 x 7 x 51", 1],
+         ["clavette forme A 8 x 7 x 51", 0], ["clavette forme B 10 x 8 x 51", 0], ["clavette forme B 8 x 7 x 50", 0],
+         ["8 x 7 x 51", 0]],
+  d3_2: [["15750 N", 1], ["15 750 N", 1], ["15,75 kN", 1], ["1575 daN", 1], ["15750", 0.5], ["31500 N", 0], ["3150 N", 0]],
+  d3_3: [["1256,64 mm²", 1], ["1256 mm²", 1], ["1256,6", 0.5], ["5026,55 mm²", 0], ["125,66 mm²", 0]],
+  d3_4: [["117,5 MPa", 1], ["117,5", 0.5], ["235 MPa", 0], ["14,69 MPa", 0]],
+  d3_5: [["14,69 MPa", 1], ["14,6875 MPa", 1], ["14,69", 0.5], ["29,38 MPa", 0], ["14,7 MPa", 0]],
+  d3_6: [["12,53 MPa", 1], ["12,54 MPa", 1], ["12,53", 0.5], ["25,07 MPa", 0], ["1,25 MPa", 0]],
+  d3_7: [["oui", 1], ["Oui, 12,53 < 14,69", 1], ["non", 0]],
   b1_1: [["295 MPa", 1], ["295", 0.5], ["295 N", 0.5], ["470 MPa", 0], ["235 MPa", 0]],
   b1_2: [["oui", 1], ["Oui, 40 < 295", 1], ["non", 0]],
   b1_3: [["7,38", 1], ["7,375", 1], ["7,37", 1], ["7.4", 0], ["0,14", 0]],
@@ -144,9 +173,12 @@ test("questions vides et saisies non numériques refusées sans être notées", 
 });
 
 test("barème : points des parties cohérents, durées 65 et 80 min, tracés et dépendances", () => {
-  assert.deepEqual(Object.keys(EXOS), ["traction-bp", "traction", "cisaillement"]);
-  assert.equal(EXOS["traction-bp"].minutes, 90);
-  assert.equal(Object.keys(EXOS["traction-bp"].qcfg).length, 30);
+  assert.deepEqual(Object.keys(EXOS), ["traction-n1", "traction", "cisaillement-n1", "cisaillement"]);
+  assert.equal(EXOS["traction-n1"].minutes, 90);
+  assert.equal(Object.keys(EXOS["traction-n1"].qcfg).length, 30);
+  assert.equal(EXOS["cisaillement-n1"].minutes, 70);
+  assert.equal(Object.keys(EXOS["cisaillement-n1"].qcfg).length, 27);
+  assert.equal(Object.keys(EXOS["cisaillement-n1"].skcfg).length, 3);
   assert.equal(EXOS.traction.minutes, 65);
   assert.equal(EXOS.cisaillement.minutes, 80);
   assert.equal(Object.keys(EXOS.traction.qcfg).length, 23);

@@ -5,12 +5,14 @@ GitHub Pages depuis `index.html`. Son accueil, sur le modèle de la page « Ajus
 
 | Adresse | Contenu |
 |---|---|
-| `index.html` | accueil : grille des cours, grille des exercices |
-| `?ex=cours-traction-bp` | Cours 1.1 — Traction (Bac pro) : courbe de l'essai cliquable, simulateur, quiz |
-| `?ex=cours-traction`, `?ex=cours-cisaillement-bp`, `?ex=cours-cisaillement` | cours 1.2, 2.1 (Bac pro), 2.2 — « En cours d'édition » |
-| `?ex=traction-bp` | Exercice 1.1 — Traction (Bac pro) : 5 parties, 30 questions, 1 tracé, 1 h 30 |
-| `?ex=traction` | Exercice 1.2 — Traction et compression : 4 parties, 23 questions, 1 tracé, 1 h 05 |
-| `?ex=cisaillement` | Exercice 2 — Cisaillement : 7 parties, 30 questions, 1 tracé, 1 h 20 |
+| `index.html` | accueil : grille des cours, grille des exercices (pastilles Niveau 1 / Niveau 2) |
+| `?ex=cours-traction-n1` | Cours 1.1 — Traction (Niveau 1) : courbe de l'essai cliquable, simulateur, quiz |
+| `?ex=cours-cisaillement-n1` | Cours 2.1 — Cisaillement (Niveau 1) : animation, simulateur, jeu des sections, quiz |
+| `?ex=cours-traction`, `?ex=cours-cisaillement` | cours 1.2 et 2.2 (Niveau 2) — « En cours d'édition » |
+| `?ex=traction-n1` | Exercice 1.1 — Traction (Niveau 1) : 5 parties, 30 questions, 1 tracé, 1 h 30 |
+| `?ex=traction` | Exercice 1.2 — Traction et compression (Niveau 2) : 4 parties, 23 questions, 1 tracé, 1 h 05 |
+| `?ex=cisaillement-n1` | Exercice 2.1 — Cisaillement (Niveau 1) : 3 parties, 27 questions, 3 tracés, 1 h 10 |
+| `?ex=cisaillement` | Exercice 2.2 — Cisaillement (Niveau 2) : 7 parties, 30 questions, 1 tracé, 1 h 20 |
 
 Chaque exercice propose le mode entraînement ou le mode examen, avec sa propre note pondérée par
 la durée de ses parties. Corrections apportées au contenu d'origine, tolérances et questions ajoutées :
@@ -32,7 +34,7 @@ python3 src/generer.py           # écrit index.html
 ## Tester
 
 ```sh
-node --test tests/correction.test.js                          # moteur de correction : 83 questions, cas justes, faux et limites
+node --test tests/correction.test.js                          # moteur de correction : 110 questions, cas justes, faux et limites
 NODE_PATH=$(npm root -g) node --test tests/navigateur.test.js # accueil, cours, parcours entraînement / examen, impression, tracés, DR
 ```
 

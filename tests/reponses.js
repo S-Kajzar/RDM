@@ -1,5 +1,10 @@
 // Réponses justes de référence (une par question), partagées par les tests Node et navigateur.
 module.exports = {
+  d1_2: "420 MPa", d1_3: "210 MPa", d1_4: "70 MPa", d1_5: "15000 N", d1_6: "1", d1_7: "2", d1_8: "15000 N",
+  d1_9: "7500 N", d1_10: "113,1 mm²", d1_11: "132,63 MPa", d1_12: "66,31 MPa", d1_13: "non", d1_14: "oui",
+  d2_2: "12000 N", d2_3: "295 MPa", d2_4: "147,5 MPa", d2_5: "29,5 MPa", d2_6: "406,78 mm²", d2_7: "8 mm",
+  d2_8: "51 mm", d2_9: "clavette forme B 8 x 7 x 51",
+  d3_2: "15750 N", d3_3: "1256,64 mm²", d3_4: "117,5 MPa", d3_5: "14,69 MPa", d3_6: "12,53 MPa", d3_7: "oui",
   b1_1: "295 MPa", b1_2: "oui", b1_3: "7,38",
   b2_1: "28,27 mm²", b2_2: "1746,18 N", b2_3: "2530,98 N", b2_4: "89,52 MPa", b2_5: "45 MPa", b2_6: "non",
   b3_1: "24 mm²", b3_2: "24 mm²", b3_3: "83,33 MPa", b3_4: "83,33 MPa", b3_5: "7,2",

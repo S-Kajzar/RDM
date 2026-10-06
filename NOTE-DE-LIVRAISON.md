@@ -1,13 +1,56 @@
 # Note de livraison — Résistance des matériaux : traction, compression et cisaillement
 
-## Mise à jour : niveau Bac pro (cours 1.1 et exercice 1.1)
+## Niveaux : pastilles « Niveau 1 » et « Niveau 2 »
+
+La pastille « Bac pro » devient **Niveau 1** (verte) ; les exercices d'origine et les cours à venir du même niveau
+portent la pastille **Niveau 2** (bleue). Les adresses suivent : `?ex=traction-n1`, `?ex=cours-traction-n1`,
+`?ex=cisaillement-n1`, `?ex=cours-cisaillement-n1` ; l'exercice de cisaillement d'origine devient l'exercice 2.2
+(adresse `?ex=cisaillement` inchangée). Cours 1.2 et 2.2 (Niveau 2) : « En cours d'édition ».
+
+## Niveau 1 : cours 2.1 et exercice 2.1 (cisaillement)
+
+**Sources** : « Cours – Cisaillement » et activités 6 (articulation), 7 (clavette) et 8 (grue d'atelier).
+
+**Cours 2.1 (interactif)** : définition, avec une animation où l'on augmente l'effort (déformation élastique,
+glissement permanent, rupture) ; contrainte tangentielle τ = T/S ; condition τ ≤ Rpg = Reg/s avec Reg = Re/2 ;
+simulateur d'axe à 1 ou 2 sections (effort, diamètre, acier, s) et défi repris de l'activité 6 ; nombre de sections
+cisaillées avec les figures du cours et un jeu « 1 ou 2 sections ? » ; quiz de 6 questions noté.
+
+**Exercice 2.1** : 3 parties, 27 questions, 3 tracés, 1 h 10 (25, 25 et 20 min). Documents : DP1 méthode en
+5 étapes, DT1 formulaire réduit du cisaillement, DT2 aciers et coefficients de sécurité (le même que pour
+l'exercice 1.1), DT3 dimensions des clavettes parallèles.
+
+Résultats recalculés : Reg = 210 MPa ; Rpg = 70 MPa ; S = 113,10 mm² ; τ = 132,63 MPa (solution 1, 1 section,
+**ne résiste pas**) et 66,31 MPa (solution 2, 2 sections, résiste) ; T = C / (d/2) = 180 / 0,015 = 12 000 N ;
+Reg = 147,5 MPa ; Rpg = 29,5 MPa ; S mini = 406,78 mm² ; a = 8 mm ; L = 50,85 → 51 mm ; T = 31 500 / 2 = 15 750 N ;
+S = 1 256,64 mm² ; Reg = 117,5 MPa ; Rpg = 14,69 MPa ; τ = 12,53 MPa (résiste).
+
+Corrections, interprétations et ajouts :
+- **Activité 6** : le tableau à compléter devient une suite de questions (une par case) ; les « sections à
+  repasser en rouge » deviennent le tracé Q1.1 sur le schéma d'origine (4 critères). « ζ » corrigé en τ.
+- **Activité 7** : les deux tracés (force sur l'arbre, section sur la perspective) sont réunis en un tracé sur la
+  même figure (Q2.1, 4 critères). Le sens de la force suit la flèche de rotation dessinée. Un arbre de 30 mm est
+  pris dans la ligne « 22 à 30 » du tableau (borne supérieure incluse, comme « 6 à 8 inclus ») : a = 8, b = 7.
+  Les colonnes h et s min du tableau d'origine, inutiles, ne sont pas reprises. La longueur est arrondie au
+  millimètre supérieur (51 mm) et la désignation attendue est « clavette forme B, 8 × 7 × 51 » ; aucune gamme de
+  longueurs normalisées n'étant fournie, la correction le signale sans l'exiger.
+- **Activité 8** : notations harmonisées avec le cours (« Rg = 0,5 Re » → Reg ; « k = 8 » → s ; « ζ » → τ).
+  « Aire minimum de la section cisaillée » (Q3) reformulé en « aire d'une section cisaillée » : la question vient
+  avant le calcul de Rpg, c'est donc l'aire réelle de l'axe Ø40 qui est demandée. Le double cisaillement est lu
+  sur le dessin (l'œil du vérin entre les deux branches de la chape) ; tracé Q3.1 (3 critères). 3 150 daN sont
+  convertis en 31 500 N ; la réponse en daN est acceptée.
+- Les grilles d'auto-évaluation par compétences ne sont pas reprises.
+
+---
+
+## Niveau 1 : cours 1.1 et exercice 1.1 (traction)
 
 **Sources** : « Cours – Traction » et activités 2 (treuil de levage), 3 (maillon de chaîne), 4 (barre percée) et
-5 (vis d'assemblage). Pastille verte « Bac pro » sur ce cours et cet exercice ; aucune autre mention de niveau.
+5 (vis d'assemblage). Pastille verte « Niveau 1 » sur ce cours et cet exercice.
 
-**Accueil** : les cours sont présentés en grille de cartes — 1.1 Traction (Bac pro, disponible), 1.2 Traction et
-compression, 2.1 Cisaillement (Bac pro) et 2.2 Cisaillement, ces trois derniers « En cours d'édition ». Exercices :
-1.1 Traction (Bac pro, nouveau), 1.2 Traction et compression (l'ancien exercice 1, adresse `?ex=traction` inchangée),
+**Accueil** : les cours sont présentés en grille de cartes — 1.1 Traction (Niveau 1, disponible), 1.2 Traction et
+compression, 2.1 Cisaillement (Niveau 1) et 2.2 Cisaillement. Exercices :
+1.1 Traction (Niveau 1, nouveau), 1.2 Traction et compression (l'ancien exercice 1, adresse `?ex=traction` inchangée),
 2 Cisaillement.
 
 **Cours 1.1 (interactif)** : courbe de l'essai redessinée et cliquable (zone élastique, Re, zone plastique, R,
