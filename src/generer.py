@@ -3111,48 +3111,42 @@ EXO_DEFS = [
      "parts": PARTS_BP, "docs": {"BDP1": "DP1", "BDT1": "DT1", "BDT2": "DT2", "BDT3": "DT3"}, "fig_shift": 0,
      "hero": ("bp-treuil", "Treuil électrique de levage suspendu à une poutre, câble et crochet",
               "Un treuil de levage : son câble travaille en traction."),
-     "card": "Un câble de treuil, une joue de chaîne, une barre percée et des vis d'assemblage : section, "
-             "contrainte, résistance pratique et coefficient de sécurité.",
+     "img": "bp-treuil", "kw": ["Câble", "Section", "Contrainte", "Coefficient de sécurité"],
      "sub": "Cinq situations de maintenance pour vérifier une pièce tendue : lire une résistance dans un tableau, "
             "calculer une section et une contrainte, comparer à la résistance pratique, choisir une vis."},
     {"key": "cisaillement-n1", "prefix": "d", "tag": "Exercice 1.2", "level": "Niveau 1", "title": "Cisaillement",
      "parts": PARTS_N1C, "docs": {"CDP1": "DP1", "CDT1": "DT1", "BDT2": "DT2", "CDT3": "DT3"}, "fig_shift": 0,
      "hero": ("n1-clavette", "Arbre et clavette : couple de 180 N·m, clavette forme B",
               "Une clavette transmet le couple de l'arbre au moyeu : elle travaille au cisaillement."),
-     "card": "Une articulation à choisir, une clavette à désigner et l'axe d'une grue d'atelier : sections "
-             "cisaillées, effort tranchant, contrainte et résistance pratique au glissement.",
+     "img": "n1-clavette", "kw": ["Articulation", "Clavette", "Effort tranchant", "Glissement"],
      "sub": "Trois situations de maintenance : repérer les sections cisaillées, calculer l'effort tranchant et la "
             "contrainte, comparer à la résistance pratique au glissement, choisir une solution ou une clavette."},
     {"key": "traction", "prefix": "t", "tag": "Exercice 2.1", "level": "Niveau 2", "title": "Traction et compression",
      "parts": PARTS[0:4], "docs": {"DP1": "DP1", "DT1": "DT1", "DT3": "DT2"}, "fig_shift": 0,
      "hero": ("t1-siege-fil", "Siège suspendu : poutre AC articulée sur un mur, maintenue par le fil DE",
               "Le fil d'acier DE porte le siège : on calcule sa tension, sa contrainte et son allongement."),
-     "card": "Un fil de maintien, une barre tendue, un tube comprimé et un fer plat à dimensionner : effort "
-             "normal, contrainte, loi de Hooke, allongement.",
+     "img": "t1-siege-fil", "kw": ["Effort normal", "Loi de Hooke", "Allongement", "Dimensionnement"],
      "sub": "Quatre pièces sollicitées en traction ou en compression : calculer l'effort normal et la contrainte, "
             "vérifier la condition de résistance, appliquer la loi de Hooke et dimensionner une section."},
     {"key": "cisaillement", "prefix": "c", "tag": "Exercice 2.2", "level": "Niveau 2", "title": "Cisaillement",
      "parts": PARTS[4:11], "docs": {"DP1": "DP1", "DT2": "DT1", "DT3": "DT2"}, "fig_shift": 4,
      "hero": ("c2-pince", "Pince à goupille : charges P sur les poignées, force de serrage dans les mâchoires",
               "La goupille de la pince transmet tout l'effort entre les deux branches."),
-     "card": "Goupilles, boulons, vis et axe de chape : compter les sections cisaillées, calculer la contrainte "
-             "de cisaillement, dimensionner un diamètre.",
+     "img": "c2-pince", "kw": ["Goupilles", "Boulons", "Sections cisaillées", "Diamètre"],
      "sub": "Sept assemblages à vérifier ou à dimensionner : identifier le simple ou double cisaillement, "
             "calculer l'effort tranchant et la contrainte, en déduire une section ou une charge admissible."},
     {"key": "traction-essais", "prefix": "u", "tag": "Exercice 2.3", "level": "Niveau 2", "title": "Traction",
      "parts": PARTS_23, "docs": {"EDP1": "DP1", "EDT1": "DT1"}, "fig_shift": 0,
      "hero": ("n2-ascenseur", "Coupe d'un immeuble de 15 étages : cabine d'ascenseur suspendue au câble du treuil",
               "Le câble d'ascenseur : il résiste, mais s'allonge-t-il trop ?"),
-     "card": "Essai de traction d'un acier trempé, chaîne, poutre sur socle, jauge de déformation et câble "
-             "d'ascenseur : lecture de courbe, résistance, loi de Hooke, allongement.",
+     "img": "n2-chaine", "kw": ["Essai de traction", "Chaîne", "Jauge", "Câble d'ascenseur"],
      "sub": "Cinq situations : exploiter un essai de traction, dimensionner en traction et en compression, passer "
             "d'une déformation mesurée à un effort, vérifier la résistance et l'allongement d'un câble."},
     {"key": "cisaillement-poinconnage", "prefix": "v", "tag": "Exercice 2.4", "level": "Niveau 2", "title": "Cisaillement",
      "parts": PARTS_24, "docs": {"EDP1": "DP1", "EDT1": "DT1"}, "fig_shift": 0,
      "hero": ("n2-poincon", "Poinçon descendant sur une tôle posée sur une matrice",
               "Poinçonner une tôle : on cherche à la rompre par cisaillement."),
-     "card": "Un axe de chape et le poinçonnage d'une tôle : sections cisaillées, effort maximal transmissible, "
-             "effort de découpe et résistance du poinçon.",
+     "img": "n2-poincon", "kw": ["Axe de chape", "Poinçonnage", "Effort de découpe"],
      "sub": "Deux situations : l'effort maximal transmis par un axe en double cisaillement, puis l'effort de "
             "poinçonnage d'une tôle et la limite élastique nécessaire au poinçon."},
     {"key": "concentration", "prefix": "w", "tag": "Exercice 2.5", "level": "Niveau 2",
@@ -3161,16 +3155,14 @@ EXO_DEFS = [
      "fig_shift": 0,
      "hero": ("n2-plat", "Plat rétréci avec un rayon de raccordement et percé d'un trou, tendu par une force F",
               "Un rétrécissement et un trou : deux concentrations de contraintes."),
-     "card": "Une tige de vérin à gorge et un plat rétréci et percé : lecture d'abaques, coefficient Kt, "
-             "contrainte maximale et coefficient de sécurité.",
+     "img": "n2-plat", "kw": ["Abaques", "Kt", "Contrainte maximale", "Sécurité"],
      "sub": "Deux pièces à changement brusque de section : calculer les rapports géométriques, lire Kt sur un "
             "abaque, en déduire la contrainte maximale et la marge de sécurité."},
     {"key": "etude-potence", "prefix": "p", "tag": "Étude 1", "level": "Niveau 2", "etude": True,
      "title": "Potence de trottinette",
      "parts": PARTS_POT, "docs": {"PDP1": "DP1", "PDT1": "DT1", "PDT2": "DT2", "EDT1": "DT3"}, "fig_shift": 0,
      "hero": ("n2-trottinette", "Trottinette pliante", "La potence, élément le plus sollicité de la trottinette."),
-     "card": "Statique graphique de la potence, lecture d'une simulation numérique et vérification de l'axe "
-             "de pliage au cisaillement.",
+     "img": "n2-trottinette", "kw": ["Statique graphique", "Simulation", "Axe de pliage"],
      "sub": "Vérifier le dimensionnement d'une potence de trottinette : actions mécaniques par construction "
             "graphique, coefficient de sécurité d'après une simulation, cisaillement de l'axe de pliage."},
     {"key": "etude-transbordeur", "prefix": "x", "tag": "Étude 2", "level": "Niveau 2", "etude": True,
@@ -3178,8 +3170,7 @@ EXO_DEFS = [
      "parts": PARTS_TRB, "docs": {"XDP1": "DP1", "XDT1": "DT1", "XDT2": "DT2", "XDT3": "DT3"}, "fig_shift": 0,
      "hero": ("n2-transbordeur", "Vue d'artiste d'un pont transbordeur : deux pylônes, une travée et une nacelle "
               "suspendue", "La nacelle est suspendue à dix câbles de 50 m."),
-     "card": "Choix des câbles de suspension d'une nacelle, allongement sous charge et par dilatation, "
-             "accessibilité aux personnes à mobilité réduite.",
+     "img": "n2-transbordeur", "kw": ["Câbles", "Allongement", "Dilatation", "Accessibilité"],
      "sub": "Choisir les suspentes d'une nacelle de pont transbordeur, calculer leur allongement sous la charge "
             "et sous l'effet de la température, puis conclure sur l'accessibilité de la nacelle."},
     {"key": "etude-futuroscope", "prefix": "f", "tag": "Étude 3", "level": "Niveau 2", "etude": True,
@@ -3187,8 +3178,7 @@ EXO_DEFS = [
      "parts": PARTS_FUT, "docs": {"FDP1": "DP1", "FDT1": "DT1", "FDT2": "DT2", "EDT1": "DT3"}, "fig_shift": 0,
      "hero": ("n2-futuro-plateforme", "Plateforme de l'attraction relevée, sièges inclinés",
               "La plateforme s'incline de près de 90° : chaque siège bascule."),
-     "card": "Attraction du Futuroscope : statique graphique d'un siège, compression du cylindre de "
-             "contrebalancement, simulation et coefficient de sécurité réglementaire.",
+     "img": "n2-futuro-salle", "kw": ["Statique graphique", "Compression", "Simulation", "Norme ERP"],
      "sub": "Valider le tube des cylindres de contrebalancement d'une attraction : forces sur un siège par "
             "construction graphique, contrainte de compression, simulation numérique et norme des ERP."},
 ]
@@ -3364,39 +3354,35 @@ MODES_HTML = """<h2 class="home-choose">Choisis ton mode de travail</h2>
 
 COURS = [
     {"key": "cours-traction-n1", "tag": "Cours 1.1", "level": "Niveau 1", "title": "Traction", "ready": True,
-     "desc": "L'essai de traction, la contrainte, la condition de résistance ; avec un simulateur et un quiz."},
+     "img": "n2-eprouvettes", "kw": ["Essai de traction", "Contrainte", "Condition de résistance"]},
     {"key": "cours-cisaillement-n1", "tag": "Cours 1.2", "level": "Niveau 1", "title": "Cisaillement", "ready": True,
-     "desc": "Simple et double cisaillement, contrainte tangentielle, condition de résistance ; avec une animation, "
-             "un simulateur et un quiz."},
+     "img": "c1-chape-goupille", "kw": ["Simple / double", "Contrainte tangentielle", "Condition de résistance"]},
     {"key": "cours-rdm", "tag": "Cours 2", "level": "Niveau 2", "title": "Résistance des matériaux", "ready": True,
-     "desc": "Hypothèses, torseur de cohésion, sollicitations, contraintes, traction-compression, cisaillement et "
-             "concentration de contraintes ; avec un jeu, un simulateur, une synthèse et un quiz."},
+     "img": "n2-sigma-tau", "kw": ["Torseur de cohésion", "Sollicitations", "Contraintes", "Concentration"]},
 ]
 
 
 OUVRIR = ("Ouvrir l'exercice", "Ouvrir l'étude")
 
 
+def _hub_card(c, href, label, cls=""):
+    src, w, h = png(c["img"])
+    kw = "".join(f"<li>{k}</li>" for k in c["kw"])
+    return (f'<article class="mode-card hub-card{cls}"><div class="hc-img"><img src="{src}" alt="" width="{w}" height="{h}"></div>'
+            f'<div class="mc-head"><span class="mc-tag">{c["tag"]}{pastille(c.get("level"))}</span><h3>{c["title"]}</h3></div>'
+            f'<ul class="hc-kw">{kw}</ul><a class="btn" href="{href}">{label}</a></article>')
+
+
 def _exo_card(e):
-    sk = f' · {e["n_sk"]} tracé{"s" if e["n_sk"] > 1 else ""}' if e["n_sk"] else ""
-    return (f'<article class="mode-card"><div class="mc-head"><span class="mc-tag">{e["tag"]}{pastille(e.get("level"))}'
-            f'</span><h3>{e["title"]}</h3></div>'
-            f'<p>{e["card"]}</p><p class="small ex-meta">{len(e["P"])} partie{"s" if len(e["P"]) > 1 else ""} · '
-            f'{e["n_q"]} questions{sk} · {hm(e["minutes"])}</p>'
-            f'<a class="btn" href="?ex={e["key"]}">{OUVRIR[bool(e.get("etude"))]}</a></article>')
+    return _hub_card(e, f'?ex={e["key"]}', OUVRIR[bool(e.get("etude"))])
 
 
 def render_hub():
     src, w, h = png("accueil")
     cards = "".join(_exo_card(e) for e in EXO_DEFS if not e.get("etude"))
     etudes = "".join(_exo_card(e) for e in EXO_DEFS if e.get("etude"))
-    cours = "".join(
-        f'<article class="mode-card cours-card{"" if c["ready"] else " en-edition"}"><div class="mc-head">'
-        f'<span class="mc-tag">{c["tag"]}{pastille(c.get("level"))}</span><h3>{c["title"]}</h3></div>'
-        f'<p>{c["desc"]}</p>' +
-        ('<p class="small ex-meta">Disponible</p>' if c["ready"] else '<p class="small ex-meta etat">En cours d\'édition</p>') +
-        f'<a class="btn{"" if c["ready"] else " ghost"}" href="?ex={c["key"]}">'
-        f'{"Lire le cours" if c["ready"] else "Voir"}</a></article>' for c in COURS)
+    cours = "".join(_hub_card(c, f'?ex={c["key"]}', "Lire le cours" if c["ready"] else "Voir",
+                              " cours-card" + ("" if c["ready"] else " en-edition")) for c in COURS)
     return (f'<div class="home-top"><div class="home-top-l"><header class="home-head"><h1 id="home-title">{TITRE}</h1>'
             '<p class="home-sub">Traction, compression, cisaillement et concentration de contraintes : calculer une '
             'contrainte, vérifier une pièce ou la dimensionner. Des cours, des exercices et des études de cas '
@@ -3667,7 +3653,6 @@ COURS_CSS = """
 .ex-grid .en-edition h3,.ex-grid .en-edition p{color:var(--encre-2)}
 .ex-grid .etat{font-weight:700; color:var(--orange)}
 #home .home-choose{margin-top:18px}
-.cours-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
 
 /* ---------- cours interactif ---------- */
 .cours .part{margin-bottom:22px}
@@ -4063,12 +4048,17 @@ body.hub .home-top .home-hero img{max-height:200px}
 .hub-course .btn{background:var(--jaune); color:var(--encre); border-color:var(--jaune); padding:11px 18px; white-space:nowrap}
 .hub-course .btn:hover{background:#FFD24A}
 @media (max-width:640px){ .hub-course{grid-template-columns:minmax(0,1fr)} .hub-btns{justify-content:flex-start} .hub-course .btn{white-space:normal} }
-.ex-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:16px}
-.ex-grid .mode-card p{margin:4px 0 8px; font-size:.95rem}
-.ex-grid .mode-card .ex-meta{margin:0 0 12px; font-size:.85rem}
-.ex-grid .mode-card h3{font-size:1.2rem}
-.ex-grid .mc-head{flex-direction:column; align-items:flex-start; gap:6px}
-.ex-grid .mode-card .btn{margin-top:auto; align-self:flex-start}
+.ex-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:16px}
+/* cartes de l'accueil : toutes de la même taille (image, titre sur deux lignes, mots clés) */
+#home .ex-grid .hub-card{height:var(--hc-h,392px); padding:0 0 14px; overflow:hidden}
+.ex-grid .hc-img{height:150px; display:flex; align-items:center; justify-content:center; padding:8px;
+  background:#fff; border-bottom:1.5px solid var(--encre)}
+.ex-grid .hc-img img{width:auto; height:auto; max-width:100%; max-height:100%; object-fit:contain}
+.ex-grid .mc-head{flex-direction:column; align-items:flex-start; gap:6px; padding:10px 16px 0; min-height:5.2em}
+.ex-grid .mode-card h3{font-size:1.15rem; line-height:1.15}
+.hc-kw{list-style:none; display:flex; flex-wrap:wrap; align-content:flex-start; gap:5px; margin:8px 0 0!important; padding:0 16px!important}
+.hc-kw li{margin:0!important; font:600 .8rem/1.2 var(--f-titre); background:var(--jaune-pale); border:1px solid var(--trait); padding:3px 8px; border-radius:999px}
+.ex-grid .mode-card .btn{margin:auto 16px 0; align-self:flex-start}
 
 __COURS_CSS__
 @media print{
