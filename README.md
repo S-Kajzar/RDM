@@ -25,7 +25,7 @@ la durée de ses parties. Corrections apportées au contenu d'origine, toléranc
 [`NOTE-DE-LIVRAISON.md`](NOTE-DE-LIVRAISON.md).
 
 **Ajouter un exercice** : décrire ses parties dans `src/generer.py` (liste `PARTS`), puis l'ajouter à
-`EXO_DEFS` (avec `"etude": True` pour la rubrique « Études de cas ») ; la carte apparaît d'elle-même sur l'accueil.
+`EXO_DEFS` (avec `"etude": True` pour la rubrique « Études de cas », `"img"` pour l'image de sa carte et `"kw"` pour 3 à 5 mots clés) ; la carte apparaît d'elle-même sur l'accueil.
 
 ## Régénérer la page
 
